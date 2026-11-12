@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Design Lib",
+  title: "quire",
   description: "Bookmark UI components from every library. Organize them. Hand them to your AI agent.",
 };
 

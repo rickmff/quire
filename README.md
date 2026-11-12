@@ -1,4 +1,4 @@
-# Design Lib
+# quire
 
 Bookmark UI components from every library, organize them, and hand them to your AI agent.
 
@@ -12,7 +12,7 @@ Free and open source under the MIT license.
 - Cmd+K to search everything.
 - Notes on each card, written for your agent.
 - "Copy as Markdown" turns a collection into a brief any AI agent can build from.
-- A bookmarklet ("Save to Design Lib") saves the page you are on.
+- A bookmarklet ("Save to quire") saves the page you are on.
 - Data lives in your browser (localStorage). Download or import JSON to back it up.
 
 ## Roadmap
@@ -29,4 +29,4 @@ npm install
 npm run dev
 ```
 
-The link preview API refuses private network addresses. In a sandbox without DNS, set `DESIGNLIB_SKIP_DNS_CHECK=1` for local testing only.
+The link preview API refuses private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.

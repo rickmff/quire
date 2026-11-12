@@ -29,7 +29,7 @@ async function safeUrl(raw: string): Promise<URL | null> {
   if (u.protocol !== "http:" && u.protocol !== "https:") return null;
   if (u.hostname === "localhost") return null;
   // Local sandboxes without DNS can opt out; never set this in production.
-  if (process.env.DESIGNLIB_SKIP_DNS_CHECK === "1") return u;
+  if (process.env.QUIRE_SKIP_DNS_CHECK === "1") return u;
   try {
     const addrs = isIP(u.hostname)
       ? [{ address: u.hostname }]
@@ -78,7 +78,7 @@ export async function GET(req: Request) {
       redirect: "follow",
       signal: AbortSignal.timeout(6000),
       headers: {
-        "user-agent": "Mozilla/5.0 (compatible; DesignLibBot/0.1; +https://github.com)",
+        "user-agent": "Mozilla/5.0 (compatible; QuireBot/0.1; +https://github.com)",
         accept: "text/html",
       },
     });

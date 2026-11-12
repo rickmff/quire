@@ -51,11 +51,11 @@ function Add() {
   return (
     <main className="grid min-h-dvh place-items-center p-6">
       <div className="text-center">
-        <div className="mx-auto mb-3 grid size-8 place-items-center rounded-lg bg-fg text-xs font-bold text-bg">D</div>
+        <div className="mx-auto mb-3 grid size-8 place-items-center rounded-lg bg-fg text-xs font-bold text-bg">q</div>
         <p className="text-sm font-medium">{text}</p>
         {title && <p className="mt-1 line-clamp-2 max-w-xs text-xs text-muted">{title}</p>}
         <a href="/" className="mt-4 inline-block text-xs text-muted underline">
-          Open Design Lib
+          Open quire
         </a>
       </div>
     </main>

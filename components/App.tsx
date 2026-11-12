@@ -345,7 +345,7 @@ function Sidebar(props: {
   useEffect(() => setOrigin(window.location.origin), []);
 
   const bookmarklet = origin
-    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'designlib','width=420,height=320')})()`
+    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=420,height=320')})()`
     : "#";
 
   const Item = ({ id, name, count }: { id: View; name: string; count: number }) => {
@@ -381,8 +381,8 @@ function Sidebar(props: {
     <aside className="border-line md:sticky md:top-0 md:h-dvh md:w-60 md:shrink-0 md:border-r">
       <div className="flex h-full flex-col gap-6 overflow-y-auto px-4 py-4 md:py-5">
         <div className="flex items-center gap-2 px-1">
-          <div className="grid size-6 place-items-center rounded-md bg-fg text-[11px] font-bold text-bg">D</div>
-          <span className="text-sm font-semibold tracking-tight">Design Lib</span>
+          <div className="grid size-6 place-items-center rounded-md bg-fg text-[11px] font-bold text-bg">q</div>
+          <span className="text-sm font-semibold tracking-tight">quire</span>
         </div>
 
         <nav className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
@@ -447,7 +447,7 @@ function Sidebar(props: {
               onClick={(e) => e.preventDefault()}
               className="mt-2 block rounded-lg bg-fg px-3 py-1.5 text-center text-sm font-medium text-bg"
             >
-              + Save to Design Lib
+              + Save to quire
             </a>
           </div>
           <a
@@ -622,7 +622,7 @@ function download(lib: Library) {
   const blob = new Blob([JSON.stringify(lib, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `design-lib-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `quire-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
 }

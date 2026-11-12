@@ -24,7 +24,7 @@ export type Library = {
   collections: Collection[];
 };
 
-const KEY = "designlib:v1";
+const KEY = "quire:v1";
 const EMPTY: Library = { version: 1, bookmarks: [], collections: [] };
 
 export const uid = () =>
@@ -108,7 +108,7 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   const lines = [
     `# ${name}`,
     "",
-    "UI components saved with Design Lib. Use these as the building blocks for the UI.",
+    "UI components saved with quire. Use these as the building blocks for the UI.",
     "Install each one with its command when present; otherwise open the source link and follow its docs.",
     "",
   ];
