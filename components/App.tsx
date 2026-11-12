@@ -628,7 +628,8 @@ function Card({
               className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.015]"
             />
           ) : (
-            <div className="grid size-full place-items-center">
+            <div className="flex size-full flex-col items-center justify-center gap-2.5">
+              <Favicon url={b.url} />
               <span className="text-[15px] font-medium tracking-tight text-faint">{b.library}</span>
             </div>
           )}
@@ -809,4 +810,15 @@ function mergeLibrary(a: Library, b: Library): Library {
     collections: [...a.collections, ...(b.collections ?? []).filter((c) => !colIds.has(c.id))],
     bookmarks: [...b.bookmarks.filter((x) => !urls.has(x.url)), ...a.bookmarks],
   };
+}
+
+function Favicon({ url }: { url: string }) {
+  const [ok, setOk] = useState(true);
+  let src = "";
+  try {
+    src = new URL("/favicon.ico", url).href;
+  } catch {}
+  if (!src || !ok) return null;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="" width={20} height={20} onError={() => setOk(false)} className="size-5 rounded opacity-70 grayscale" />;
 }
