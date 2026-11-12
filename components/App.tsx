@@ -29,6 +29,8 @@ export default function App() {
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
+  const [libFilter, setLibFilter] = useState<string | null>(null);
+  const [sel, setSel] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -118,10 +120,48 @@ export default function App() {
     };
   }, [add]);
 
-  const visible = useMemo(
-    () => (view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view)),
-    [lib.bookmarks, view],
-  );
+  const visible = useMemo(() => {
+    const inView = view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view);
+    return libFilter ? inView.filter((b) => b.library === libFilter) : inView;
+  }, [lib.bookmarks, view, libFilter]);
+
+  const libraries = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const b of lib.bookmarks) m.set(b.library, (m.get(b.library) ?? 0) + 1);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
+  }, [lib.bookmarks]);
+
+  useEffect(() => setSel(-1), [view, libFilter]);
+
+  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to delete.
+  const navRef = useRef<{ visible: Bookmark[]; sel: number }>({ visible: [], sel: -1 });
+  navRef.current = { visible, sel };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (palette || e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.target as HTMLElement)?.closest("input, textarea, select")) return;
+      const { visible: v, sel: i } = navRef.current;
+      if (!v.length) return;
+      const cols = Math.max(1, Math.round((document.querySelector("[data-grid]")?.clientWidth ?? 1) / 340));
+      const move = (d: number) => {
+        e.preventDefault();
+        const n = Math.min(v.length - 1, Math.max(0, (i < 0 ? -d : i) + d));
+        setSel(n);
+        document.querySelector(`[data-card="${v[n].id}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      };
+      const cur = v[i];
+      if (e.key === "ArrowRight" || e.key === "l") move(1);
+      else if (e.key === "ArrowLeft" || e.key === "h") move(-1);
+      else if (e.key === "ArrowDown" || e.key === "j") move(cols);
+      else if (e.key === "ArrowUp" || e.key === "k") move(-cols);
+      else if (e.key === "Escape") setSel(-1);
+      else if (cur && e.key === "Enter") window.open(cur.url, "_blank", "noopener");
+      else if (cur && e.key === "c") document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-copy]`)?.click();
+      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-delete]`)?.click();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [palette]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -242,6 +282,11 @@ export default function App() {
             <span className="font-medium">{viewName}</span>
             <span className="text-faint tabular-nums">{visible.length || ""}</span>
           </h1>
+          {libFilter && (
+            <button onClick={() => setLibFilter(null)} className="text-[12px] text-muted transition hover:text-fg" title="Clear filter">
+              {libFilter} <span className="text-faint">×</span>
+            </button>
+          )}
         </div>
 
         {ready && lib.bookmarks.length === 0 ? (
@@ -249,12 +294,13 @@ export default function App() {
         ) : ready && visible.length === 0 ? (
           <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {visible.map((b) => (
               <Card
                 key={b.id}
                 b={b}
                 lib={lib}
+                selected={visible[sel]?.id === b.id}
                 onMove={(cid) => {
                   moveTo(b.id, cid);
                   flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
@@ -332,6 +378,16 @@ export default function App() {
               </Command.Item>
             ))}
           </Command.Group>
+          {libraries.length > 1 && (
+            <Command.Group heading="Filter by library">
+              {libraries.map((name) => (
+                <Command.Item key={name} value={`filter library ${name}`} onSelect={run(() => setLibFilter(name))} className={itemCls}>
+                  {name}
+                  {libFilter === name && <span className="ml-auto text-faint">on</span>}
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
           <Command.Group heading={`Agent · ${viewName}`}>
             <Command.Item onSelect={run(() => copy(exportMarkdown(lib, exportView), "Copied for your agent"))} className={itemCls}>
               Copy as Markdown for an AI agent
@@ -526,6 +582,7 @@ function NavItem({
 function Card({
   b,
   lib,
+  selected,
   onMove,
   onDelete,
   onNote,
@@ -533,6 +590,7 @@ function Card({
 }: {
   b: Bookmark;
   lib: Library;
+  selected: boolean;
   onMove: (cid: string | null) => void;
   onDelete: () => void;
   onNote: (note: string) => void;
@@ -548,6 +606,7 @@ function Card({
         e.dataTransfer.setData("text/bookmark-id", b.id);
         e.dataTransfer.effectAllowed = "move";
       }}
+      data-card={b.id}
       className="group pop"
     >
       <div className="relative">
@@ -555,7 +614,7 @@ function Card({
           href={b.url}
           target="_blank"
           rel="noreferrer"
-          className="block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset"
+          className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}
           tabIndex={-1}
         >
           {b.image && imgOk ? (
@@ -576,7 +635,7 @@ function Card({
         </a>
 
         <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
-          <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy}>
+          <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
             <CopyIcon />
           </IconBtn>
           <IconBtn label="Note for your agent" onClick={() => setEditing(true)}>
@@ -598,7 +657,7 @@ function Card({
               ))}
             </select>
           </label>
-          <IconBtn label="Delete" onClick={onDelete}>
+          <IconBtn label="Delete" onClick={onDelete} data="delete">
             <TrashIcon />
           </IconBtn>
         </div>
@@ -650,10 +709,11 @@ function Card({
   );
 }
 
-function IconBtn({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+function IconBtn({ label, onClick, children, data }: { label: string; onClick: () => void; children: React.ReactNode; data?: string }) {
   return (
     <button
       onClick={onClick}
+      {...(data ? { [`data-${data}`]: "" } : {})}
       aria-label={label}
       title={label}
       className="grid size-6 place-items-center rounded text-muted transition hover:bg-hover hover:text-fg"

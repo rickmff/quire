@@ -9,7 +9,8 @@ Free and open source under the MIT license.
 - Paste any component link (or press Cmd+V anywhere) to save it as a card.
 - Known libraries are detected automatically. shadcn/ui, Magic UI and Aceternity links get their `npx shadcn add` command.
 - Collections in a sidebar. Drag a card onto a collection to move it. Double-click a collection to rename it.
-- Cmd+K to search everything.
+- Cmd+K to search everything and filter by library.
+- Keyboard: arrows or h/j/k/l to move between cards, Enter to open, c to copy, Backspace to delete (with undo).
 - Notes on each card, written for your agent.
 - Cmd+K → "Copy as Markdown for an AI agent" turns a collection into a brief any agent can build from. Export and import backups live there too.
 - A bookmarklet ("Save to quire") saves the page you are on.
