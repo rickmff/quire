@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fafafa;
+  --bg: #fcfcfc;
   --panel: #ffffff;
-  --fg: #0a0a0a;
-  --muted: #737373;
-  --line: #e5e5e5;
-  --accent: #0a0a0a;
+  --fg: #111111;
+  --muted: #8f8f8f;
+  --faint: #c4c4c4;
+  --line: #ededed;
+  --hover: rgb(0 0 0 / 0.035);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0a0a0a;
-    --panel: #141414;
-    --fg: #fafafa;
-    --muted: #8a8a8a;
-    --line: #262626;
-    --accent: #fafafa;
+    --bg: #0b0b0b;
+    --panel: #111111;
+    --fg: #ececec;
+    --muted: #7a7a7a;
+    --faint: #474747;
+    --line: #1d1d1d;
+    --hover: rgb(255 255 255 / 0.04);
     color-scheme: dark;
   }
 }
@@ -27,16 +29,32 @@
   --color-panel: var(--panel);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-line: var(--line);
-  --color-accent: var(--accent);
-  --font-sans: ui-sans-serif, -apple-system, "Inter", "Segoe UI", system-ui, sans-serif;
+  --color-hover: var(--hover);
+  --font-sans: "Inter", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 }
 
 html, body { background: var(--bg); color: var(--fg); }
-body { -webkit-font-smoothing: antialiased; }
+body {
+  -webkit-font-smoothing: antialiased;
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  font-feature-settings: "cv11", "ss01";
+}
+::selection { background: color-mix(in srgb, var(--fg) 14%, transparent); }
+:focus-visible { outline: 1px solid var(--muted); outline-offset: 2px; border-radius: 6px; }
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 
-[cmdk-overlay] { position: fixed; inset: 0; background: rgb(0 0 0 / 0.35); backdrop-filter: blur(2px); z-index: 40; }
-[cmdk-dialog] { position: fixed; top: 14vh; left: 50%; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); z-index: 50; }
-[cmdk-item][data-selected="true"] { background: color-mix(in srgb, var(--fg) 8%, transparent); }
-[cmdk-group-heading] { padding: 8px 12px 4px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+[cmdk-overlay] { position: fixed; inset: 0; background: rgb(0 0 0 / 0.18); z-index: 40; animation: fade 120ms ease-out; }
+[cmdk-dialog] { position: fixed; top: 16vh; left: 50%; transform: translateX(-50%); width: min(520px, calc(100vw - 32px)); z-index: 50; animation: rise 140ms cubic-bezier(.2,.8,.2,1); }
+[cmdk-item] { transition: background 80ms; }
+[cmdk-item][data-selected="true"] { background: var(--hover); color: var(--fg); }
+[cmdk-group-heading] { padding: 10px 10px 4px; font-size: 11px; color: var(--muted); }
+
+@keyframes fade { from { opacity: 0 } }
+@keyframes rise { from { opacity: 0; transform: translate(-50%, 4px) } }
+@keyframes pop { from { opacity: 0; transform: translateY(3px) } }
+.pop { animation: pop 160ms cubic-bezier(.2,.8,.2,1); }
+[cmdk-input]:focus-visible { outline: none; }

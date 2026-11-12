@@ -16,35 +16,36 @@ import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 type View = "all" | null | string; // null = Inbox
 
 const EXAMPLES = [
-  "https://magicui.design/docs/components/marquee",
-  "https://ui.aceternity.com/components/3d-card-effect",
-  "https://ui.shadcn.com/docs/components/command",
+  "magicui.design/docs/components/marquee",
+  "ui.aceternity.com/components/3d-card-effect",
+  "ui.shadcn.com/docs/components/command",
 ];
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
   const [view, setView] = useState<View>("all");
   const [input, setInput] = useState("");
-  const [filter, setFilter] = useState("");
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const toastTimer = useRef<number | undefined>(undefined);
 
   const flash = useCallback((msg: string) => {
     setToast(msg);
-    window.clearTimeout((flash as unknown as { t?: number }).t);
-    (flash as unknown as { t?: number }).t = window.setTimeout(() => setToast(null), 1800);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 1600);
   }, []);
 
   const add = useCallback(
     async (raw: string) => {
       const url = normalizeUrl(raw);
-      if (!url) return flash("That doesn't look like a link");
+      if (!url) return flash("Not a link");
       if (lib.bookmarks.some((b) => b.url === url)) return flash("Already saved");
       const id = uid();
       const m = matchLibrary(url);
-      const collectionId = view === "all" ? null : view;
       const draft: Bookmark = {
         id,
         url,
@@ -52,7 +53,7 @@ export default function App() {
         library: m.library,
         install: m.install,
         tags: [],
-        collectionId,
+        collectionId: view === "all" ? null : view,
         createdAt: Date.now(),
       };
       update((l) => ({ ...l, bookmarks: [draft, ...l.bookmarks] }));
@@ -72,7 +73,6 @@ export default function App() {
     [lib.bookmarks, update, view, flash],
   );
 
-  // Global shortcuts and paste-to-save.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const typing = (e.target as HTMLElement)?.closest("input, textarea, select");
@@ -82,6 +82,8 @@ export default function App() {
       } else if (e.key === "/" && !typing) {
         e.preventDefault();
         inputRef.current?.focus();
+      } else if (e.key === "Escape" && typing) {
+        (e.target as HTMLElement).blur();
       }
     };
     const onPaste = (e: ClipboardEvent) => {
@@ -100,20 +102,13 @@ export default function App() {
     };
   }, [add]);
 
-  const visible = useMemo(() => {
-    const base =
-      view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view);
-    const q = filter.trim().toLowerCase();
-    if (!q) return base;
-    return base.filter((b) =>
-      [b.title, b.library, b.description, b.url, b.note, ...b.tags]
-        .filter(Boolean)
-        .some((s) => s!.toLowerCase().includes(q)),
-    );
-  }, [lib.bookmarks, view, filter]);
+  const visible = useMemo(
+    () => (view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view)),
+    [lib.bookmarks, view],
+  );
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { inbox: 0 };
+    const c: Record<string, number> = {};
     for (const b of lib.bookmarks) {
       const k = b.collectionId ?? "inbox";
       c[k] = (c[k] ?? 0) + 1;
@@ -121,16 +116,34 @@ export default function App() {
     return c;
   }, [lib.bookmarks]);
 
-  const viewName =
-    view === "all" ? "All" : view === null ? "Inbox" : lib.collections.find((c) => c.id === view)?.name ?? "All";
+  const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
+  const viewName = view === "all" ? "All" : view === null ? "Inbox" : (current?.name ?? "All");
+  const exportView = view === "all" ? "all" : view;
 
   const createCollection = (name: string) => {
     const n = name.trim();
-    if (!n) return setNewCol(null);
+    setNewCol(null);
+    if (!n) return;
     const id = uid();
     update((l) => ({ ...l, collections: [...l.collections, { id, name: n, createdAt: Date.now() }] }));
-    setNewCol(null);
     setView(id);
+  };
+
+  const renameCollection = (id: string, name: string) => {
+    setRenaming(null);
+    const n = name.trim();
+    if (!n) return;
+    update((l) => ({ ...l, collections: l.collections.map((c) => (c.id === id ? { ...c, name: n } : c)) }));
+  };
+
+  const deleteCollection = (id: string) => {
+    update((l) => ({
+      ...l,
+      collections: l.collections.filter((c) => c.id !== id),
+      bookmarks: l.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
+    }));
+    setView("all");
+    flash("Collection removed");
   };
 
   const moveTo = (bookmarkId: string, collectionId: string | null) =>
@@ -148,7 +161,16 @@ export default function App() {
     }
   };
 
-  const exportView = view === "all" ? "all" : view;
+  const copyInstall = () => {
+    const cmds = visible.map((b) => b.install).filter(Boolean).join("\n");
+    if (!cmds) return flash("No install commands here");
+    copy(cmds, "Install commands copied");
+  };
+
+  const run = (fn: () => void) => () => {
+    setPalette(false);
+    fn();
+  };
 
   return (
     <div className="flex min-h-dvh flex-col md:flex-row">
@@ -160,83 +182,67 @@ export default function App() {
         newCol={newCol}
         setNewCol={setNewCol}
         createCollection={createCollection}
+        renaming={renaming}
+        setRenaming={setRenaming}
+        renameCollection={renameCollection}
         moveTo={moveTo}
-        onDeleteCollection={(id) => {
-          update((l) => ({
-            ...l,
-            collections: l.collections.filter((c) => c.id !== id),
-            bookmarks: l.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
-          }));
-          setView("all");
-        }}
-        onCopyMarkdown={() => copy(exportMarkdown(lib, exportView), "Copied for your agent")}
-        onCopyInstall={() => {
-          const cmds = visible.map((b) => b.install).filter(Boolean).join("\n");
-          if (!cmds) return flash("No install commands here");
-          copy(cmds, "Install commands copied");
-        }}
-        onDownload={() => download(lib)}
-        onImport={(data) => {
-          update((l) => mergeLibrary(l, data));
-          flash("Imported");
-        }}
+        openPalette={() => setPalette(true)}
       />
 
-      <main className="flex-1 px-4 pb-16 md:px-8">
-        <header className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-bg/85 px-4 py-4 backdrop-blur md:-mx-8 md:px-8">
+      <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
+        <header className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
-            className="flex flex-1 items-center gap-2 rounded-xl border border-line bg-panel px-3 focus-within:border-fg/40"
+            className="flex h-14 items-center gap-3 border-b border-line"
             onSubmit={(e) => {
               e.preventDefault();
               add(input);
               setInput("");
             }}
           >
-            <span className="text-muted">+</span>
+            <PlusIcon />
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste a component link and press Enter"
-              className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted"
+              placeholder="Paste a link"
+              className="h-full w-full bg-transparent outline-none placeholder:text-faint"
               aria-label="Component link"
+              autoComplete="off"
+              spellCheck={false}
             />
-            <kbd className="hidden rounded border border-line px-1.5 text-[11px] text-muted sm:block">/</kbd>
+            <button
+              type="button"
+              onClick={() => setPalette(true)}
+              className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
+              aria-label="Open command menu"
+            >
+              ⌘K
+            </button>
           </form>
-          <button
-            onClick={() => setPalette(true)}
-            className="flex h-11 items-center gap-2 rounded-xl border border-line bg-panel px-3 text-sm text-muted hover:text-fg"
-            aria-label="Search"
-          >
-            <span className="hidden sm:inline">Search</span>
-            <kbd className="rounded border border-line px-1.5 text-[11px]">⌘K</kbd>
-          </button>
         </header>
 
-        <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h1 className="text-lg font-semibold tracking-tight">
-            {viewName} <span className="font-normal text-muted">{visible.length}</span>
+        <div className="flex h-12 items-center justify-between">
+          <h1 className="flex items-baseline gap-2">
+            <span className="font-medium">{viewName}</span>
+            <span className="text-faint tabular-nums">{visible.length || ""}</span>
           </h1>
-          {lib.bookmarks.length > 0 && (
-            <input
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter"
-              className="h-8 w-36 rounded-lg border border-line bg-transparent px-2 text-sm outline-none placeholder:text-muted focus:border-fg/40"
-            />
-          )}
         </div>
 
         {ready && lib.bookmarks.length === 0 ? (
-          <Empty onAdd={add} />
+          <Empty onAdd={(u) => add(`https://${u}`)} />
+        ) : ready && visible.length === 0 ? (
+          <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {visible.map((b) => (
               <Card
                 key={b.id}
                 b={b}
                 lib={lib}
-                onMove={(cid) => moveTo(b.id, cid)}
+                onMove={(cid) => {
+                  moveTo(b.id, cid);
+                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
+                }}
                 onDelete={() => update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== b.id) }))}
                 onNote={(note) =>
                   update((l) => ({
@@ -244,85 +250,117 @@ export default function App() {
                     bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)),
                   }))
                 }
-                onCopy={() =>
-                  b.install ? copy(b.install, "Install command copied") : copy(b.url, "Link copied")
-                }
+                onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
               />
             ))}
           </div>
         )}
       </main>
 
-      <Command.Dialog open={palette} onOpenChange={setPalette} label="Search" className="overflow-hidden rounded-2xl border border-line bg-panel shadow-2xl">
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json"
+        className="hidden"
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          try {
+            const data = JSON.parse(await f.text()) as Library;
+            update((l) => mergeLibrary(l, data));
+            flash("Imported");
+          } catch {
+            flash("Not a quire file");
+          }
+          e.target.value = "";
+        }}
+      />
+
+      <Command.Dialog
+        open={palette}
+        onOpenChange={setPalette}
+        label="Command menu"
+        className="overflow-hidden rounded-xl border border-line bg-panel shadow-[0_16px_48px_-12px_rgb(0_0_0/0.25)]"
+      >
         <Command.Input
           autoFocus
-          placeholder="Search bookmarks, collections, actions"
-          className="h-12 w-full border-b border-line bg-transparent px-4 text-sm outline-none placeholder:text-muted"
+          placeholder="Search or run a command"
+          className="h-12 w-full border-b border-line bg-transparent px-4 outline-none placeholder:text-faint"
         />
-        <Command.List className="max-h-[50vh] overflow-y-auto p-2">
-          <Command.Empty className="px-3 py-6 text-center text-sm text-muted">Nothing found.</Command.Empty>
-          <Command.Group heading="Bookmarks">
-            {lib.bookmarks.map((b) => (
-              <Command.Item
-                key={b.id}
-                value={`${b.title} ${b.library} ${b.tags.join(" ")} ${b.id}`}
-                onSelect={() => {
-                  window.open(b.url, "_blank", "noopener");
-                  setPalette(false);
-                }}
-                className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm"
-              >
-                <span className="truncate">{b.title}</span>
-                <span className="shrink-0 text-xs text-muted">{b.library}</span>
-              </Command.Item>
-            ))}
-          </Command.Group>
-          <Command.Group heading="Collections">
+        <Command.List className="max-h-[52vh] overflow-y-auto p-1.5">
+          <Command.Empty className="px-3 py-8 text-center text-muted">No results</Command.Empty>
+          {lib.bookmarks.length > 0 && (
+            <Command.Group heading="Bookmarks">
+              {lib.bookmarks.map((b) => (
+                <Command.Item
+                  key={b.id}
+                  value={`${b.title} ${b.library} ${b.tags.join(" ")} ${b.note ?? ""} ${b.id}`}
+                  onSelect={run(() => window.open(b.url, "_blank", "noopener"))}
+                  className={itemCls}
+                >
+                  <span className="truncate">{b.title}</span>
+                  <span className="ml-auto shrink-0 text-muted">{b.library}</span>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+          <Command.Group heading="Go to">
             {[{ id: "all", name: "All" }, { id: "inbox", name: "Inbox" }, ...lib.collections].map((c) => (
               <Command.Item
                 key={c.id}
                 value={`go ${c.name} ${c.id}`}
-                onSelect={() => {
-                  setView(c.id === "all" ? "all" : c.id === "inbox" ? null : c.id);
-                  setPalette(false);
-                }}
-                className="cursor-pointer rounded-lg px-3 py-2 text-sm"
+                onSelect={run(() => setView(c.id === "all" ? "all" : c.id === "inbox" ? null : c.id))}
+                className={itemCls}
               >
-                Go to {c.name}
+                {c.name}
               </Command.Item>
             ))}
           </Command.Group>
-          <Command.Group heading="Actions">
-            <Command.Item
-              onSelect={() => {
-                setPalette(false);
-                setNewCol("");
-              }}
-              className="cursor-pointer rounded-lg px-3 py-2 text-sm"
-            >
+          <Command.Group heading={`Agent · ${viewName}`}>
+            <Command.Item onSelect={run(() => copy(exportMarkdown(lib, exportView), "Copied for your agent"))} className={itemCls}>
+              Copy as Markdown for an AI agent
+            </Command.Item>
+            <Command.Item onSelect={run(copyInstall)} className={itemCls}>
+              Copy install commands
+            </Command.Item>
+          </Command.Group>
+          <Command.Group heading="Library">
+            <Command.Item onSelect={run(() => setNewCol(""))} className={itemCls}>
               New collection
             </Command.Item>
-            <Command.Item
-              onSelect={() => {
-                setPalette(false);
-                copy(exportMarkdown(lib, exportView), "Copied for your agent");
-              }}
-              className="cursor-pointer rounded-lg px-3 py-2 text-sm"
-            >
-              Copy “{viewName}” for an AI agent
+            {current && (
+              <>
+                <Command.Item onSelect={run(() => setRenaming(current.id))} className={itemCls}>
+                  Rename “{current.name}”
+                </Command.Item>
+                <Command.Item onSelect={run(() => deleteCollection(current.id))} className={itemCls}>
+                  Delete “{current.name}”
+                </Command.Item>
+              </>
+            )}
+            <Command.Item onSelect={run(() => download(lib))} className={itemCls}>
+              Export backup (JSON)
+            </Command.Item>
+            <Command.Item onSelect={run(() => fileRef.current?.click())} className={itemCls}>
+              Import backup
             </Command.Item>
           </Command.Group>
         </Command.List>
       </Command.Dialog>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-fg px-4 py-2 text-sm text-bg shadow-lg">
+        <div
+          role="status"
+          className="pop fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-line bg-panel px-3.5 py-1.5 text-muted shadow-[0_6px_20px_-8px_rgb(0_0_0/0.2)]"
+        >
           {toast}
         </div>
       )}
     </div>
   );
 }
+
+const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
 function Sidebar(props: {
   lib: Library;
@@ -332,68 +370,48 @@ function Sidebar(props: {
   newCol: string | null;
   setNewCol: (v: string | null) => void;
   createCollection: (name: string) => void;
+  renaming: string | null;
+  setRenaming: (id: string | null) => void;
+  renameCollection: (id: string, name: string) => void;
   moveTo: (bookmarkId: string, collectionId: string | null) => void;
-  onDeleteCollection: (id: string) => void;
-  onCopyMarkdown: () => void;
-  onCopyInstall: () => void;
-  onDownload: () => void;
-  onImport: (data: Library) => void;
+  openPalette: () => void;
 }) {
   const { lib, view, setView, counts, newCol, setNewCol } = props;
-  const fileRef = useRef<HTMLInputElement>(null);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
 
   const bookmarklet = origin
-    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=420,height=320')})()`
+    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
     : "#";
 
-  const Item = ({ id, name, count }: { id: View; name: string; count: number }) => {
-    const [over, setOver] = useState(false);
-    const active = view === id;
-    return (
-      <div className="group relative">
-        <button
-          onClick={() => setView(id)}
-          onDragOver={(e) => {
-            if (id === "all") return;
-            e.preventDefault();
-            setOver(true);
-          }}
-          onDragLeave={() => setOver(false)}
-          onDrop={(e) => {
-            setOver(false);
-            const bid = e.dataTransfer.getData("text/bookmark-id");
-            if (bid && id !== "all") props.moveTo(bid, id);
-          }}
-          className={`flex w-full shrink-0 items-center justify-between gap-3 rounded-lg px-2.5 py-1.5 text-left text-sm whitespace-nowrap ${
-            active ? "bg-fg/[0.07] font-medium" : "text-muted hover:text-fg"
-          } ${over ? "ring-1 ring-fg/40" : ""}`}
-        >
-          <span className="truncate">{name}</span>
-          <span className="text-xs text-muted">{count}</span>
-        </button>
-      </div>
-    );
-  };
-
   return (
-    <aside className="border-line md:sticky md:top-0 md:h-dvh md:w-60 md:shrink-0 md:border-r">
-      <div className="flex h-full flex-col gap-6 overflow-y-auto px-4 py-4 md:py-5">
-        <div className="flex items-center gap-2 px-1">
-          <div className="grid size-6 place-items-center rounded-md bg-fg text-[11px] font-bold text-bg">q</div>
-          <span className="text-sm font-semibold tracking-tight">quire</span>
+    <aside className="md:sticky md:top-0 md:h-dvh md:w-52 md:shrink-0">
+      <div className="flex h-full flex-col px-3 pt-4 md:px-4">
+        <div className="flex h-10 items-center px-2 md:h-6">
+          <span className="font-medium tracking-tight">quire</span>
         </div>
 
-        <nav className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
-          <Item id="all" name="All" count={lib.bookmarks.length} />
-          <Item id={null} name="Inbox" count={counts.inbox ?? 0} />
-          <div className="hidden px-2.5 pt-4 pb-1 text-[11px] tracking-wide text-muted uppercase md:block">
-            Collections
-          </div>
-          {lib.collections.map((c) => (
-            <Item key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} />
-          ))}
+        <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:flex-col md:overflow-visible md:pb-0">
+          <NavItem id="all" name="All" count={lib.bookmarks.length} {...props} />
+          <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
+          <div className="hidden h-6 md:block" />
+          {lib.collections.map((c) =>
+            props.renaming === c.id ? (
+              <input
+                key={c.id}
+                autoFocus
+                defaultValue={c.name}
+                onBlur={(e) => props.renameCollection(c.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  if (e.key === "Escape") props.setRenaming(null);
+                }}
+                className="h-7 shrink-0 rounded-md bg-hover px-2 outline-none"
+              />
+            ) : (
+              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
+            ),
+          )}
           {newCol !== null ? (
             <input
               autoFocus
@@ -404,70 +422,82 @@ function Sidebar(props: {
                 if (e.key === "Enter") props.createCollection(newCol);
                 if (e.key === "Escape") setNewCol(null);
               }}
-              placeholder="Collection name"
-              className="h-8 shrink-0 rounded-lg border border-line bg-transparent px-2.5 text-sm outline-none"
+              placeholder="Name"
+              className="h-7 shrink-0 rounded-md bg-hover px-2 outline-none placeholder:text-faint"
             />
           ) : (
             <button
               onClick={() => setNewCol("")}
-              className="shrink-0 rounded-lg px-2.5 py-1.5 text-left text-sm whitespace-nowrap text-muted hover:text-fg"
+              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted"
             >
-              + New collection
+              New collection
             </button>
           )}
         </nav>
 
-        <div className="mt-auto hidden flex-col gap-1 text-sm md:flex">
-          <div className="px-2.5 pb-1 text-[11px] tracking-wide text-muted uppercase">For your agent</div>
-          <SideAction onClick={props.onCopyMarkdown}>Copy as Markdown</SideAction>
-          <SideAction onClick={props.onCopyInstall}>Copy install commands</SideAction>
-          <SideAction onClick={props.onDownload}>Download JSON</SideAction>
-          <SideAction onClick={() => fileRef.current?.click()}>Import JSON</SideAction>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (!f) return;
-              try {
-                props.onImport(JSON.parse(await f.text()));
-              } catch {}
-              e.target.value = "";
-            }}
-          />
-          {typeof view === "string" && view !== "all" && (
-            <SideAction onClick={() => props.onDeleteCollection(view)}>Delete this collection</SideAction>
-          )}
-          <div className="mt-4 rounded-xl border border-dashed border-line p-3 text-xs text-muted">
-            Drag this to your bookmarks bar to save from any page:
-            <a
-              href={bookmarklet}
-              onClick={(e) => e.preventDefault()}
-              className="mt-2 block rounded-lg bg-fg px-3 py-1.5 text-center text-sm font-medium text-bg"
-            >
-              + Save to quire
-            </a>
-          </div>
+        <div className="mt-auto hidden flex-col gap-0.5 pb-5 text-[12px] md:flex">
           <a
-            href="https://github.com"
-            className="px-2.5 pt-3 text-xs text-muted hover:text-fg"
-            target="_blank"
-            rel="noreferrer"
+            href={bookmarklet}
+            onClick={(e) => e.preventDefault()}
+            title="Drag to your bookmarks bar, then click it on any page to save it"
+            className="rounded-md px-2 py-1 text-faint transition hover:text-muted"
           >
-            Free and open source · MIT
+            Save button <span className="text-faint">· drag to bar</span>
           </a>
+          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted">
+            Commands <span>⌘K</span>
+          </button>
+          <span className="px-2 py-1 text-faint">Open source · MIT</span>
         </div>
       </div>
     </aside>
   );
 }
 
-function SideAction({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+function NavItem({
+  id,
+  name,
+  count,
+  view,
+  setView,
+  moveTo,
+  onRename,
+}: {
+  id: View;
+  name: string;
+  count: number;
+  view: View;
+  setView: (v: View) => void;
+  moveTo: (bookmarkId: string, collectionId: string | null) => void;
+  onRename?: () => void;
+}) {
+  const [over, setOver] = useState(false);
+  const active = view === id;
+  const droppable = id !== "all";
   return (
-    <button onClick={onClick} className="rounded-lg px-2.5 py-1.5 text-left text-muted hover:text-fg">
-      {children}
+    <button
+      onClick={() => setView(id)}
+      onDoubleClick={onRename}
+      onDragOver={(e) => {
+        if (!droppable) return;
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        setOver(false);
+        const bid = e.dataTransfer.getData("text/bookmark-id");
+        if (bid && droppable) moveTo(bid, id);
+      }}
+      title={onRename ? "Double-click to rename" : undefined}
+      className={`group flex h-7 shrink-0 items-center justify-between gap-4 rounded-md px-2 text-left whitespace-nowrap transition ${
+        active ? "bg-hover text-fg" : "text-muted hover:text-fg"
+      } ${over ? "bg-hover text-fg" : ""}`}
+    >
+      <span className="truncate">{name}</span>
+      <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
+        {count || ""}
+      </span>
     </button>
   );
 }
@@ -493,74 +523,51 @@ function Card({
   return (
     <article
       draggable
-      onDragStart={(e) => e.dataTransfer.setData("text/bookmark-id", b.id)}
-      className="group overflow-hidden rounded-2xl border border-line bg-panel transition hover:border-fg/25"
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/bookmark-id", b.id);
+        e.dataTransfer.effectAllowed = "move";
+      }}
+      className="group pop"
     >
-      <a href={b.url} target="_blank" rel="noreferrer" className="block aspect-[16/10] overflow-hidden bg-fg/[0.04]">
-        {b.image && imgOk ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={b.image}
-            alt=""
-            loading="lazy"
-            onError={() => setImgOk(false)}
-            className="size-full object-cover transition duration-300 group-hover:scale-[1.02]"
-          />
-        ) : (
-          <div className="grid size-full place-items-center">
-            <span className="text-3xl font-semibold tracking-tight text-fg/15">{b.library}</span>
-          </div>
-        )}
-      </a>
-      <div className="flex flex-col gap-2 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <a href={b.url} target="_blank" rel="noreferrer" className="line-clamp-1 text-sm font-medium first-letter:uppercase hover:underline">
-            {b.title}
-          </a>
-          <span className="shrink-0 rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">{b.library}</span>
-        </div>
+      <div className="relative">
+        <a
+          href={b.url}
+          target="_blank"
+          rel="noreferrer"
+          className="block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset"
+          tabIndex={-1}
+        >
+          {b.image && imgOk ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={b.image}
+              alt=""
+              loading="lazy"
+              draggable={false}
+              onError={() => setImgOk(false)}
+              className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.015]"
+            />
+          ) : (
+            <div className="grid size-full place-items-center">
+              <span className="text-[15px] font-medium tracking-tight text-faint">{b.library}</span>
+            </div>
+          )}
+        </a>
 
-        {b.install && (
-          <button
-            onClick={onCopy}
-            title="Copy install command"
-            className="truncate rounded-lg bg-fg/[0.05] px-2 py-1.5 text-left font-mono text-[11px] text-muted hover:text-fg"
-          >
-            {b.install}
-          </button>
-        )}
-
-        {b.note && !editing && <p className="line-clamp-2 text-xs text-muted">“{b.note}”</p>}
-        {editing && (
-          <textarea
-            autoFocus
-            defaultValue={b.note}
-            placeholder="Note for your agent, e.g. use for the pricing section"
-            onBlur={(e) => {
-              onNote(e.target.value.trim());
-              setEditing(false);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) (e.target as HTMLTextAreaElement).blur();
-            }}
-            className="min-h-16 rounded-lg border border-line bg-transparent p-2 text-xs outline-none"
-          />
-        )}
-
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 gap-1 overflow-hidden">
-            {b.tags.map((t) => (
-              <span key={t} className="text-[11px] text-muted">
-                #{t}
-              </span>
-            ))}
-          </div>
-          <div className="flex shrink-0 items-center gap-1 opacity-100 transition md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
+        <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
+          <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy}>
+            <CopyIcon />
+          </IconBtn>
+          <IconBtn label="Note for your agent" onClick={() => setEditing(true)}>
+            <NoteIcon />
+          </IconBtn>
+          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
+            <FolderIcon />
             <select
               value={b.collectionId ?? ""}
               onChange={(e) => onMove(e.target.value || null)}
               aria-label="Move to collection"
-              className="h-7 max-w-28 rounded-md border border-line bg-panel px-1 text-[11px] text-muted outline-none"
+              className="absolute inset-0 cursor-pointer opacity-0"
             >
               <option value="">Inbox</option>
               {lib.collections.map((c) => (
@@ -569,11 +576,54 @@ function Card({
                 </option>
               ))}
             </select>
-            <IconBtn label="Note" onClick={() => setEditing(true)}>✎</IconBtn>
-            <IconBtn label={b.install ? "Copy install" : "Copy link"} onClick={onCopy}>⧉</IconBtn>
-            <IconBtn label="Delete" onClick={onDelete}>×</IconBtn>
-          </div>
+          </label>
+          <IconBtn label="Delete" onClick={onDelete}>
+            <TrashIcon />
+          </IconBtn>
         </div>
+      </div>
+
+      <div className="mt-2.5 px-0.5">
+        <div className="flex items-baseline justify-between gap-3">
+          <a href={b.url} target="_blank" rel="noreferrer" className="truncate first-letter:uppercase">
+            {b.title}
+          </a>
+          <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
+        </div>
+
+        {b.install && (
+          <button
+            onClick={onCopy}
+            title="Copy"
+            className="mt-1 block max-w-full truncate text-left font-mono text-[11px] text-faint transition hover:text-muted"
+          >
+            {b.install}
+          </button>
+        )}
+
+        {editing ? (
+          <textarea
+            autoFocus
+            rows={2}
+            defaultValue={b.note}
+            placeholder="A note for your agent"
+            onBlur={(e) => {
+              onNote(e.target.value.trim());
+              setEditing(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) (e.target as HTMLTextAreaElement).blur();
+              if (e.key === "Escape") setEditing(false);
+            }}
+            className="mt-1.5 w-full resize-none rounded-md bg-hover px-2 py-1.5 text-[12px] outline-none placeholder:text-faint"
+          />
+        ) : (
+          b.note && (
+            <p onClick={() => setEditing(true)} className="mt-1 line-clamp-2 cursor-text text-[12px] text-muted">
+              {b.note}
+            </p>
+          )
+        )}
       </div>
     </article>
   );
@@ -585,7 +635,7 @@ function IconBtn({ label, onClick, children }: { label: string; onClick: () => v
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="grid size-7 place-items-center rounded-md text-sm text-muted hover:bg-fg/[0.06] hover:text-fg"
+      className="grid size-6 place-items-center rounded text-muted transition hover:bg-hover hover:text-fg"
     >
       {children}
     </button>
@@ -594,27 +644,69 @@ function IconBtn({ label, onClick, children }: { label: string; onClick: () => v
 
 function Empty({ onAdd }: { onAdd: (url: string) => void }) {
   return (
-    <div className="mx-auto mt-16 max-w-md text-center">
-      <h2 className="text-xl font-semibold tracking-tight">Your component library starts here</h2>
-      <p className="mt-2 text-sm text-muted">
-        Paste any link from shadcn, Magic UI, Aceternity, 21st.dev or anywhere else. Press{" "}
-        <kbd className="rounded border border-line px-1 text-[11px]">⌘V</kbd> anywhere on this page.
-      </p>
-      <div className="mt-6 flex flex-col gap-2">
+    <div className="mx-auto max-w-sm pt-24 text-center">
+      <p className="text-fg">Paste a component link.</p>
+      <p className="mt-1 text-muted">From any library. Press ⌘V anywhere.</p>
+      <div className="mt-8 flex flex-col items-center gap-1">
         {EXAMPLES.map((u) => (
           <button
             key={u}
             onClick={() => onAdd(u)}
-            className="truncate rounded-xl border border-line bg-panel px-3 py-2 text-left font-mono text-xs text-muted hover:text-fg"
+            className="rounded-md px-2 py-1 font-mono text-[11px] text-faint transition hover:bg-hover hover:text-muted"
           >
-            + {u.replace("https://", "")}
+            {u}
           </button>
         ))}
       </div>
-      <p className="mt-6 text-xs text-muted">
-        Everything stays in this browser for now. Download JSON any time to back it up.
-      </p>
     </div>
+  );
+}
+
+const svg = {
+  width: 14,
+  height: 14,
+  viewBox: "0 0 16 16",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.4,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+function PlusIcon() {
+  return (
+    <svg {...svg} className="shrink-0 text-faint" aria-hidden>
+      <path d="M8 3.5v9M3.5 8h9" />
+    </svg>
+  );
+}
+function CopyIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <rect x="5.5" y="5.5" width="7.5" height="7.5" rx="1.5" />
+      <path d="M10.5 3.5v-.25A1.25 1.25 0 0 0 9.25 2h-5A1.25 1.25 0 0 0 3 3.25v5A1.25 1.25 0 0 0 4.25 9.5h.25" />
+    </svg>
+  );
+}
+function NoteIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <path d="M10.5 2.75 13.25 5.5 6 12.75H3.25V10z" />
+    </svg>
+  );
+}
+function FolderIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <path d="M2.5 4.75c0-.7.55-1.25 1.25-1.25h2.6l1.4 1.5h4.5c.7 0 1.25.55 1.25 1.25v5c0 .7-.55 1.25-1.25 1.25h-8.5c-.7 0-1.25-.55-1.25-1.25z" />
+    </svg>
+  );
+}
+function TrashIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5" />
+    </svg>
   );
 }
 
