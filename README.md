@@ -30,3 +30,7 @@ npm run dev
 ```
 
 The link preview API refuses private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.
+
+## Browser extension
+
+`extension/` is a small Chrome extension (Manifest V3). Load it unpacked from `chrome://extensions`. Click the icon or press Alt+S on any page to save it to quire. Set your quire address in the extension options.

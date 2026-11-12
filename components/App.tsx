@@ -26,18 +26,34 @@ export default function App() {
   const [view, setView] = useState<View>("all");
   const [input, setInput] = useState("");
   const [palette, setPalette] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
 
-  const flash = useCallback((msg: string) => {
-    setToast(msg);
+  const flash = useCallback((msg: string, undo?: () => void) => {
+    setToast({ msg, undo });
     window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 1600);
+    toastTimer.current = window.setTimeout(() => setToast(null), undo ? 4000 : 1600);
   }, []);
+
+  const removeBookmark = (id: string) => {
+    const idx = lib.bookmarks.findIndex((x) => x.id === id);
+    const gone = lib.bookmarks[idx];
+    if (!gone) return;
+    update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== id) }));
+    flash("Deleted", () => {
+      update((l) => {
+        if (l.bookmarks.some((x) => x.id === gone.id)) return l;
+        const next = [...l.bookmarks];
+        next.splice(Math.min(idx, next.length), 0, gone);
+        return { ...l, bookmarks: next };
+      });
+      setToast(null);
+    });
+  };
 
   const add = useCallback(
     async (raw: string) => {
@@ -243,7 +259,7 @@ export default function App() {
                   moveTo(b.id, cid);
                   flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
                 }}
-                onDelete={() => update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== b.id) }))}
+                onDelete={() => removeBookmark(b.id)}
                 onNote={(note) =>
                   update((l) => ({
                     ...l,
@@ -351,9 +367,14 @@ export default function App() {
       {toast && (
         <div
           role="status"
-          className="pop fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-line bg-panel px-3.5 py-1.5 text-muted shadow-[0_6px_20px_-8px_rgb(0_0_0/0.2)]"
+          className="pop fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full border border-line bg-panel px-3.5 py-1.5 text-muted shadow-[0_6px_20px_-8px_rgb(0_0_0/0.2)]"
         >
-          {toast}
+          {toast.msg}
+          {toast.undo && (
+            <button onClick={toast.undo} className="text-fg transition hover:opacity-70">
+              Undo
+            </button>
+          )}
         </div>
       )}
     </div>
