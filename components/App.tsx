@@ -250,13 +250,14 @@ export default function App() {
       <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
         <header className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
-            className="flex h-14 items-center gap-3 border-b border-line"
+            className="flex h-14 items-center"
             onSubmit={(e) => {
               e.preventDefault();
               add(input);
               setInput("");
             }}
           >
+            <div className="flex h-9 w-full items-center gap-2.5 rounded-lg bg-field px-3 transition-colors focus-within:bg-field-focus">
             <PlusIcon />
             <input
               ref={inputRef}
@@ -276,6 +277,7 @@ export default function App() {
             >
               ⌘K
             </button>
+            </div>
           </form>
         </header>
 
@@ -349,7 +351,7 @@ export default function App() {
         <Command.Input
           autoFocus
           placeholder="Search or run a command"
-          className="h-12 w-full border-b border-line bg-transparent px-4 outline-none placeholder:text-faint"
+          className="m-1.5 mb-0 block h-10 w-[calc(100%-0.75rem)] rounded-lg bg-field px-3 outline-none transition-colors placeholder:text-faint focus:bg-field-focus"
         />
         <Command.List className="max-h-[52vh] overflow-y-auto p-1.5">
           <Command.Empty className="px-3 py-8 text-center text-muted">No results</Command.Empty>
@@ -488,7 +490,7 @@ function Sidebar(props: {
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   if (e.key === "Escape") props.setRenaming(null);
                 }}
-                className="h-7 shrink-0 rounded-md bg-hover px-2 outline-none"
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus"
               />
             ) : (
               <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
@@ -505,7 +507,7 @@ function Sidebar(props: {
                 if (e.key === "Escape") setNewCol(null);
               }}
               placeholder="Name"
-              className="h-7 shrink-0 rounded-md bg-hover px-2 outline-none placeholder:text-faint"
+              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint"
             />
           ) : (
             <button
@@ -701,7 +703,7 @@ function Card({
               if (e.key === "Enter" && !e.shiftKey) (e.target as HTMLTextAreaElement).blur();
               if (e.key === "Escape") setEditing(false);
             }}
-            className="mt-1.5 w-full resize-none rounded-md bg-hover px-2 py-1.5 text-[12px] outline-none placeholder:text-faint"
+            className="mt-1.5 w-full resize-none rounded-md bg-field px-2 py-1.5 text-[12px] outline-none transition-colors focus:bg-field-focus placeholder:text-faint"
           />
         ) : (
           b.note && (

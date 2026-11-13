@@ -8,6 +8,8 @@
   --faint: #c4c4c4;
   --line: #ededed;
   --hover: rgb(0 0 0 / 0.035);
+  --field: rgb(0 0 0 / 0.035);
+  --field-focus: rgb(0 0 0 / 0.06);
   color-scheme: light;
 }
 
@@ -20,6 +22,8 @@
     --faint: #474747;
     --line: #1d1d1d;
     --hover: rgb(255 255 255 / 0.04);
+    --field: rgb(255 255 255 / 0.04);
+    --field-focus: rgb(255 255 255 / 0.075);
     color-scheme: dark;
   }
 }
@@ -32,6 +36,8 @@
   --color-faint: var(--faint);
   --color-line: var(--line);
   --color-hover: var(--hover);
+  --color-field: var(--field);
+  --color-field-focus: var(--field-focus);
   --font-sans: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
@@ -56,4 +62,6 @@ body {
 @keyframes rise { from { opacity: 0; transform: translate(-50%, 4px) } }
 @keyframes pop { from { opacity: 0; transform: translateY(3px) } }
 .pop { animation: pop 160ms cubic-bezier(.2,.8,.2,1); }
-[cmdk-input]:focus-visible { outline: none; }
+[cmdk-input]:focus-visible,
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus-visible { outline: none; }
