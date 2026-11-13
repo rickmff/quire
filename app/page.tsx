@@ -34,7 +34,6 @@ export default function Landing() {
 
       <footer className={`${s.bar} ${s.foot}`}>
         <span>Free and open source</span>
-        <span>MIT</span>
       </footer>
     </div>
   );
