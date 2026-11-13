@@ -124,3 +124,30 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   }
   return lines.join("\n");
 }
+
+export function exportJSON(lib: Library, collectionId: string | "all" | null) {
+  const items =
+    collectionId === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === collectionId);
+  const name =
+    collectionId === "all"
+      ? "All bookmarks"
+      : collectionId === null
+        ? "Inbox"
+        : (lib.collections.find((c) => c.id === collectionId)?.name ?? "Collection");
+  return JSON.stringify(
+    {
+      collection: name,
+      components: items.map((b) => ({
+        title: b.title,
+        url: b.url,
+        library: b.library,
+        ...(b.install ? { install: b.install } : {}),
+        ...(b.tags.length ? { tags: b.tags } : {}),
+        ...(b.note ? { note: b.note } : {}),
+        ...(b.description ? { description: b.description } : {}),
+      })),
+    },
+    null,
+    2,
+  );
+}

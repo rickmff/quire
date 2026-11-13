@@ -6,6 +6,7 @@ import {
   type Bookmark,
   type Library,
   exportMarkdown,
+  exportJSON,
   fetchMeta,
   normalizeUrl,
   uid,
@@ -391,6 +392,9 @@ export default function App() {
           <Command.Group heading={`Agent · ${viewName}`}>
             <Command.Item onSelect={run(() => copy(exportMarkdown(lib, exportView), "Copied for your agent"))} className={itemCls}>
               Copy as Markdown for an AI agent
+            </Command.Item>
+            <Command.Item onSelect={run(() => copy(exportJSON(lib, exportView), "Copied as JSON"))} className={itemCls}>
+              Copy as JSON for an AI agent
             </Command.Item>
             <Command.Item onSelect={run(copyInstall)} className={itemCls}>
               Copy install commands
