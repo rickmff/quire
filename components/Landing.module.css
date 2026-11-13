@@ -1,0 +1,77 @@
+.page {
+  --sheet: rgb(255 255 255 / 0.62);
+  --edge: rgb(0 0 0 / 0.07);
+  --foil: 0.55;
+  --floor: rgb(0 0 0 / 0.1);
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 24px 28px;
+}
+@media (prefers-color-scheme: dark) {
+  .page {
+    --sheet: rgb(255 255 255 / 0.035);
+    --edge: rgb(255 255 255 / 0.09);
+    --foil: 0.42;
+    --floor: rgb(170 150 255 / 0.12);
+  }
+}
+.bar { display: flex; align-items: center; justify-content: space-between; color: var(--muted); }
+.bar a { transition: color 0.15s; }
+.bar a:hover { color: var(--fg); }
+.foot { font-size: 12px; color: var(--faint); }
+.wordmark { display: block; height: 19px; width: auto; color: var(--fg); }
+
+.main { display: grid; place-items: center; align-content: center; gap: 56px; }
+.copy { display: grid; justify-items: center; gap: 22px; text-align: center; }
+.title { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
+.title span { color: var(--muted); }
+.cta { display: flex; align-items: center; gap: 6px; }
+.btn {
+  height: 32px; padding: 0 14px; border-radius: 9px; display: inline-flex; align-items: center;
+  font-weight: 500; transition: opacity 0.15s, color 0.15s;
+}
+.solid { background: var(--fg); color: var(--bg); }
+.solid:hover { opacity: 0.86; }
+.ghost { color: var(--muted); }
+.ghost:hover { color: var(--fg); }
+
+/* The one detail: a quire of holographic sheets. */
+.scene { position: relative; width: min(380px, 66vw); aspect-ratio: 4 / 3; perspective: 1600px; }
+.stack {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(calc(56deg + var(--ry, 0deg))) rotateZ(calc(-34deg + var(--rz, 0deg)));
+}
+.sheet {
+  position: absolute; inset: 0; overflow: hidden; border-radius: 16px;
+  transform: translateZ(calc(var(--i) * var(--gap, 12px))) rotateZ(calc(var(--i) * var(--fan, 0deg)));
+  background: var(--sheet); border: 1px solid var(--edge);
+}
+.sheet::before {
+  content: ""; position: absolute; inset: -40%; opacity: var(--foil);
+  background: conic-gradient(
+    from calc(var(--h, 0deg) + var(--i) * 22deg)
+      at calc(50% + var(--px, 0) * 30%) calc(50% + var(--py, 0) * 30%),
+    #ff9ad5, #ffd59a, #c8ff9a, #9affea, #9ac4ff, #d39aff, #ff9ad5
+  );
+  filter: blur(18px) saturate(1.15);
+}
+.sheet::after {
+  content: ""; position: absolute; inset: 0; mix-blend-mode: soft-light;
+  background: radial-gradient(
+    120% 80% at calc(50% + var(--px, 0) * 60%) calc(30% + var(--py, 0) * 60%),
+    rgb(255 255 255 / 0.55), transparent 55%
+  );
+}
+.floor {
+  position: absolute; left: 8%; right: 8%; bottom: -8%; height: 30%; border-radius: 50%;
+  background: radial-gradient(closest-side, var(--floor), transparent);
+  filter: blur(14px); transform: translateY(calc(var(--gap, 12px) * 0.6));
+}
+
+@media (max-width: 520px) {
+  .page { padding: 20px; }
+  .main { gap: 40px; }
+}

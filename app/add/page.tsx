@@ -54,7 +54,7 @@ function Add() {
         <p className="text-faint">quire</p>
         <p className="mt-3">{text}</p>
         {title && <p className="mt-1 line-clamp-2 max-w-xs text-muted">{title}</p>}
-        <a href="/" className="mt-5 inline-block text-[12px] text-faint transition hover:text-muted">
+        <a href="/app" className="mt-5 inline-block text-[12px] text-faint transition hover:text-muted">
           Open library
         </a>
       </div>
