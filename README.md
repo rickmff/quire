@@ -34,4 +34,4 @@ The link preview API refuses private network addresses. In a sandbox without DNS
 
 ## Browser extension
 
-`extension/` is a small Chrome extension (Manifest V3). Load it unpacked from `chrome://extensions`. Click the icon or press Alt+S on any page to save it to quire. Set your quire address in the extension options.
+`extension/` is a small Chrome extension (Manifest V3). Load it unpacked from `chrome://extensions`. Click the icon or press Alt+S on any page to save it to quire. On x.com every post gets a quire button next to X's bookmark button: it saves the post, with its text and first image, to your Inbox. Set your quire address in the extension options.

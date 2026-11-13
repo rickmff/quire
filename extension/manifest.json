@@ -1,17 +1,40 @@
 {
   "manifest_version": 3,
   "name": "quire",
-  "version": "0.1.0",
-  "description": "Save the component you are looking at to quire.",
-  "action": { "default_title": "Save to quire" },
-  "background": { "service_worker": "background.js" },
-  "permissions": ["activeTab", "storage"],
+  "version": "0.2.0",
+  "description": "Save the component you are looking at to quire. Adds a save button to posts on X.",
+  "action": {
+    "default_title": "Save to quire"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
   "options_page": "options.html",
-  "icons": { "128": "icon.png" },
+  "icons": {
+    "128": "icon.png"
+  },
   "commands": {
     "_execute_action": {
-      "suggested_key": { "default": "Alt+S" },
+      "suggested_key": {
+        "default": "Alt+S"
+      },
       "description": "Save this page to quire"
     }
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "x.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
 }

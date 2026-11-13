@@ -15,6 +15,10 @@ function Add() {
     if (!url) return setState("error");
     const lib = readLibrary();
     if (lib.bookmarks.some((b) => b.url === url)) return setState("exists");
+    // The extension can pass what it read from the page, e.g. a post on X.
+    const hint = (k: string) => params.get(k)?.trim().slice(0, 300) || undefined;
+    const hintTitle = hint("title")?.slice(0, 160);
+    const hintImage = /^https:\/\//.test(hint("image") ?? "") ? hint("image") : undefined;
     (async () => {
       const m = matchLibrary(url);
       let meta = null;
@@ -25,9 +29,9 @@ function Add() {
       fresh.bookmarks.unshift({
         id: uid(),
         url,
-        title: meta?.title ?? titleFromUrl(url),
+        title: hintTitle ?? meta?.title ?? titleFromUrl(url),
         description: meta?.description,
-        image: meta?.image,
+        image: hintImage ?? meta?.image,
         library: meta?.library ?? m.library,
         install: meta?.install ?? m.install,
         tags: meta?.tags ?? [],
@@ -35,7 +39,7 @@ function Add() {
         createdAt: Date.now(),
       });
       writeLibrary(fresh);
-      setTitle(meta?.title ?? url);
+      setTitle(hintTitle ?? meta?.title ?? url);
       setState("saved");
       setTimeout(() => window.close(), 1200);
     })();
