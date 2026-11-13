@@ -23,6 +23,7 @@ The landing page is at `/` and the app is at `/app`.
 1. Open `chrome://extensions` and turn on Developer mode.
 2. Click **Load unpacked** and select the `extension/` folder.
 3. Click the icon or press Alt+S on any page to save it.
+4. On x.com, click the quire button next to X's bookmark button to save a post. The card keeps the post text and first image.
 
 Set your quire address in the extension options. A bookmarklet in the app sidebar does the same job without the extension.
 
