@@ -12,6 +12,7 @@ import {
   useLibrary,
 } from "@/lib/store";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
+import Wordmark from "@/components/Wordmark";
 
 type View = "all" | null | string; // null = Inbox
 
@@ -462,10 +463,10 @@ function Sidebar(props: {
     : "#";
 
   return (
-    <aside className="md:sticky md:top-0 md:h-dvh md:w-52 md:shrink-0">
+    <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
         <div className="flex h-10 items-center px-2 md:h-6">
-          <span className="font-medium tracking-tight">quire</span>
+          <Wordmark className="h-[15px] w-auto text-fg" />
         </div>
 
         <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:flex-col md:overflow-visible md:pb-0">
@@ -512,7 +513,7 @@ function Sidebar(props: {
           )}
         </nav>
 
-        <div className="mt-auto hidden flex-col gap-0.5 pb-5 text-[12px] md:flex">
+        <div className="mt-auto hidden flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
           <a
             href={bookmarklet}
             onClick={(e) => e.preventDefault()}
