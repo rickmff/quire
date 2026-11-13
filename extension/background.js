@@ -1,6 +1,6 @@
 // Opens quire's /add page in a small popup window.
 // The page saves the link into the library stored on the quire site.
-const DEFAULT_ORIGIN = "https://quire-ten-pi.vercel.app";
+const DEFAULT_ORIGIN = "https://quire.fyi";
 
 async function openAdd(params, focused = true) {
   const { origin = DEFAULT_ORIGIN } = await chrome.storage.sync.get("origin");
