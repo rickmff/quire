@@ -1,37 +1,38 @@
+<img src="app/icon.svg" width="40" alt="quire">
+
 # quire
 
-Bookmark UI components from every library, organize them, and hand them to your AI agent.
+Save components from any UI library, organize them into collections, and hand them to your AI agent.
 
-Free and open source under the MIT license.
+The landing page is at `/` and the app is at `/app`.
 
-## What works today
+## Features
 
-- Paste any component link (or press Cmd+V anywhere) to save it as a card.
-- Known libraries are detected automatically. shadcn/ui, Magic UI and Aceternity links get their `npx shadcn add` command.
-- Collections in a sidebar. Drag a card onto a collection to move it. Double-click a collection to rename it.
-- Cmd+K to search everything and filter by library.
-- Keyboard: arrows or h/j/k/l to move between cards, Enter to open, c to copy, Backspace to delete (with undo).
-- Notes on each card, written for your agent.
-- Cmd+K → "Copy as Markdown for an AI agent" turns a collection into a brief any agent can build from. Export and import backups live there too.
-- A bookmarklet ("Save to quire") saves the page you are on.
-- Data lives in your browser (localStorage). Download or import JSON to back it up.
+- **Save links.** Paste a component URL anywhere in the app (⌘V) to add it as a card with title, description and preview image.
+- **Library detection.** quire recognizes 24 sources, including shadcn/ui, Magic UI, Aceternity UI, 21st.dev and React Bits. For shadcn registries it adds the `npx shadcn add` command.
+- **Collections.** Group cards in the sidebar. Drag a card onto a collection to move it. Double-click a collection to rename it.
+- **Notes.** Add a note to each card for your agent.
+- **Command palette.** ⌘K searches every card, filters by library, and exports a collection as Markdown or JSON for an AI agent.
+- **Keyboard.** Arrows or `h` `j` `k` `l` to move, `Enter` to open, `c` to copy, `Backspace` to delete.
+- **Local first.** Data stays in your browser. Export and import JSON backups from ⌘K.
 
-## Roadmap
+## Browser extension
 
-1. Accounts and sync (Postgres).
-2. Browser extension with per-library parsers and screenshots.
-3. Remote MCP server so Claude, Cursor and others can read your collections.
-4. Each collection as a shadcn registry namespace.
+`extension/` contains a Chrome extension (Manifest V3).
 
-## Develop
+1. Open `chrome://extensions` and turn on Developer mode.
+2. Click **Load unpacked** and select the `extension/` folder.
+3. Click the icon or press Alt+S on any page to save it.
+
+Set your quire address in the extension options. A bookmarklet in the app sidebar does the same job without the extension.
+
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-The link preview API refuses private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.
+Built with Next.js, React and Tailwind CSS.
 
-## Browser extension
-
-`extension/` is a small Chrome extension (Manifest V3). Load it unpacked from `chrome://extensions`. Click the icon or press Alt+S on any page to save it to quire. Set your quire address in the extension options.
+The link preview API (`/api/meta`) blocks private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.
