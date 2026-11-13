@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://quire.fyi">Website</a> ·
   <a href="#features">Features</a> ·
   <a href="#browser-extension">Extension</a> ·
   <a href="#getting-started">Getting started</a> ·
@@ -42,7 +43,7 @@
 3. Click the icon or press Alt+S on any page to save it.
 4. On x.com, click the quire button next to X's bookmark button to save a post. The card keeps the post text and first image.
 
-Set your quire address in the extension options. A bookmarklet in the app sidebar does the same job without the extension.
+The extension saves to [quire.fyi](https://quire.fyi). To use your own instance, set its address in the extension options. A bookmarklet in the app sidebar does the same job without the extension.
 
 ## Getting started
 
