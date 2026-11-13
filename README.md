@@ -4,7 +4,7 @@
 
 Save components from any UI library, organize them into collections, and hand them to your AI agent.
 
-Live at [quire-ten-pi.vercel.app](https://quire-ten-pi.vercel.app). The landing page is at `/` and the app is at `/app`.
+The landing page is at `/` and the app is at `/app`.
 
 ## Features
 
