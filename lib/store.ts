@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { classify, typeById } from "@/lib/types";
 
 export type Bookmark = {
   id: string;
@@ -12,6 +13,14 @@ export type Bookmark = {
   install?: string;
   tags: string[];
   note?: string;
+  // Component type from lib/types.ts. Older cards have none and are
+  // classified on the fly from their title and description.
+  type?: string;
+  // The site's own category, e.g. "Inputs" on rareui.com.
+  category?: string;
+  // Pointer to the source in a shadcn registry, e.g. owner/repo/otp-input.
+  registry?: string;
+  dependencies?: string[];
   collectionId: string | null;
   createdAt: number;
 };
@@ -48,7 +57,7 @@ export function writeLibrary(lib: Library) {
   } catch {}
 }
 
-export type Meta = Omit<Bookmark, "id" | "collectionId" | "createdAt" | "note">;
+export type Meta = Omit<Bookmark, "id" | "collectionId" | "createdAt" | "note" | "type" | "category" | "registry" | "dependencies">;
 
 export async function fetchMeta(url: string): Promise<Meta> {
   const res = await fetch(`/api/meta?url=${encodeURIComponent(url)}`);
@@ -94,17 +103,24 @@ export function useLibrary() {
   return { lib, ready, update };
 }
 
-export function exportMarkdown(lib: Library, collectionId: string | "all" | null) {
-  const items =
-    collectionId === "all"
-      ? lib.bookmarks
-      : lib.bookmarks.filter((b) => b.collectionId === collectionId);
-  const name =
-    collectionId === "all"
-      ? "All bookmarks"
-      : collectionId === null
-        ? "Inbox"
-        : (lib.collections.find((c) => c.id === collectionId)?.name ?? "Collection");
+export const typeOf = (b: Bookmark) => b.type ?? classify({ title: b.title, description: b.description });
+
+// A view is "all", null (Inbox), "type:<id>" or a collection id.
+export function selectView(lib: Library, view: string | null) {
+  if (view === "all") return { name: "All bookmarks", items: lib.bookmarks };
+  if (view === null) return { name: "Inbox", items: lib.bookmarks.filter((b) => b.collectionId === null) };
+  if (view.startsWith("type:")) {
+    const id = view.slice(5);
+    return { name: typeById(id).name, items: lib.bookmarks.filter((b) => typeOf(b) === id) };
+  }
+  return {
+    name: lib.collections.find((c) => c.id === view)?.name ?? "Collection",
+    items: lib.bookmarks.filter((b) => b.collectionId === view),
+  };
+}
+
+export function exportMarkdown(lib: Library, view: string | null) {
+  const { name, items } = selectView(lib, view);
   const lines = [
     `# ${name}`,
     "",
@@ -114,9 +130,12 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   ];
   for (const b of items) {
     lines.push(`## ${b.title}`);
+    lines.push(`- Type: ${typeById(typeOf(b)).name}`);
     lines.push(`- Source: ${b.url}`);
     lines.push(`- Library: ${b.library}`);
     if (b.install) lines.push(`- Install: \`${b.install}\``);
+    if (b.registry) lines.push(`- Registry: ${b.registry}`);
+    if (b.dependencies?.length) lines.push(`- Dependencies: ${b.dependencies.join(", ")}`);
     if (b.tags.length) lines.push(`- Tags: ${b.tags.join(", ")}`);
     if (b.note) lines.push(`- Note: ${b.note}`);
     if (b.description) lines.push(`- About: ${b.description}`);
@@ -125,23 +144,19 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   return lines.join("\n");
 }
 
-export function exportJSON(lib: Library, collectionId: string | "all" | null) {
-  const items =
-    collectionId === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === collectionId);
-  const name =
-    collectionId === "all"
-      ? "All bookmarks"
-      : collectionId === null
-        ? "Inbox"
-        : (lib.collections.find((c) => c.id === collectionId)?.name ?? "Collection");
+export function exportJSON(lib: Library, view: string | null) {
+  const { name, items } = selectView(lib, view);
   return JSON.stringify(
     {
       collection: name,
       components: items.map((b) => ({
         title: b.title,
+        type: typeById(typeOf(b)).name,
         url: b.url,
         library: b.library,
         ...(b.install ? { install: b.install } : {}),
+        ...(b.registry ? { registry: b.registry } : {}),
+        ...(b.dependencies?.length ? { dependencies: b.dependencies } : {}),
         ...(b.tags.length ? { tags: b.tags } : {}),
         ...(b.note ? { note: b.note } : {}),
         ...(b.description ? { description: b.description } : {}),
