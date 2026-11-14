@@ -1,45 +1,7 @@
-import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
 import { autoTags, matchLibrary, titleFromUrl } from "@/lib/libraries";
+import { safeUrl } from "@/lib/net";
 
 export const runtime = "nodejs";
-
-function isPrivate(ip: string) {
-  if (ip.includes(":")) {
-    const v = ip.toLowerCase();
-    return v === "::1" || v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe80") || v.startsWith("::ffff:127.");
-  }
-  const [a, b] = ip.split(".").map(Number);
-  return (
-    a === 10 || a === 127 || a === 0 ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    (a === 100 && b >= 64 && b <= 127)
-  );
-}
-
-async function safeUrl(raw: string): Promise<URL | null> {
-  let u: URL;
-  try {
-    u = new URL(raw);
-  } catch {
-    return null;
-  }
-  if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-  if (u.hostname === "localhost") return null;
-  // Local sandboxes without DNS can opt out; never set this in production.
-  if (process.env.QUIRE_SKIP_DNS_CHECK === "1") return u;
-  try {
-    const addrs = isIP(u.hostname)
-      ? [{ address: u.hostname }]
-      : await lookup(u.hostname, { all: true });
-    if (addrs.some((a) => isPrivate(a.address))) return null;
-  } catch {
-    return null;
-  }
-  return u;
-}
 
 function pick(html: string, ...keys: string[]) {
   for (const k of keys) {

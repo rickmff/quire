@@ -9,13 +9,19 @@ import {
   exportJSON,
   fetchMeta,
   normalizeUrl,
+  selectView,
+  typeOf,
   uid,
   useLibrary,
 } from "@/lib/store";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
+import { OTHER, TYPES, typeById } from "@/lib/types";
 import Wordmark from "@/components/Wordmark";
+import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
 
-type View = "all" | null | string; // null = Inbox
+type View = "all" | null | string; // null = Inbox, "type:<id>" = a type, else a collection id
+
+const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
 
 const EXAMPLES = [
   "magicui.design/docs/components/marquee",
@@ -33,6 +39,7 @@ export default function App() {
   const [renaming, setRenaming] = useState<string | null>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
+  const [importing, setImporting] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -66,6 +73,7 @@ export default function App() {
       if (lib.bookmarks.some((b) => b.url === url)) return flash("Already saved");
       const id = uid();
       const m = matchLibrary(url);
+      const t = typeView(view);
       const draft: Bookmark = {
         id,
         url,
@@ -73,7 +81,8 @@ export default function App() {
         library: m.library,
         install: m.install,
         tags: [],
-        collectionId: view === "all" ? null : view,
+        ...(t ? { type: t } : {}),
+        collectionId: view === "all" || t ? null : view,
         createdAt: Date.now(),
       };
       update((l) => ({ ...l, bookmarks: [draft, ...l.bookmarks] }));
@@ -123,9 +132,9 @@ export default function App() {
   }, [add]);
 
   const visible = useMemo(() => {
-    const inView = view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view);
+    const inView = selectView(lib, view).items;
     return libFilter ? inView.filter((b) => b.library === libFilter) : inView;
-  }, [lib.bookmarks, view, libFilter]);
+  }, [lib, view, libFilter]);
 
   const libraries = useMemo(() => {
     const m = new Map<string, number>();
@@ -170,13 +179,62 @@ export default function App() {
     for (const b of lib.bookmarks) {
       const k = b.collectionId ?? "inbox";
       c[k] = (c[k] ?? 0) + 1;
+      const t = `type:${typeOf(b)}`;
+      c[t] = (c[t] ?? 0) + 1;
     }
     return c;
   }, [lib.bookmarks]);
 
   const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
-  const viewName = view === "all" ? "All" : view === null ? "Inbox" : (current?.name ?? "All");
-  const exportView = view === "all" ? "all" : view;
+  const viewType = typeView(view);
+  const viewName = view === "all" ? "All" : view === null ? "Inbox" : viewType ? typeById(viewType).name : (current?.name ?? "All");
+  const exportView = view;
+
+  const setType = (bookmarkId: string, type: string) =>
+    update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.id === bookmarkId ? { ...b, type } : b)) }));
+
+  const dropTo = (bookmarkId: string, target: View) => {
+    const t = typeView(target);
+    if (t) {
+      setType(bookmarkId, t);
+      flash(`Marked as ${typeById(t).name}`);
+    } else moveTo(bookmarkId, target);
+  };
+
+  const importSite = ({ result, items, collection }: ImportChoice) => {
+    let colId: string | null = null;
+    update((l) => {
+      let collections = l.collections;
+      if (collection) {
+        const existing = l.collections.find((c) => c.name === collection);
+        colId = existing?.id ?? uid();
+        if (!existing) collections = [...collections, { id: colId, name: collection, createdAt: Date.now() }];
+      }
+      const have = new Set(l.bookmarks.map((b) => b.url));
+      const now = Date.now();
+      const fresh: Bookmark[] = items
+        .filter((i) => !have.has(i.url))
+        .map((i, n) => ({
+          id: uid(),
+          url: i.url,
+          title: i.title,
+          description: i.description,
+          library: result.library,
+          install: i.install,
+          registry: i.registry,
+          dependencies: i.dependencies,
+          category: i.category,
+          type: i.type,
+          tags: [],
+          collectionId: colId,
+          createdAt: now - n,
+        }));
+      return { ...l, collections, bookmarks: [...fresh, ...l.bookmarks] };
+    });
+    setImporting(null);
+    if (colId) setView(colId);
+    flash(`Imported ${items.length} from ${result.site}`);
+  };
 
   const createCollection = (name: string) => {
     const n = name.trim();
@@ -243,7 +301,7 @@ export default function App() {
         renaming={renaming}
         setRenaming={setRenaming}
         renameCollection={renameCollection}
-        moveTo={moveTo}
+        moveTo={dropTo}
         openPalette={() => setPalette(true)}
       />
 
@@ -269,6 +327,19 @@ export default function App() {
               autoComplete="off"
               spellCheck={false}
             />
+            {input.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  setImporting(input);
+                  setInput("");
+                }}
+                title="Find every component on this site and sort them by type"
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+              >
+                Import site
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setPalette(true)}
@@ -310,6 +381,7 @@ export default function App() {
                   flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
                 }}
                 onDelete={() => removeBookmark(b.id)}
+                onType={(t) => setType(b.id, t)}
                 onNote={(note) =>
                   update((l) => ({
                     ...l,
@@ -371,7 +443,12 @@ export default function App() {
             </Command.Group>
           )}
           <Command.Group heading="Go to">
-            {[{ id: "all", name: "All" }, { id: "inbox", name: "Inbox" }, ...lib.collections].map((c) => (
+            {[
+              { id: "all", name: "All" },
+              { id: "inbox", name: "Inbox" },
+              ...lib.collections,
+              ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
+            ].map((c) => (
               <Command.Item
                 key={c.id}
                 value={`go ${c.name} ${c.id}`}
@@ -404,6 +481,9 @@ export default function App() {
             </Command.Item>
           </Command.Group>
           <Command.Group heading="Library">
+            <Command.Item onSelect={run(() => setImporting(""))} className={itemCls}>
+              Import every component from a site
+            </Command.Item>
             <Command.Item onSelect={run(() => setNewCol(""))} className={itemCls}>
               New collection
             </Command.Item>
@@ -426,6 +506,15 @@ export default function App() {
           </Command.Group>
         </Command.List>
       </Command.Dialog>
+
+      {importing !== null && (
+        <ImportDialog
+          initialUrl={importing}
+          savedUrls={new Set(lib.bookmarks.map((b) => b.url))}
+          onClose={() => setImporting(null)}
+          onImport={importSite}
+        />
+      )}
 
       {toast && (
         <div
@@ -457,7 +546,7 @@ function Sidebar(props: {
   renaming: string | null;
   setRenaming: (id: string | null) => void;
   renameCollection: (id: string, name: string) => void;
-  moveTo: (bookmarkId: string, collectionId: string | null) => void;
+  moveTo: (bookmarkId: string, target: View) => void;
   openPalette: () => void;
 }) {
   const { lib, view, setView, counts, newCol, setNewCol } = props;
@@ -475,7 +564,7 @@ function Sidebar(props: {
           <Wordmark className="h-[15px] w-auto text-fg" />
         </div>
 
-        <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:flex-col md:overflow-visible md:pb-0">
+        <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:min-h-0 md:flex-1 md:flex-col md:overflow-y-auto md:pb-4">
           <NavItem id="all" name="All" count={lib.bookmarks.length} {...props} />
           <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
           <div className="hidden h-6 md:block" />
@@ -517,9 +606,20 @@ function Sidebar(props: {
               New collection
             </button>
           )}
+          {[...TYPES, OTHER].some((t) => counts[`type:${t.id}`]) && (
+            <>
+              <div className="hidden h-6 md:block" />
+              <span className="hidden px-2 pb-1 text-[11px] text-faint md:block">Types</span>
+              {[...TYPES, OTHER]
+                .filter((t) => counts[`type:${t.id}`])
+                .map((t) => (
+                  <NavItem key={t.id} id={`type:${t.id}`} name={t.name} count={counts[`type:${t.id}`]} {...props} />
+                ))}
+            </>
+          )}
         </nav>
 
-        <div className="mt-auto hidden flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
+        <div className="hidden shrink-0 flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
           <a
             href={bookmarklet}
             onClick={(e) => e.preventDefault()}
@@ -552,7 +652,7 @@ function NavItem({
   count: number;
   view: View;
   setView: (v: View) => void;
-  moveTo: (bookmarkId: string, collectionId: string | null) => void;
+  moveTo: (bookmarkId: string, target: View) => void;
   onRename?: () => void;
 }) {
   const [over, setOver] = useState(false);
@@ -592,6 +692,7 @@ function Card({
   selected,
   onMove,
   onDelete,
+  onType,
   onNote,
   onCopy,
 }: {
@@ -600,6 +701,7 @@ function Card({
   selected: boolean;
   onMove: (cid: string | null) => void;
   onDelete: () => void;
+  onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
 }) {
@@ -665,6 +767,21 @@ function Card({
               ))}
             </select>
           </label>
+          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
+            <TagIcon />
+            <select
+              value={typeOf(b)}
+              onChange={(e) => onType(e.target.value)}
+              aria-label="Component type"
+              className="absolute inset-0 cursor-pointer opacity-0"
+            >
+              {[...TYPES, OTHER].map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <IconBtn label="Delete" onClick={onDelete} data="delete">
             <TrashIcon />
           </IconBtn>
@@ -678,6 +795,10 @@ function Card({
           </a>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
+        <p className="mt-0.5 truncate text-[12px] text-faint">
+          {typeById(typeOf(b)).name}
+          {b.description && <span className="text-faint"> · {b.description}</span>}
+        </p>
 
         {b.install && (
           <button
@@ -788,6 +909,14 @@ function FolderIcon() {
   return (
     <svg {...svg} aria-hidden>
       <path d="M2.5 4.75c0-.7.55-1.25 1.25-1.25h2.6l1.4 1.5h4.5c.7 0 1.25.55 1.25 1.25v5c0 .7-.55 1.25-1.25 1.25h-8.5c-.7 0-1.25-.55-1.25-1.25z" />
+    </svg>
+  );
+}
+function TagIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <path d="M2.75 8.25V3.5c0-.4.35-.75.75-.75h4.75l5 5-5.5 5.5z" />
+      <circle cx="5.5" cy="5.5" r=".9" />
     </svg>
   );
 }

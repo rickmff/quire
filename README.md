@@ -28,6 +28,8 @@
 
 - **Save links.** Paste a component URL anywhere in the app (⌘V). quire adds a card with title, description and preview image.
 - **Library detection.** quire recognizes 24 sources, including shadcn/ui, Magic UI, Aceternity UI, 21st.dev and React Bits. For shadcn registries it adds the `npx shadcn add` command.
+- **Import a whole site.** Paste the page that lists a library's components (for example `rareui.com/components`) and click **Import site**, or use ⌘K. quire reads the site's shadcn registry when it has one, else the page links or the sitemap, and shows every component for review before it saves them.
+- **Types.** Every card gets a component type (Sidebar, Toast, OTP input…) from one shared list, so references from different sites line up in the sidebar under **Types**. Change a card's type from its tag menu or by dragging it onto a type.
 - **Collections.** Group cards in the sidebar. Drag a card onto a collection to move it. Double-click a collection to rename it.
 - **Notes.** Add a note to each card for your agent.
 - **Command palette.** ⌘K searches every card, filters by library, and exports a collection as Markdown or JSON for an AI agent.
