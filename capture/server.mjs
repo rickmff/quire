@@ -64,8 +64,8 @@ const PREVIEW_SELECTORS = [
   "[class*='ComponentPreview']",
   "[class*='component-preview']",
   // shadcn-style docs (8bitcn and others): the bordered demo box.
-  "main [class*='min-h-[450px]'][class*='border']",
-  "main [class*='min-h-[350px]'][class*='border']",
+  "[class*='min-h-[450px]'][class*='border']",
+  "[class*='min-h-[350px]'][class*='border']",
   "[class*='preview' i]:not(nav *):not(header *)",
   "main iframe",
   "[role='tabpanel']",
