@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Quire from "@/components/Quire";
+import Quire3D from "@/components/Quire3D";
 import Wordmark from "@/components/Wordmark";
 import s from "@/components/Landing.module.css";
 
@@ -16,7 +16,7 @@ export default function Landing() {
       </header>
 
       <main className={s.main}>
-        <Quire />
+        <Quire3D />
         <div className={s.copy}>
           <h1 className={s.title}>
             Keep every component you find. <span>Hand them to your agent.</span>
