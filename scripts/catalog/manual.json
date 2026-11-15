@@ -1,0 +1,817 @@
+{
+ "aceternity": [
+  {
+   "name": "webcam-pixel-grid",
+   "title": "Webcam Pixel Grid",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "images-badge",
+   "title": "Images Badge",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "parallax-hero-images",
+   "title": "Parallax Hero Images",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "scales",
+   "title": "Scales",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "dotted-glow-background",
+   "title": "Dotted Glow Background",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-ripple-effect",
+   "title": "Background Ripple Effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "sparkles",
+   "title": "Sparkles",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-gradient",
+   "title": "Background Gradient",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-gradient-animation",
+   "title": "Gradient Animation",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "wavy-background",
+   "title": "Wavy Background",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-boxes",
+   "title": "Background Boxes",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-beams",
+   "title": "Background Beams",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-beams-with-collision",
+   "title": "Background Beams With Collision",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-lines",
+   "title": "Background Lines",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "aurora-background",
+   "title": "Aurora Background",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "meteors",
+   "title": "Meteors",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "glowing-stars-effect",
+   "title": "Glowing Stars",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "shooting-stars-and-stars-background",
+   "title": "Shooting Stars",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "vortex",
+   "title": "Vortex",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "background-cubes-grid",
+   "title": "Background Cubes Grid",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "liquid-glass",
+   "title": "Liquid Glass",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "cloud-shader",
+   "title": "Cloud Shader",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "chromatic-image",
+   "title": "Chromatic Image",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "spotlight",
+   "title": "Spotlight",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "spotlight-new",
+   "title": "Spotlight New",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "canvas-reveal-effect",
+   "title": "Canvas Reveal Effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "svg-mask-effect",
+   "title": "SVG Mask Effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "tracing-beam",
+   "title": "Tracing Beam",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "lamp-effect",
+   "title": "Lamp effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "grid-and-dot-backgrounds",
+   "title": "Grid and Dot Backgrounds",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "glowing-effect",
+   "title": "Glowing Effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "google-gemini-effect",
+   "title": "Google Gemini Effect",
+   "category": "Backgrounds & Effects"
+  },
+  {
+   "name": "keyboard",
+   "title": "Keyboard",
+   "category": "Card Components"
+  },
+  {
+   "name": "terminal",
+   "title": "Terminal",
+   "category": "Card Components"
+  },
+  {
+   "name": "tooltip-card",
+   "title": "Tooltip Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "ascii-art",
+   "title": "ASCII Art",
+   "category": "Card Components"
+  },
+  {
+   "name": "pixelated-canvas",
+   "title": "Pixelated Canvas",
+   "category": "Card Components"
+  },
+  {
+   "name": "3d-card-effect",
+   "title": "3D Card Effect",
+   "category": "Card Components"
+  },
+  {
+   "name": "evervault-card",
+   "title": "Evervault Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "card-stack",
+   "title": "Card Stack",
+   "category": "Card Components"
+  },
+  {
+   "name": "card-hover-effect",
+   "title": "Card Hover Effect",
+   "category": "Card Components"
+  },
+  {
+   "name": "wobble-card",
+   "title": "Wobble Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "expandable-card",
+   "title": "Expandable Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "card-spotlight",
+   "title": "Card Spotlight",
+   "category": "Card Components"
+  },
+  {
+   "name": "focus-cards",
+   "title": "Focus Cards",
+   "category": "Card Components"
+  },
+  {
+   "name": "infinite-moving-cards",
+   "title": "Infinite Moving Cards",
+   "category": "Card Components"
+  },
+  {
+   "name": "draggable-card",
+   "title": "Draggable Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "comet-card",
+   "title": "Comet Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "glare-card",
+   "title": "Glare Card",
+   "category": "Card Components"
+  },
+  {
+   "name": "direction-aware-hover",
+   "title": "Direction Aware Hover",
+   "category": "Card Components"
+  },
+  {
+   "name": "parallax-scroll",
+   "title": "Parallax Scroll",
+   "category": "Scroll & Parallax"
+  },
+  {
+   "name": "sticky-scroll-reveal",
+   "title": "Sticky Scroll Reveal",
+   "category": "Scroll & Parallax"
+  },
+  {
+   "name": "macbook-scroll",
+   "title": "Macbook Scroll",
+   "category": "Scroll & Parallax"
+  },
+  {
+   "name": "container-scroll-animation",
+   "title": "Container Scroll Animation",
+   "category": "Scroll & Parallax"
+  },
+  {
+   "name": "hero-parallax",
+   "title": "Hero Parallax",
+   "category": "Scroll & Parallax"
+  },
+  {
+   "name": "canvas-text",
+   "title": "Canvas Text",
+   "category": "Text Components"
+  },
+  {
+   "name": "encrypted-text",
+   "title": "Encrypted Text",
+   "category": "Text Components"
+  },
+  {
+   "name": "layout-text-flip",
+   "title": "Layout Text Flip",
+   "category": "Text Components"
+  },
+  {
+   "name": "colourful-text",
+   "title": "Colourful Text",
+   "category": "Text Components"
+  },
+  {
+   "name": "squiggly-text",
+   "title": "Squiggly Text",
+   "category": "Text Components"
+  },
+  {
+   "name": "text-generate-effect",
+   "title": "Text Generate Effect",
+   "category": "Text Components"
+  },
+  {
+   "name": "typewriter-effect",
+   "title": "Typewriter Effect",
+   "category": "Text Components"
+  },
+  {
+   "name": "flip-words",
+   "title": "Flip Words",
+   "category": "Text Components"
+  },
+  {
+   "name": "text-hover-effect",
+   "title": "Text Hover Effect",
+   "category": "Text Components"
+  },
+  {
+   "name": "container-text-flip",
+   "title": "Container Text Flip",
+   "category": "Text Components"
+  },
+  {
+   "name": "hero-highlight",
+   "title": "Hero Highlight",
+   "category": "Text Components"
+  },
+  {
+   "name": "text-reveal-card",
+   "title": "Text Reveal Card",
+   "category": "Text Components"
+  },
+  {
+   "name": "text-flipping-board",
+   "title": "Text Flipping Board",
+   "category": "Text Components"
+  },
+  {
+   "name": "magnetic-button",
+   "title": "Magnetic Button",
+   "category": "Buttons"
+  },
+  {
+   "name": "noise-background",
+   "title": "Noise Background",
+   "category": "Buttons"
+  },
+  {
+   "name": "tailwindcss-buttons",
+   "title": "Tailwind CSS buttons",
+   "category": "Buttons"
+  },
+  {
+   "name": "hover-border-gradient",
+   "title": "Hover Border Gradient",
+   "category": "Buttons"
+  },
+  {
+   "name": "moving-border",
+   "title": "Moving Border",
+   "category": "Buttons"
+  },
+  {
+   "name": "stateful-button",
+   "title": "Stateful Button",
+   "category": "Buttons"
+  },
+  {
+   "name": "image-generation-loader",
+   "title": "Image Generation Loader",
+   "category": "Loaders"
+  },
+  {
+   "name": "multi-step-loader",
+   "title": "Multi Step Loader",
+   "category": "Loaders"
+  },
+  {
+   "name": "loader",
+   "title": "Loader",
+   "category": "Loaders"
+  },
+  {
+   "name": "notch",
+   "title": "Notch",
+   "category": "Navigation"
+  },
+  {
+   "name": "floating-navbar",
+   "title": "Floating Navbar",
+   "category": "Navigation"
+  },
+  {
+   "name": "navbar-menu",
+   "title": "Navbar Menu",
+   "category": "Navigation"
+  },
+  {
+   "name": "sidebar",
+   "title": "Sidebar",
+   "category": "Navigation"
+  },
+  {
+   "name": "floating-dock",
+   "title": "Floating Dock",
+   "category": "Navigation"
+  },
+  {
+   "name": "tabs",
+   "title": "Tabs",
+   "category": "Navigation"
+  },
+  {
+   "name": "resizable-navbar",
+   "title": "Resizable Navbar",
+   "category": "Navigation"
+  },
+  {
+   "name": "sticky-banner",
+   "title": "Sticky Banner",
+   "category": "Navigation"
+  },
+  {
+   "name": "signup-form",
+   "title": "Signup Form",
+   "category": "Inputs & Forms"
+  },
+  {
+   "name": "placeholders-and-vanish-input",
+   "title": "Placeholders And Vanish Input",
+   "category": "Inputs & Forms"
+  },
+  {
+   "name": "file-upload",
+   "title": "File Upload",
+   "category": "Inputs & Forms"
+  },
+  {
+   "name": "gooey-input",
+   "title": "Gooey Input",
+   "category": "Inputs & Forms"
+  },
+  {
+   "name": "dither-shader",
+   "title": "Dither Shader",
+   "category": "Overlays & Popovers"
+  },
+  {
+   "name": "animated-modal",
+   "title": "Animated Modal",
+   "category": "Overlays & Popovers"
+  },
+  {
+   "name": "animated-tooltip",
+   "title": "Animated Tooltip",
+   "category": "Overlays & Popovers"
+  },
+  {
+   "name": "link-preview",
+   "title": "Link Preview",
+   "category": "Overlays & Popovers"
+  },
+  {
+   "name": "images-slider",
+   "title": "Images Slider",
+   "category": "Carousels & Sliders"
+  },
+  {
+   "name": "carousel",
+   "title": "Carousel",
+   "category": "Carousels & Sliders"
+  },
+  {
+   "name": "apple-cards-carousel",
+   "title": "Apple Cards Carousel",
+   "category": "Carousels & Sliders"
+  },
+  {
+   "name": "animated-testimonials",
+   "title": "Animated Testimonials",
+   "category": "Carousels & Sliders"
+  },
+  {
+   "name": "layout-grid",
+   "title": "Layout Grid",
+   "category": "Layout & Grid"
+  },
+  {
+   "name": "bento-grid",
+   "title": "Bento Grid",
+   "category": "Layout & Grid"
+  },
+  {
+   "name": "container-cover",
+   "title": "Container Cover",
+   "category": "Layout & Grid"
+  },
+  {
+   "name": "github-globe",
+   "title": "GitHub Globe",
+   "category": "Data & Visualization"
+  },
+  {
+   "name": "world-map",
+   "title": "World Map",
+   "category": "Data & Visualization"
+  },
+  {
+   "name": "timeline",
+   "title": "Timeline",
+   "category": "Data & Visualization"
+  },
+  {
+   "name": "compare",
+   "title": "Compare",
+   "category": "Data & Visualization"
+  },
+  {
+   "name": "code-block",
+   "title": "Codeblock",
+   "category": "Data & Visualization"
+  },
+  {
+   "name": "following-pointer",
+   "title": "Following Pointer",
+   "category": "Cursor & Pointer"
+  },
+  {
+   "name": "pointer-highlight",
+   "title": "Pointer Highlight",
+   "category": "Cursor & Pointer"
+  },
+  {
+   "name": "lens",
+   "title": "Lens",
+   "category": "Cursor & Pointer"
+  },
+  {
+   "name": "3d-globe",
+   "title": "3D Globe",
+   "category": "3D"
+  },
+  {
+   "name": "3d-pin",
+   "title": "3D Pin",
+   "category": "3D"
+  },
+  {
+   "name": "3d-marquee",
+   "title": "3D Marquee",
+   "category": "3D"
+  }
+ ],
+ "rareui": [
+  {
+   "name": "folder-component",
+   "title": "Folder Component",
+   "description": "Animated folder with fanning cards, a tilted flap, and sm/md/lg sizes and colors",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "bounce-sidebar",
+   "title": "Bounce Sidebar",
+   "description": "Vertical nav list with a springy active indicator",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "hook-sidebar",
+   "title": "Hook Sidebar",
+   "description": "Vertical nav list where a dashed rail marks the active item",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "family-drawer",
+   "title": "Family Drawer",
+   "description": "Bottom drawer with morphing transitions between stacked views, built on Vaul",
+   "dependencies": [
+    "motion",
+    "vaul"
+   ]
+  },
+  {
+   "name": "proximity-sidebar",
+   "title": "Proximity Sidebar",
+   "description": "Dash-style scrolling sidebar whose items expand as the pointer nears",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "duration-picker",
+   "title": "Duration Picker",
+   "description": "Gooey, spring-animated picker for hours and minutes",
+   "dependencies": [
+    "motion",
+    "figma-squircle",
+    "flubber",
+    "react-use-measure",
+    "@radix-ui/react-slot"
+   ]
+  },
+  {
+   "name": "fluid-orb",
+   "title": "Fluid Orb",
+   "description": "Animated WebGL orb with drifting fluid shading and size/color props",
+   "dependencies": []
+  },
+  {
+   "name": "scroll-progress",
+   "title": "Scroll Progress",
+   "description": "Progress pill tracking reading position that expands into a menu of jumpable sections",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "rail-toc",
+   "title": "Rail TOC",
+   "description": "Table of contents where a paper plane flies to the current section",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "code-block",
+   "title": "Code Block",
+   "description": "Code block whose full theme derives from one accent color",
+   "dependencies": [
+    "motion",
+    "prism-react-renderer",
+    "lucide-react"
+   ]
+  },
+  {
+   "name": "otp-input",
+   "title": "OTP Input",
+   "description": "One-time-code input with characters rolling into slots behind a sliding caret",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "password-input",
+   "title": "Password Input",
+   "description": "Password field with a show/hide toggle and a live strength meter",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "toast",
+   "title": "Toast",
+   "description": "Toast notification with animated status icons, built on Sonner",
+   "dependencies": [
+    "sonner",
+    "motion",
+    "figma-squircle"
+   ]
+  },
+  {
+   "name": "theme-selector",
+   "title": "Theme Selector",
+   "description": "Row of miniature app previews, one per theme, with a ring marking the selection",
+   "dependencies": []
+  },
+  {
+   "name": "gravity-letters",
+   "title": "Gravity Letters",
+   "description": "Gravity field where characters or components fall and pile up",
+   "dependencies": []
+  },
+  {
+   "name": "github-activity",
+   "title": "GitHub Activity",
+   "description": "Contribution heatmap with a footer panel that ranks top repositories",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "emoji-reaction",
+   "title": "Emoji Reaction",
+   "description": "Tapback-style button that opens an Apple emoji bar and floats copies of the pick",
+   "dependencies": [
+    "motion",
+    "react-apple-emojis",
+    "lucide-react",
+    "@radix-ui/react-slot"
+   ]
+  },
+  {
+   "name": "notification-bell",
+   "title": "Notification Bell",
+   "description": "iOS-style bell with an unread count badge",
+   "dependencies": [
+    "motion",
+    "@radix-ui/react-slot"
+   ]
+  },
+  {
+   "name": "step-player",
+   "title": "Step Player",
+   "description": "iOS-style stepped progress track with play, pause, and replay, where the active step becomes a filling bar",
+   "dependencies": [
+    "motion",
+    "flubber"
+   ]
+  },
+  {
+   "name": "grid-reveal",
+   "title": "Grid Reveal",
+   "description": "Loading state for AI images that resolves into the final picture",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "gooey-nav",
+   "title": "Gooey Nav",
+   "description": "Gooey navigation bar that separates the selected item from the group",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "delete-button",
+   "title": "Delete Button",
+   "description": "Delete button that confirms in place, with no dialog",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "animated-counter",
+   "title": "Animated Counter",
+   "description": "Odometer-style number that counts to its new value on digit wheels",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "matrix-orb",
+   "title": "Matrix Orb",
+   "description": "Dot-matrix orb that cycles through idle, listening, and thinking states",
+   "dependencies": []
+  },
+  {
+   "name": "task-list",
+   "title": "Task List",
+   "description": "Checklist that strikes through completed tasks and moves them to the bottom",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "voice-note",
+   "title": "Voice Note",
+   "description": "Voice message bar with a scrubbable waveform and play control",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "faq",
+   "title": "FAQ",
+   "description": "FAQ displayed as a message thread, with answers as reply bubbles",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "web-search",
+   "title": "Web Search",
+   "description": "Sources behind an AI answer: search pill, source cards, streaming answer, inline citations",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "ai-status",
+   "title": "Inline AI Status",
+   "description": "Inline status showing AI progress from thinking through researching and writing to done",
+   "dependencies": [
+    "motion",
+    "react-use-measure"
+   ]
+  },
+  {
+   "name": "prompt-box",
+   "title": "AI Prompt Box",
+   "description": "Chat input where holding send longer sets how hard the AI thinks",
+   "dependencies": [
+    "motion"
+   ]
+  },
+  {
+   "name": "streaming-response",
+   "title": "Streaming Response",
+   "description": "AI reply that appears word by word, with markdown, a caret, and a reply bar",
+   "dependencies": [
+    "motion",
+    "lucide-react"
+   ]
+  }
+ ]
+}

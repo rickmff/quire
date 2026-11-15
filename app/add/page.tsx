@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fetchMeta, normalizeUrl, readLibrary, uid, writeLibrary } from "@/lib/store";
+import { fetchMeta, normalizeUrl, pushLibrary, readLibrary, uid, writeLibrary } from "@/lib/store";
+import type { ClientCatalog } from "@/lib/useCatalog";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 
 function Add() {
@@ -13,6 +14,7 @@ function Add() {
   useEffect(() => {
     const url = normalizeUrl(params.get("url") ?? "");
     if (!url) return setState("error");
+    if (params.get("mode") === "site") return window.location.replace(`/app?import=${encodeURIComponent(url)}`);
     const lib = readLibrary();
     if (lib.bookmarks.some((b) => b.url === url)) return setState("exists");
     // The extension can pass what it read from the page, e.g. a post on X.
@@ -21,6 +23,37 @@ function Add() {
     const hintImage = /^https:\/\//.test(hint("image") ?? "") ? hint("image") : undefined;
     (async () => {
       const m = matchLibrary(url);
+      // A page of the curated catalog: save it with its catalog id, so agents get its source.
+      let known: ClientCatalog["components"][number] | undefined;
+      try {
+        const cat: ClientCatalog = await (await fetch("/api/catalog")).json();
+        known = cat.components.find((c) => c.docs.replace(/\/$/, "") === url.replace(/\/$/, ""));
+        if (known) {
+          const fresh = readLibrary();
+          fresh.bookmarks.unshift({
+            id: uid(),
+            url,
+            title: known.title,
+            description: known.description,
+            image: known.preview,
+            library: cat.libraries.find((l) => l.id === known!.library)?.name ?? known.library,
+            install: known.install,
+            registry: known.item,
+            category: known.category,
+            type: known.type,
+            ref: known.id,
+            tags: [],
+            collectionId: null,
+            createdAt: Date.now(),
+          });
+          writeLibrary(fresh);
+          await pushLibrary(fresh);
+          setTitle(known.title);
+          setState("saved");
+          setTimeout(() => window.close(), 1200);
+          return;
+        }
+      } catch {}
       let meta = null;
       try {
         meta = await fetchMeta(url);
@@ -39,6 +72,7 @@ function Add() {
         createdAt: Date.now(),
       });
       writeLibrary(fresh);
+      await pushLibrary(fresh);
       setTitle(hintTitle ?? meta?.title ?? url);
       setState("saved");
       setTimeout(() => window.close(), 1200);

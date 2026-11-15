@@ -73,7 +73,7 @@ export const TYPES: ComponentType[] = [
   { id: "device", name: "Device mockup", family: "Media", re: /mockup|iphone|android|safari|browser frame/i },
 
   // Visual effects
-  { id: "text-effect", name: "Text effect", family: "Effect", re: /\btext|letters?|typewriter|typing|heading|\bwords?\b|font|glyph/i },
+  { id: "text-effect", name: "Text effect", family: "Effect", re: /\btext|headline|letters?|typewriter|typing|heading|\bwords?\b|font|glyph/i },
   { id: "orb", name: "Orb & shader", family: "Effect", re: /\borb\b|blob|sphere|shader|webgl|fluid/i },
   { id: "background", name: "Background", family: "Effect", re: /background|gradient|\bgrid\b|beams?|particles|aurora|noise|dots|stars|meteor/i },
   { id: "3d", name: "3D", family: "Effect", re: /\b3d\b|three|globe/i },

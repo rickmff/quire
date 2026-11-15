@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  Save components from any UI library, organize them into collections, and hand them to your AI agent.
+  A reference gallery of UI components, micro-interactions and animations, organized by type, that your AI agent reads over MCP.
 </p>
 
 <p align="center">
@@ -26,15 +26,34 @@
 
 ## Features
 
-- **Save links.** Paste a component URL anywhere in the app (⌘V). quire adds a card with title, description and preview image.
-- **Library detection.** quire recognizes 24 sources, including shadcn/ui, Magic UI, Aceternity UI, 21st.dev and React Bits. For shadcn registries it adds the `npx shadcn add` command.
-- **Import a whole site.** Paste the page that lists a library's components (for example `rareui.com/components`) and click **Import site**, or use ⌘K. quire reads the site's shadcn registry when it has one, else the page links or the sitemap, and shows every component for review before it saves them.
-- **Types.** Every card gets a component type (Sidebar, Toast, OTP input…) from one shared list, so references from different sites line up in the sidebar under **Types**. Change a card's type from its tag menu or by dragging it onto a type.
-- **Collections.** Group cards in the sidebar. Drag a card onto a collection to move it. Double-click a collection to rename it.
-- **Notes.** Add a note to each card for your agent.
-- **Command palette.** ⌘K searches every card, filters by library, and exports a collection as Markdown or JSON for an AI agent.
-- **Keyboard.** Arrows or `h` `j` `k` `l` to move, `Enter` to open, `c` to copy, `Backspace` to delete.
-- **Local first.** Data stays in your browser. Export and import JSON backups from ⌘K.
+- **Curated library.** 1,984 components from 20 component sites (Magic UI, Aceternity UI, React Bits, Animate UI, Motion Primitives, Cult UI, Kokonut UI, SmoothUI, Animata and more), read from each site's registry or repo.
+- **Or start from scratch.** Begin empty and paste the link of each component library you want. Quire reads its registry, pages or sitemap and adds every component.
+- **Organized by type, not by site.** Every component gets a type (button, dock, text effect, background…), the motion that drives it (hover, scroll, cursor, drag, loop…) and the tech it uses (Motion, GSAP, Three.js).
+- **Detail like a gallery.** Preview, credit and link to the source, install command, and the real source code.
+- **MCP for agents.** `/api/mcp` serves the curated library, or your own library with your key. Tools: `recommend`, `search_components`, `get_component`, `get_component_source`, `get_filters`, `list_libraries`.
+- **Collections and notes.** Save components, group them, add a note for your agent. ⌘K searches and exports.
+
+## MCP
+
+```bash
+claude mcp add --transport http quire https://quire.fyi/api/mcp
+```
+
+Open **Agents** in the app to connect your own library. You get the same address with a private `key`.
+Start an agent with a brief, for example "pricing page with a playful toggle and a magnetic button". It calls
+`recommend`, then `get_component_source` for the references it adapts.
+
+## Curated catalog
+
+`lib/catalog/data.json` is generated. The sources live in `scripts/catalog/sources.ts`.
+
+```bash
+node scripts/build-catalog.ts            # all sites
+node scripts/build-catalog.ts magicui    # one site
+```
+
+Previews come from the libraries' own repos where they keep them. The rest come from the capture service in
+[`capture/`](capture/README.md), which runs Chromium on a VPS and records a still and a short clip of each component.
 
 ## Browser extension
 
@@ -42,10 +61,11 @@
 
 1. Open `chrome://extensions` and turn on Developer mode.
 2. Click **Load unpacked** and select the `extension/` folder.
-3. Click the icon or press Alt+S on any page to save it.
-4. On x.com, click the quire button next to X's bookmark button to save a post. The card keeps the post text and first image.
+3. Click the icon or press Alt+S on a component page to save it. A page from the curated catalog keeps its source for your agent.
+4. Press Alt+Shift+S, or right-click, to add the whole component library you are on.
+5. On x.com, click the quire button next to X's bookmark button to save a post.
 
-The extension saves to [quire.fyi](https://quire.fyi). To use your own instance, set its address in the extension options. A bookmarklet in the app sidebar does the same job without the extension.
+The extension saves to [quire.fyi](https://quire.fyi). To use your own instance, set its address in the extension options.
 
 ## Getting started
 
@@ -59,6 +79,15 @@ npm run dev
 Open [localhost:3000](http://localhost:3000). The landing page is at `/` and the app is at `/app`.
 
 The link preview API (`/api/meta`) blocks private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.
+
+### Environment
+
+| Variable | Needed for |
+| --- | --- |
+| `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, `CF_API_TOKEN` | Syncing personal libraries so the MCP can read them (Cloudflare KV, token with KV edit rights). Upstash also works: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. In development, libraries go to `.data/`. |
+| `QUIRE_CAPTURE_URL`, `QUIRE_CAPTURE_TOKEN` | Previews for components added by link. See [`capture/`](capture/README.md). |
+
+Without them, the curated library and its MCP still work.
 
 ## Tech stack
 

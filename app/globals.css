@@ -65,3 +65,7 @@ body {
 [cmdk-input]:focus-visible,
 input:not([type="checkbox"]):not([type="radio"]):focus-visible,
 textarea:focus-visible { outline: none; }
+
+@keyframes slide { from { opacity: 0; transform: translateX(16px) } }
+.slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
