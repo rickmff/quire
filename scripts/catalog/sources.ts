@@ -34,6 +34,9 @@ export type Source = {
   pathHint?: (name: string) => RegExp | undefined;
   // Source files for mdx/pages sources, as repo paths.
   code?: (name: string, category: string) => string[];
+  // Docs pages kept as .mdx in the repo: a name found under dir links to
+  // base + its path there, e.g. content/docs/blocks/hero/hero1.mdx -> /docs/blocks/hero/hero1.
+  docsPages?: { dir: string; base: string };
 };
 
 const shadcnAdd = (url: string) => `npx shadcn@latest add ${url}`;
@@ -178,6 +181,7 @@ export const SOURCES: Source[] = [
     kind: "registry",
     path: "registry.json",
     docs: (n) => `https://www.8bitcn.com/docs/components/${n}`,
+    docsPages: { dir: "content/docs/", base: "https://www.8bitcn.com/docs/" },
     item: (n) => `https://www.8bitcn.com/r/${n}.json`,
     install: (n) => shadcnAdd(`@8bitcn/${n}`),
   },

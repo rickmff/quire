@@ -240,6 +240,14 @@ for (const src of SOURCES) {
   }
   try {
     const items = await build(src);
+    if (src.docsPages && src.repo) {
+      const { dir, base } = src.docsPages;
+      const pages = checkout(src.repo, src.branch).files.filter((f) => f.startsWith(dir) && f.endsWith(".mdx"));
+      for (const c of items) {
+        const hit = pages.find((f) => f.endsWith(`/${c.name}.mdx`));
+        if (hit) c.docs = base + hit.slice(dir.length, -4);
+      }
+    }
     components.push(...items);
     libraries.push({ id: src.id, name: src.name, url: src.url, blurb: src.blurb, repo: src.repo, count: items.length });
     console.log(`${src.id.padEnd(18)} ${items.length}`);

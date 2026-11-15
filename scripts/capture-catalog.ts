@@ -49,7 +49,7 @@ const read = <T,>(file: string, empty: T): T => (existsSync(file) ? JSON.parse(r
 const catalog: Catalog = read(DATA, { version: 1, generatedAt: "", libraries: [], components: [] });
 const shots = read<Record<string, { image?: string; video?: string }>>(OUT, {});
 const failed = read<Record<string, string>>(FAILED, {});
-if (flag("retry")) for (const id of Object.keys(failed)) delete failed[id];
+if (flag("retry")) for (const id of Object.keys(failed)) if (!only || id.startsWith(`${only}/`)) delete failed[id];
 
 const todo = catalog.components
   .filter((c) => !c.preview && !shots[c.id]?.image && !failed[c.id] && (!only || c.library === only))

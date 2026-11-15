@@ -777,6 +777,20 @@ function Sidebar(props: {
     return [...m];
   }, [counts]);
 
+  // Ticks within ~3 rows of the pointer grow, nearest the most.
+  const ruler = useRef<HTMLElement>(null);
+  const grow = (e: React.MouseEvent) => {
+    for (const el of ruler.current?.querySelectorAll<HTMLElement>("[data-row]") ?? []) {
+      const r = el.getBoundingClientRect();
+      const d = Math.abs(e.clientY - (r.top + r.height / 2)) / r.height;
+      el.style.setProperty("--grow", String(Math.max(0, 1 - d / 3).toFixed(2)));
+    }
+  };
+  const settle = () => ruler.current?.querySelectorAll<HTMLElement>("[data-row]").forEach((el) => el.style.removeProperty("--grow"));
+  useEffect(() => {
+    ruler.current?.querySelector("[aria-current=page]")?.scrollIntoView({ block: "nearest" });
+  }, [view]);
+
   const bookmarklet = origin
     ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
     : "#";
@@ -784,11 +798,16 @@ function Sidebar(props: {
   return (
     <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
-        <div className="flex h-10 items-center px-2 md:h-6">
+        <div className="flex h-10 items-center px-2 md:h-6 md:pl-[34px]">
           <Wordmark className="h-[15px] w-auto text-fg" />
         </div>
 
-        <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:min-h-0 md:flex-1 md:flex-col md:overflow-y-auto md:pb-4">
+        <nav
+          ref={ruler}
+          onMouseMove={grow}
+          onMouseLeave={settle}
+          className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
+        >
           <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
           <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
           <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
@@ -804,7 +823,7 @@ function Sidebar(props: {
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   if (e.key === "Escape") props.setRenaming(null);
                 }}
-                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus"
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
               />
             ) : (
               <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
@@ -821,12 +840,12 @@ function Sidebar(props: {
                 if (e.key === "Escape") setNewCol(null);
               }}
               placeholder="Name"
-              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint"
+              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint md:ml-[34px]"
             />
           ) : (
             <button
               onClick={() => setNewCol("")}
-              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted"
+              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:pl-[34px]"
             >
               New collection
             </button>
@@ -836,7 +855,7 @@ function Sidebar(props: {
               <div className="hidden h-6 md:block" />
               {families.map(([family, types]) => (
                 <div key={family} className="contents">
-                  <span className="hidden px-2 pt-3 pb-1 text-[11px] text-faint md:block">{family}</span>
+                  <span className="hidden pt-4 pb-1 pl-[34px] text-[11px] text-faint md:block">{family}</span>
                   {types.map((t) => (
                     <NavItem key={t.id} id={`type:${t.id}`} name={t.name} count={counts[`type:${t.id}`]} {...props} />
                   ))}
@@ -856,14 +875,14 @@ function Sidebar(props: {
             href={bookmarklet}
             onClick={(e) => e.preventDefault()}
             title="Drag to your bookmarks bar, then click it on any page to save it"
-            className="rounded-md px-2 py-1 text-faint transition hover:text-muted"
+            className="rounded-md px-2 py-1 text-faint transition hover:text-muted md:pl-[34px]"
           >
             Save button <span className="text-faint">· drag to bar</span>
           </a>
-          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted">
+          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted md:pl-[34px]">
             Commands <span>⌘K</span>
           </button>
-          <span className="px-2 py-1 text-faint">Open source · MIT</span>
+          <span className="px-2 py-1 text-faint md:pl-[34px]">Open source · MIT</span>
         </div>
       </div>
     </aside>
@@ -906,11 +925,16 @@ function NavItem({
         if (bid && droppable) moveTo(bid, id);
       }}
       title={onRename ? "Double-click to rename" : undefined}
-      className={`group flex h-7 shrink-0 items-center justify-between gap-4 rounded-md px-2 text-left whitespace-nowrap transition ${
-        active ? "bg-hover text-fg" : "text-muted hover:text-fg"
+      data-row
+      aria-current={active ? "page" : undefined}
+      className={`group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap transition md:rounded-none md:px-0 ${
+        active ? "bg-hover text-fg md:bg-transparent" : "text-muted hover:text-fg"
       } ${over ? "bg-hover text-fg" : ""}`}
     >
-      <span className="truncate">{name}</span>
+      <span className="hidden w-[26px] shrink-0 md:block">
+        <span data-tick className={`block h-px ${active ? "" : "bg-faint group-hover:bg-muted"}`} />
+      </span>
+      <span data-label className="min-w-0 flex-1 truncate">{name}</span>
       <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
         {count || ""}
       </span>
