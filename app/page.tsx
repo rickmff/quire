@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FocusReveal from "@/components/FocusReveal";
 import Quire3D from "@/components/Quire3D";
 import Wordmark from "@/components/Wordmark";
 import s from "@/components/Landing.module.css";
@@ -18,9 +19,9 @@ export default function Landing() {
       <main className={s.main}>
         <Quire3D />
         <div className={s.copy}>
-          <h1 className={s.title}>
-            Keep every component you find. <span>Hand them to your agent.</span>
-          </h1>
+          <FocusReveal
+            parts={[{ text: "Keep every component you find." }, { text: "Hand them to your agent.", muted: true }]}
+          />
           <div className={s.cta}>
             <Link href="/app" className={`${s.btn} ${s.solid}`}>
               Start collecting
