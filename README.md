@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  A reference gallery of UI components, micro-interactions and animations, organized by type, that your AI agent reads over MCP.
+  A reference gallery of UI components, micro-interactions and animations, organized by library, that your AI agent reads over MCP.
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@
 
 - **Curated library.** 1,796 components from 19 component sites (Magic UI, Aceternity UI, React Bits, Animate UI, Motion Primitives, Cult UI, Kokonut UI, SmoothUI, Animata and more), read from each site's registry or repo.
 - **Or start from scratch.** Begin empty and paste the link of each component library you want. Quire reads its registry, pages or sitemap and adds every component.
-- **Organized by type, not by site.** Every component gets a type (button, dock, text effect, background…), the motion that drives it (hover, scroll, cursor, drag, loop…) and the tech it uses (Motion, GSAP, Three.js).
+- **Organized by library.** Browse each library and its own components. Every component also gets a type (button, dock, text effect, background…), the motion that drives it (hover, scroll, cursor, drag, loop…) and the tech it uses (Motion, GSAP, Three.js), so agents can still ask for all buttons across libraries.
 - **Detail like a gallery.** Preview, credit and link to the source, install command, and the real source code.
 - **MCP for agents.** `/api/mcp` serves the curated library, or your own library with your key. Tools: `recommend`, `search_components`, `get_component`, `get_component_source`, `get_filters`, `list_libraries`.
 - **Collections and notes.** Save components, group them, add a note for your agent. ⌘K searches and exports.

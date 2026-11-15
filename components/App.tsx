@@ -28,8 +28,13 @@ import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 type View = "library" | "all" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
+// "site:<key>" = one library and its own components.
+const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5) : null);
 const PAGES = new Set(["library", "sites", "agents"]);
-const isGallery = (v: View) => v === "library" || typeView(v) !== null;
+const isGallery = (v: View) => v === "library" || typeView(v) !== null || siteView(v) !== null;
+// Curated components group by library id; your own links by the site they came from.
+const siteKey = (i: { library: string; site?: string }) =>
+  i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
 const EXAMPLES = [
   "magicui.design/docs/components/marquee",
@@ -43,6 +48,15 @@ export default function App() {
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
+
+  // Quire registers no service worker. One left on this origin by another app
+  // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
+  useEffect(() => {
+    navigator.serviceWorker
+      ?.getRegistrations()
+      .then((rs) => rs.forEach((r) => r.unregister()))
+      .catch(() => {});
+  }, []);
   const [input, setInput] = useState("");
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
@@ -186,8 +200,21 @@ export default function App() {
 
   const galleryView = useMemo(() => {
     const t = typeView(view);
+    const s = siteView(view);
+    if (s) return galleryItems.filter((i) => siteKey(i) === s);
     return t ? galleryItems.filter((i) => i.type === t) : galleryItems;
   }, [galleryItems, view]);
+
+  // Library first: every site in the library, with its own components.
+  const sites = useMemo(() => {
+    const m = new Map<string, { key: string; name: string; items: GalleryItem[] }>();
+    for (const i of galleryItems) {
+      const key = siteKey(i);
+      if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
+      m.get(key)!.items.push(i);
+    }
+    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [galleryItems, catalog]);
 
   const saveFromCatalog = (c: GalleryItem) => {
     if (lib.bookmarks.some((b) => b.ref === c.id || b.url === c.docs)) return flash("Already saved");
@@ -328,7 +355,17 @@ export default function App() {
   const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
   const viewType = typeView(view);
   const viewName =
-    view === "library" ? "Library" : view === "all" ? "Saved" : view === null ? "Inbox" : viewType ? typeById(viewType).name : (current?.name ?? "Saved");
+    view === "library"
+      ? "Library"
+      : view === "all"
+        ? "Saved"
+        : view === null
+          ? "Inbox"
+          : viewType
+            ? typeById(viewType).name
+            : siteView(view)
+              ? (sites.find((x) => x.key === siteView(view))?.name ?? "Library")
+              : (current?.name ?? "Saved");
   const exportView = view;
 
   const setType = (bookmarkId: string, type: string) =>
@@ -460,6 +497,9 @@ export default function App() {
         renameCollection={renameCollection}
         moveTo={dropTo}
         openPalette={() => setPalette(true)}
+        sites={sites}
+        openItem={setOpen}
+        openId={open?.id}
       />
 
       <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
@@ -516,6 +556,8 @@ export default function App() {
             <Gallery
               items={galleryView}
               title={viewName}
+              sections={view === "library" && sites.length > 1 ? sites : undefined}
+              onSite={(key) => setView(`site:${key}`)}
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
               empty={
@@ -763,19 +805,15 @@ function Sidebar(props: {
   renameCollection: (id: string, name: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
   openPalette: () => void;
+  sites: { key: string; name: string; items: GalleryItem[] }[];
+  openItem: (item: GalleryItem) => void;
+  openId?: string;
 }) {
-  const { lib, view, setView, counts, newCol, setNewCol } = props;
+  const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
+  const activeSite = siteView(view);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
 
-  const families = useMemo(() => {
-    const m = new Map<string, typeof TYPES>();
-    for (const t of [...TYPES, OTHER]) {
-      if (!counts[`type:${t.id}`]) continue;
-      m.set(t.family, [...(m.get(t.family) ?? []), t]);
-    }
-    return [...m];
-  }, [counts]);
 
   // Ticks within ~3 rows of the pointer grow, nearest the most.
   const ruler = useRef<HTMLElement>(null);
@@ -850,15 +888,33 @@ function Sidebar(props: {
               New collection
             </button>
           )}
-          {[...TYPES, OTHER].some((t) => counts[`type:${t.id}`]) && (
+          {sites.length > 0 && (
             <>
               <div className="hidden h-6 md:block" />
-              {families.map(([family, types]) => (
-                <div key={family} className="contents">
-                  <span className="hidden pt-4 pb-1 pl-[34px] text-[11px] text-faint md:block">{family}</span>
-                  {types.map((t) => (
-                    <NavItem key={t.id} id={`type:${t.id}`} name={t.name} count={counts[`type:${t.id}`]} {...props} />
-                  ))}
+              <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
+              {sites.map((x) => (
+                <div key={x.key} className="contents">
+                  <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
+                  {activeSite === x.key && (
+                    <div className="hidden md:contents">
+                      {x.items.map((i) => (
+                        <button
+                          key={i.id}
+                          data-row
+                          aria-current={openId === i.id ? "page" : undefined}
+                          onClick={() => openItem(i)}
+                          className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+                        >
+                          <span className="w-[26px] shrink-0">
+                            <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
+                          </span>
+                          <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
+                            {i.title}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </>
@@ -908,7 +964,7 @@ function NavItem({
 }) {
   const [over, setOver] = useState(false);
   const active = view === id;
-  const droppable = id !== "all" && !(typeof id === "string" && PAGES.has(id));
+  const droppable = id !== "all" && !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
   return (
     <button
       onClick={() => setView(id)}
