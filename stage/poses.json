@@ -1,0 +1,636 @@
+{
+ "animate-ui/components-backgrounds-bubble": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-fireworks": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-gradient": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-gravity-stars": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-hexagon": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-hole": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-backgrounds-stars": {
+  "fill": true,
+  "wait": 2500
+ },
+ "animate-ui/components-radix-dialog": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-alert-dialog": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-sheet": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-popover": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-dropdown-menu": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-base-menu": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/primitives-base-menu": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-hover-card": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject a, #subject button, #subject [data-slot]"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-tooltip": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject a, #subject button, #subject [data-slot]"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-base-preview-card": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject a, #subject button, #subject [data-slot]"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/primitives-base-preview-card": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject a, #subject button, #subject [data-slot]"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-preview-link-card": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject a"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-community-radial-menu": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "rightclick": "#subject > *"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-accordion": {
+  "w": 560,
+  "steps": [
+   {
+    "wait": 600
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1000
+   }
+  ]
+ },
+ "animate-ui/primitives-radix-collapsible": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/primitives-headless-disclosure": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-checkbox": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-switch": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-radix-toggle": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-buttons-flip": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-buttons-liquid": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-buttons-ripple": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 250
+   }
+  ]
+ },
+ "animate-ui/components-buttons-copy": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 500
+   }
+  ]
+ },
+ "animate-ui/components-buttons-icon": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-animate-cursor": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > *",
+    "at": [
+     0.62,
+     0.55
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/primitives-effects-magnetic": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > *",
+    "at": [
+     0.8,
+     0.7
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/primitives-effects-click": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "click": "#subject > *"
+   },
+   {
+    "wait": 150
+   }
+  ]
+ },
+ "animate-ui/primitives-effects-tilt": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > *",
+    "at": [
+     0.8,
+     0.3
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "animate-ui/components-animate-github-stars-wheel": {
+  "wait": 6500
+ },
+ "animate-ui/components-buttons-github-stars": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-animate-github-stars": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-sliding-number": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-morphing": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-typing": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-rotating": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-counting-number": {
+  "wait": 6500
+ },
+ "animate-ui/components-animate-code": {
+  "wait": 6500
+ },
+ "animate-ui/components-animate-code-tabs": {
+  "wait": 6500,
+  "w": 620
+ },
+ "animate-ui/primitives-animate-code-block": {
+  "wait": 6500
+ },
+ "animate-ui/primitives-texts-scrolling-number": {
+  "wait": 6500
+ },
+ "magicui/animated-beam": {
+  "wait": 700,
+  "video": {
+   "force": true,
+   "seconds": 5
+  }
+ },
+ "magicui/cool-mode": {
+  "steps": [
+   {
+    "wait": 600
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 120
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 120
+   },
+   {
+    "click": "#subject button"
+   },
+   {
+    "wait": 250
+   }
+  ]
+ },
+ "magicui/magic-card": {
+  "w": 460,
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > *",
+    "at": [
+     0.3,
+     0.3
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "magicui/glare-hover": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > *",
+    "at": [
+     0.35,
+     0.4
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "magicui/smooth-cursor": {
+  "steps": [
+   {
+    "wait": 600
+   },
+   {
+    "move": [
+     700,
+     420
+    ]
+   },
+   {
+    "wait": 800
+   }
+  ]
+ },
+ "magicui/pointer": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject > * > *",
+    "at": [
+     0.5,
+     0.5
+    ]
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "magicui/dock": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "hover": "#subject a >> nth=2"
+   },
+   {
+    "wait": 900
+   }
+  ]
+ },
+ "magicui/interactive-hover-button": {
+  "steps": [
+   {
+    "wait": 900
+   },
+   {
+    "hover": "#subject button"
+   },
+   {
+    "wait": 1200
+   }
+  ]
+ },
+ "magicui/confetti": {
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "click": "#subject button, #subject > *"
+   },
+   {
+    "wait": 500
+   }
+  ]
+ },
+ "magicui/typing-animation": {
+  "wait": 5000
+ },
+ "magicui/number-ticker": {
+  "wait": 4000
+ },
+ "magicui/shine-border": {
+  "w": 460
+ },
+ "animate-ui/primitives-animate-scroll-progress": {
+  "w": 560,
+  "h": 340,
+  "box": true,
+  "steps": [
+   {
+    "wait": 1200
+   },
+   {
+    "hover": "#subject",
+    "at": [
+     0.5,
+     0.5
+    ]
+   },
+   {
+    "scroll": 120
+   },
+   {
+    "wait": 900
+   }
+  ]
+ },
+ "animate-ui/primitives-animate-motion-grid": {
+  "wait": 1000
+ },
+ "magicui/scroll-progress": {
+  "fullFrame": true,
+  "steps": [
+   {
+    "wait": 800
+   },
+   {
+    "eval": "document.body.style.minHeight='2400px'; window.scrollTo(0, 640)"
+   },
+   {
+    "wait": 700
+   }
+  ]
+ },
+ "animate-ui/components-radix-sidebar": {
+  "fill": true,
+  "wait": 2000
+ }
+}

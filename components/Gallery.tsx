@@ -187,17 +187,37 @@ export function Gallery({
   );
 }
 
+// Follows the system theme, like the rest of the site.
+function useDark() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const on = () => setDark(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return dark;
+}
+
 export function Preview({ item, site, large }: { item: GalleryItem; site: string; large?: boolean }) {
-  const [img, setImg] = useState(Boolean(item.preview));
-  const [vid, setVid] = useState(Boolean(item.video));
+  const dark = useDark();
+  const image = (dark && item.previewDark) || item.preview;
+  const video = (dark && item.videoDark) || item.video;
+  return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
+}
+
+function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; site: string; large?: boolean; image?: string; video?: string }) {
+  const [img, setImg] = useState(Boolean(image));
+  const [vid, setVid] = useState(Boolean(video));
   const ref = useRef<HTMLVideoElement>(null);
 
-  if (vid && item.video)
+  if (vid && video)
     return (
       <video
         ref={ref}
-        src={item.video}
-        poster={img ? item.preview : undefined}
+        src={video}
+        poster={img ? image : undefined}
         muted
         loop
         playsInline
@@ -209,11 +229,11 @@ export function Preview({ item, site, large }: { item: GalleryItem; site: string
         className="size-full object-cover"
       />
     );
-  if (img && item.preview)
+  if (img && image)
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={item.preview}
+        src={image}
         alt=""
         loading="lazy"
         draggable={false}

@@ -1,0 +1,7 @@
+app-*/
+out/
+node_modules/
+mirror/*
+!mirror/fetch-assets.mjs
+sheet-*.png
+*.log
