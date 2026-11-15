@@ -17,8 +17,10 @@ export type CatalogComponent = {
   install?: string;
   repo?: string; // GitHub owner/name, for the source fallback
   files?: string[]; // source paths inside repo
-  preview?: string; // image URL
-  video?: string; // short clip URL (webm or mp4)
+  preview?: string; // image URL (light theme)
+  previewDark?: string; // image URL for the dark theme
+  video?: string; // short clip URL (webm or mp4), light theme
+  videoDark?: string; // clip for the dark theme
   note?: string; // the user's note, personal items only
   site?: string; // display name of the source, personal items only
 };

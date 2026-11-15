@@ -26,7 +26,7 @@
 
 ## Features
 
-- **Curated library.** 1,796 components from 19 component sites (Magic UI, Aceternity UI, React Bits, Animate UI, Motion Primitives, Cult UI, Kokonut UI, SmoothUI, Animata and more), read from each site's registry or repo.
+- **Curated library.** 166 components from two libraries, Magic UI (79) and Animate UI (87), read from each library's registry. The catalog is kept small so every component has a preview that was rendered and checked by hand.
 - **Or start from scratch.** Begin empty and paste the link of each component library you want. Quire reads its registry, pages or sitemap and adds every component.
 - **Organized by library.** Browse each library and its own components. Every component also gets a type (button, dock, text effect, background…), the motion that drives it (hover, scroll, cursor, drag, loop…) and the tech it uses (Motion, GSAP, Three.js), so agents can still ask for all buttons across libraries.
 - **Detail like a gallery.** Preview, credit and link to the source, install command, and the real source code.
@@ -52,9 +52,11 @@ node scripts/build-catalog.ts            # all sites
 node scripts/build-catalog.ts magicui    # one site
 ```
 
-Every card in the gallery shows a preview. Previews come from the libraries' own repos where they keep them.
-The rest are recorded by the capture service in [`capture/`](capture/README.md), which runs Chromium on your
-computer, and saved in `public/previews/`. Components without a preview stay out of the gallery.
+Every card in the gallery shows a preview, rendered on the Quire stage in [`stage/`](stage/README.md). The stage
+installs each component's own demo from the library's registry into a neutral Vite app, poses it (opens the
+dialog, hovers the button, waits for the animation), frames what is on screen and saves a 1600×1000 still for
+the light and the dark theme, plus a short clip when the component moves. Files go to `public/previews/` and
+`lib/catalog/stage.json`. Components without a preview stay out of the gallery.
 
 ## Browser extension
 

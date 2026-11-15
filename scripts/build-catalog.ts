@@ -256,8 +256,24 @@ for (const src of SOURCES) {
   }
 }
 
+// Previews rendered on the Quire stage (stage/) win over a library's own
+// media: the same framing, size and themes for every card.
+const STAGE = join(ROOT, "lib/catalog/stage.json");
+if (existsSync(STAGE)) {
+  type Shot = { image?: string; imageDark?: string; video?: string; videoDark?: string };
+  const shots: Record<string, Shot> = JSON.parse(readFileSync(STAGE, "utf8"));
+  for (const c of components) {
+    const s = shots[c.id];
+    if (!s?.image) continue;
+    c.preview = s.image;
+    c.previewDark = s.imageDark;
+    c.video = s.video;
+    c.videoDark = s.videoDark;
+  }
+}
+
 // Previews recorded by the capture service (scripts/capture-catalog.ts) fill
-// in where a library keeps no preview in its repo.
+// in where a component has none yet.
 const CAPTURES = join(ROOT, "lib/catalog/captures.json");
 if (existsSync(CAPTURES)) {
   const shots: Record<string, { image?: string; video?: string }> = JSON.parse(readFileSync(CAPTURES, "utf8"));
