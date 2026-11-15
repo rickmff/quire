@@ -226,7 +226,5 @@
  "syntaxui/input": "page returned 500",
  "syntaxui/loaders": "page returned 500",
  "syntaxui/text": "page returned 500",
- "syntaxui/toggle": "page returned 500",
- "8bitcn/login-form-2": "page returned 404",
- "8bitcn/profile-card": "page returned 404"
+ "syntaxui/toggle": "page returned 500"
 }

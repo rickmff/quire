@@ -26,7 +26,7 @@
 
 ## Features
 
-- **Curated library.** 1,984 components from 20 component sites (Magic UI, Aceternity UI, React Bits, Animate UI, Motion Primitives, Cult UI, Kokonut UI, SmoothUI, Animata and more), read from each site's registry or repo.
+- **Curated library.** 1,796 components from 19 component sites (Magic UI, Aceternity UI, React Bits, Animate UI, Motion Primitives, Cult UI, Kokonut UI, SmoothUI, Animata and more), read from each site's registry or repo.
 - **Or start from scratch.** Begin empty and paste the link of each component library you want. Quire reads its registry, pages or sitemap and adds every component.
 - **Organized by type, not by site.** Every component gets a type (button, dock, text effect, background…), the motion that drives it (hover, scroll, cursor, drag, loop…) and the tech it uses (Motion, GSAP, Three.js).
 - **Detail like a gallery.** Preview, credit and link to the source, install command, and the real source code.
