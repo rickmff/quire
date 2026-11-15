@@ -1,0 +1,3206 @@
+{
+ "magicui/animated-beam": {
+  "image": "/previews/magicui/animated-beam.webp"
+ },
+ "magicui/android": {
+  "image": "/previews/magicui/android.webp"
+ },
+ "animata/alarm-clock": {
+  "image": "/previews/animata/alarm-clock.webp"
+ },
+ "animata/ai-button": {
+  "image": "/previews/animata/ai-button.webp"
+ },
+ "aceternity/3d-card-effect": {
+  "image": "/previews/aceternity/3d-card-effect.webp"
+ },
+ "aceternity/3d-marquee": {
+  "image": "/previews/aceternity/3d-marquee.webp"
+ },
+ "aceternity/3d-globe": {
+  "image": "/previews/aceternity/3d-globe.webp"
+ },
+ "aceternity/animated-modal": {
+  "image": "/previews/aceternity/animated-modal.webp"
+ },
+ "aceternity/3d-pin": {
+  "image": "/previews/aceternity/3d-pin.webp"
+ },
+ "aceternity/animated-testimonials": {
+  "image": "/previews/aceternity/animated-testimonials.webp"
+ },
+ "aceternity/animated-tooltip": {
+  "image": "/previews/aceternity/animated-tooltip.webp"
+ },
+ "aceternity/apple-cards-carousel": {
+  "image": "/previews/aceternity/apple-cards-carousel.webp"
+ },
+ "aceternity/aurora-background": {
+  "image": "/previews/aceternity/aurora-background.webp"
+ },
+ "aceternity/background-beams": {
+  "image": "/previews/aceternity/background-beams.webp"
+ },
+ "aceternity/ascii-art": {
+  "image": "/previews/aceternity/ascii-art.webp"
+ },
+ "aceternity/background-beams-with-collision": {
+  "image": "/previews/aceternity/background-beams-with-collision.webp"
+ },
+ "aceternity/background-boxes": {
+  "image": "/previews/aceternity/background-boxes.webp"
+ },
+ "aceternity/background-gradient": {
+  "image": "/previews/aceternity/background-gradient.webp"
+ },
+ "aceternity/background-gradient-animation": {
+  "image": "/previews/aceternity/background-gradient-animation.webp"
+ },
+ "aceternity/background-lines": {
+  "image": "/previews/aceternity/background-lines.webp"
+ },
+ "aceternity/background-cubes-grid": {
+  "image": "/previews/aceternity/background-cubes-grid.webp"
+ },
+ "aceternity/background-ripple-effect": {
+  "image": "/previews/aceternity/background-ripple-effect.webp"
+ },
+ "aceternity/bento-grid": {
+  "image": "/previews/aceternity/bento-grid.webp"
+ },
+ "aceternity/canvas-reveal-effect": {
+  "image": "/previews/aceternity/canvas-reveal-effect.webp"
+ },
+ "aceternity/canvas-text": {
+  "image": "/previews/aceternity/canvas-text.webp"
+ },
+ "aceternity/card-hover-effect": {
+  "image": "/previews/aceternity/card-hover-effect.webp"
+ },
+ "aceternity/card-spotlight": {
+  "image": "/previews/aceternity/card-spotlight.webp"
+ },
+ "aceternity/card-stack": {
+  "image": "/previews/aceternity/card-stack.webp"
+ },
+ "aceternity/carousel": {
+  "image": "/previews/aceternity/carousel.webp"
+ },
+ "aceternity/chromatic-image": {
+  "image": "/previews/aceternity/chromatic-image.webp"
+ },
+ "aceternity/code-block": {
+  "image": "/previews/aceternity/code-block.webp"
+ },
+ "aceternity/colourful-text": {
+  "image": "/previews/aceternity/colourful-text.webp"
+ },
+ "aceternity/comet-card": {
+  "image": "/previews/aceternity/comet-card.webp"
+ },
+ "aceternity/compare": {
+  "image": "/previews/aceternity/compare.webp"
+ },
+ "aceternity/container-cover": {
+  "image": "/previews/aceternity/container-cover.webp"
+ },
+ "aceternity/container-scroll-animation": {
+  "image": "/previews/aceternity/container-scroll-animation.webp"
+ },
+ "aceternity/container-text-flip": {
+  "image": "/previews/aceternity/container-text-flip.webp"
+ },
+ "aceternity/direction-aware-hover": {
+  "image": "/previews/aceternity/direction-aware-hover.webp"
+ },
+ "aceternity/dither-shader": {
+  "image": "/previews/aceternity/dither-shader.webp"
+ },
+ "aceternity/dotted-glow-background": {
+  "image": "/previews/aceternity/dotted-glow-background.webp"
+ },
+ "aceternity/draggable-card": {
+  "image": "/previews/aceternity/draggable-card.webp"
+ },
+ "aceternity/encrypted-text": {
+  "image": "/previews/aceternity/encrypted-text.webp"
+ },
+ "aceternity/evervault-card": {
+  "image": "/previews/aceternity/evervault-card.webp"
+ },
+ "aceternity/expandable-card": {
+  "image": "/previews/aceternity/expandable-card.webp"
+ },
+ "aceternity/file-upload": {
+  "image": "/previews/aceternity/file-upload.webp"
+ },
+ "aceternity/cloud-shader": {
+  "image": "/previews/aceternity/cloud-shader.webp"
+ },
+ "aceternity/flip-words": {
+  "image": "/previews/aceternity/flip-words.webp"
+ },
+ "aceternity/floating-dock": {
+  "image": "/previews/aceternity/floating-dock.webp"
+ },
+ "aceternity/floating-navbar": {
+  "image": "/previews/aceternity/floating-navbar.webp"
+ },
+ "aceternity/focus-cards": {
+  "image": "/previews/aceternity/focus-cards.webp"
+ },
+ "aceternity/following-pointer": {
+  "image": "/previews/aceternity/following-pointer.webp"
+ },
+ "aceternity/glare-card": {
+  "image": "/previews/aceternity/glare-card.webp"
+ },
+ "aceternity/github-globe": {
+  "image": "/previews/aceternity/github-globe.webp"
+ },
+ "aceternity/glowing-effect": {
+  "image": "/previews/aceternity/glowing-effect.webp"
+ },
+ "aceternity/glowing-stars-effect": {
+  "image": "/previews/aceternity/glowing-stars-effect.webp"
+ },
+ "aceternity/gooey-input": {
+  "image": "/previews/aceternity/gooey-input.webp"
+ },
+ "aceternity/google-gemini-effect": {
+  "image": "/previews/aceternity/google-gemini-effect.webp"
+ },
+ "aceternity/grid-and-dot-backgrounds": {
+  "image": "/previews/aceternity/grid-and-dot-backgrounds.webp"
+ },
+ "aceternity/hero-highlight": {
+  "image": "/previews/aceternity/hero-highlight.webp"
+ },
+ "aceternity/hero-parallax": {
+  "image": "/previews/aceternity/hero-parallax.webp"
+ },
+ "aceternity/hover-border-gradient": {
+  "image": "/previews/aceternity/hover-border-gradient.webp"
+ },
+ "aceternity/images-badge": {
+  "image": "/previews/aceternity/images-badge.webp"
+ },
+ "aceternity/image-generation-loader": {
+  "image": "/previews/aceternity/image-generation-loader.webp"
+ },
+ "aceternity/images-slider": {
+  "image": "/previews/aceternity/images-slider.webp"
+ },
+ "aceternity/infinite-moving-cards": {
+  "image": "/previews/aceternity/infinite-moving-cards.webp"
+ },
+ "aceternity/keyboard": {
+  "image": "/previews/aceternity/keyboard.webp"
+ },
+ "aceternity/lamp-effect": {
+  "image": "/previews/aceternity/lamp-effect.webp"
+ },
+ "aceternity/layout-grid": {
+  "image": "/previews/aceternity/layout-grid.webp"
+ },
+ "aceternity/layout-text-flip": {
+  "image": "/previews/aceternity/layout-text-flip.webp"
+ },
+ "aceternity/lens": {
+  "image": "/previews/aceternity/lens.webp"
+ },
+ "aceternity/link-preview": {
+  "image": "/previews/aceternity/link-preview.webp"
+ },
+ "aceternity/liquid-glass": {
+  "image": "/previews/aceternity/liquid-glass.webp"
+ },
+ "aceternity/loader": {
+  "image": "/previews/aceternity/loader.webp"
+ },
+ "aceternity/macbook-scroll": {
+  "image": "/previews/aceternity/macbook-scroll.webp"
+ },
+ "aceternity/magnetic-button": {
+  "image": "/previews/aceternity/magnetic-button.webp"
+ },
+ "aceternity/meteors": {
+  "image": "/previews/aceternity/meteors.webp"
+ },
+ "aceternity/moving-border": {
+  "image": "/previews/aceternity/moving-border.webp"
+ },
+ "aceternity/navbar-menu": {
+  "image": "/previews/aceternity/navbar-menu.webp"
+ },
+ "aceternity/multi-step-loader": {
+  "image": "/previews/aceternity/multi-step-loader.webp"
+ },
+ "aceternity/noise-background": {
+  "image": "/previews/aceternity/noise-background.webp"
+ },
+ "aceternity/notch": {
+  "image": "/previews/aceternity/notch.webp"
+ },
+ "aceternity/parallax-hero-images": {
+  "image": "/previews/aceternity/parallax-hero-images.webp"
+ },
+ "aceternity/parallax-scroll": {
+  "image": "/previews/aceternity/parallax-scroll.webp"
+ },
+ "aceternity/pixelated-canvas": {
+  "image": "/previews/aceternity/pixelated-canvas.webp"
+ },
+ "aceternity/placeholders-and-vanish-input": {
+  "image": "/previews/aceternity/placeholders-and-vanish-input.webp"
+ },
+ "aceternity/pointer-highlight": {
+  "image": "/previews/aceternity/pointer-highlight.webp"
+ },
+ "aceternity/resizable-navbar": {
+  "image": "/previews/aceternity/resizable-navbar.webp"
+ },
+ "aceternity/scales": {
+  "image": "/previews/aceternity/scales.webp"
+ },
+ "aceternity/shooting-stars-and-stars-background": {
+  "image": "/previews/aceternity/shooting-stars-and-stars-background.webp"
+ },
+ "aceternity/sidebar": {
+  "image": "/previews/aceternity/sidebar.webp"
+ },
+ "aceternity/signup-form": {
+  "image": "/previews/aceternity/signup-form.webp"
+ },
+ "aceternity/sparkles": {
+  "image": "/previews/aceternity/sparkles.webp"
+ },
+ "aceternity/spotlight": {
+  "image": "/previews/aceternity/spotlight.webp"
+ },
+ "aceternity/spotlight-new": {
+  "image": "/previews/aceternity/spotlight-new.webp"
+ },
+ "aceternity/squiggly-text": {
+  "image": "/previews/aceternity/squiggly-text.webp"
+ },
+ "aceternity/stateful-button": {
+  "image": "/previews/aceternity/stateful-button.webp"
+ },
+ "aceternity/sticky-banner": {
+  "image": "/previews/aceternity/sticky-banner.webp"
+ },
+ "aceternity/sticky-scroll-reveal": {
+  "image": "/previews/aceternity/sticky-scroll-reveal.webp"
+ },
+ "aceternity/svg-mask-effect": {
+  "image": "/previews/aceternity/svg-mask-effect.webp"
+ },
+ "aceternity/tabs": {
+  "image": "/previews/aceternity/tabs.webp"
+ },
+ "aceternity/tailwindcss-buttons": {
+  "image": "/previews/aceternity/tailwindcss-buttons.webp"
+ },
+ "aceternity/terminal": {
+  "image": "/previews/aceternity/terminal.webp"
+ },
+ "aceternity/text-generate-effect": {
+  "image": "/previews/aceternity/text-generate-effect.webp"
+ },
+ "aceternity/text-flipping-board": {
+  "image": "/previews/aceternity/text-flipping-board.webp"
+ },
+ "aceternity/text-hover-effect": {
+  "image": "/previews/aceternity/text-hover-effect.webp"
+ },
+ "aceternity/text-reveal-card": {
+  "image": "/previews/aceternity/text-reveal-card.webp"
+ },
+ "aceternity/timeline": {
+  "image": "/previews/aceternity/timeline.webp"
+ },
+ "aceternity/tooltip-card": {
+  "image": "/previews/aceternity/tooltip-card.webp"
+ },
+ "aceternity/tracing-beam": {
+  "image": "/previews/aceternity/tracing-beam.webp"
+ },
+ "aceternity/typewriter-effect": {
+  "image": "/previews/aceternity/typewriter-effect.webp"
+ },
+ "aceternity/webcam-pixel-grid": {
+  "image": "/previews/aceternity/webcam-pixel-grid.webp"
+ },
+ "aceternity/vortex": {
+  "image": "/previews/aceternity/vortex.webp"
+ },
+ "aceternity/wavy-background": {
+  "image": "/previews/aceternity/wavy-background.webp"
+ },
+ "aceternity/wobble-card": {
+  "image": "/previews/aceternity/wobble-card.webp"
+ },
+ "aceternity/world-map": {
+  "image": "/previews/aceternity/world-map.webp"
+ },
+ "animata/animated-beam": {
+  "image": "/previews/animata/animated-beam.webp"
+ },
+ "animata/algolia-blue-button": {
+  "image": "/previews/animata/algolia-blue-button.webp"
+ },
+ "animata/algolia-white-button": {
+  "image": "/previews/animata/algolia-white-button.webp"
+ },
+ "animata/animated-gradient-text": {
+  "image": "/previews/animata/animated-gradient-text.webp"
+ },
+ "animata/animated-follow-button": {
+  "image": "/previews/animata/animated-follow-button.webp"
+ },
+ "animata/animated-border-trail": {
+  "image": "/previews/animata/animated-border-trail.webp"
+ },
+ "animata/animatedtimeline": {
+  "image": "/previews/animata/animatedtimeline.webp"
+ },
+ "animata/aperture-reveal": {
+  "image": "/previews/animata/aperture-reveal.webp"
+ },
+ "animata/avatar-list": {
+  "image": "/previews/animata/avatar-list.webp"
+ },
+ "animata/bar-chart": {
+  "image": "/previews/animata/bar-chart.webp"
+ },
+ "animata/battery": {
+  "image": "/previews/animata/battery.webp"
+ },
+ "animata/battery-level": {
+  "image": "/previews/animata/battery-level.webp"
+ },
+ "animata/blur-out-up": {
+  "image": "/previews/animata/blur-out-up.webp"
+ },
+ "animata/blurry-blob": {
+  "image": "/previews/animata/blurry-blob.webp"
+ },
+ "animata/boids-ecosystem": {
+  "image": "/previews/animata/boids-ecosystem.webp"
+ },
+ "animata/bold-copy": {
+  "image": "/previews/animata/bold-copy.webp"
+ },
+ "animata/calendar-event": {
+  "image": "/previews/animata/calendar-event.webp"
+ },
+ "animata/bottom-up-letters": {
+  "image": "/previews/animata/bottom-up-letters.webp"
+ },
+ "animata/card-spread": {
+  "image": "/previews/animata/card-spread.webp"
+ },
+ "animata/calorie-counter": {
+  "image": "/previews/animata/calorie-counter.webp"
+ },
+ "animata/card-comment": {
+  "image": "/previews/animata/card-comment.webp"
+ },
+ "animata/case-study-card": {
+  "image": "/previews/animata/case-study-card.webp"
+ },
+ "animata/card-stack": {
+  "image": "/previews/animata/card-stack.webp"
+ },
+ "animata/circular-text": {
+  "image": "/previews/animata/circular-text.webp"
+ },
+ "animata/clock-with-photo": {
+  "image": "/previews/animata/clock-with-photo.webp"
+ },
+ "animata/code": {
+  "image": "/previews/animata/code.webp"
+ },
+ "animata/collab-card": {
+  "image": "/previews/animata/collab-card.webp"
+ },
+ "animata/counter": {
+  "image": "/previews/animata/counter.webp"
+ },
+ "animata/cursor-tracker": {
+  "image": "/previews/animata/cursor-tracker.webp"
+ },
+ "animata/cycle-text": {
+  "image": "/previews/animata/cycle-text.webp"
+ },
+ "animata/cycling": {
+  "image": "/previews/animata/cycling.webp"
+ },
+ "animata/diagonal-lines": {
+  "image": "/previews/animata/diagonal-lines.webp"
+ },
+ "animata/delivery-card": {
+  "image": "/previews/animata/delivery-card.webp"
+ },
+ "animata/direction-card": {
+  "image": "/previews/animata/direction-card.webp"
+ },
+ "animata/disclose-image": {
+  "image": "/previews/animata/disclose-image.webp"
+ },
+ "animata/donut-chart": {
+  "image": "/previews/animata/donut-chart.webp"
+ },
+ "animata/dot": {
+  "image": "/previews/animata/dot.webp"
+ },
+ "animata/double-underline": {
+  "image": "/previews/animata/double-underline.webp"
+ },
+ "animata/duolingo": {
+  "image": "/previews/animata/duolingo.webp"
+ },
+ "animata/eight": {
+  "image": "/previews/animata/eight.webp"
+ },
+ "animata/expense-tracker": {
+  "image": "/previews/animata/expense-tracker.webp"
+ },
+ "animata/fade-through": {
+  "image": "/previews/animata/fade-through.webp"
+ },
+ "animata/flight-widget": {
+  "image": "/previews/animata/flight-widget.webp"
+ },
+ "animata/flip-card": {
+  "image": "/previews/animata/flip-card.webp"
+ },
+ "animata/flipping-cards": {
+  "image": "/previews/animata/flipping-cards.webp"
+ },
+ "animata/flower-menu": {
+  "image": "/previews/animata/flower-menu.webp"
+ },
+ "animata/fluid-tabs": {
+  "image": "/previews/animata/fluid-tabs.webp"
+ },
+ "animata/focus-blur-resolve": {
+  "image": "/previews/animata/focus-blur-resolve.webp"
+ },
+ "animata/fund-widget": {
+  "image": "/previews/animata/fund-widget.webp"
+ },
+ "animata/gauge-chart": {
+  "image": "/previews/animata/gauge-chart.webp"
+ },
+ "animata/get-started-button": {
+  "image": "/previews/animata/get-started-button.webp"
+ },
+ "animata/gibberish-text": {
+  "image": "/previews/animata/gibberish-text.webp"
+ },
+ "animata/github-card-shiny": {
+  "image": "/previews/animata/github-card-shiny.webp"
+ },
+ "animata/github-card-skew": {
+  "image": "/previews/animata/github-card-skew.webp"
+ },
+ "animata/glitch-text": {
+  "image": "/previews/animata/glitch-text.webp"
+ },
+ "animata/glowing-card": {
+  "image": "/previews/animata/glowing-card.webp"
+ },
+ "animata/gooey-tabs": {
+  "image": "/previews/animata/gooey-tabs.webp"
+ },
+ "animata/gradient": {
+  "image": "/previews/animata/gradient.webp"
+ },
+ "animata/grid": {
+  "image": "/previews/animata/grid.webp"
+ },
+ "animata/hero-section-text-hover": {
+  "image": "/previews/animata/hero-section-text-hover.webp"
+ },
+ "animata/hover-interaction": {
+  "image": "/previews/animata/hover-interaction.webp"
+ },
+ "animata/icon-ripple": {
+  "image": "/previews/animata/icon-ripple.webp"
+ },
+ "animata/images-reveal": {
+  "image": "/previews/animata/images-reveal.webp"
+ },
+ "animata/interactive-grid": {
+  "image": "/previews/animata/interactive-grid.webp"
+ },
+ "animata/jitter-text": {
+  "image": "/previews/animata/jitter-text.webp"
+ },
+ "animata/jumping-text-instagram": {
+  "image": "/previews/animata/jumping-text-instagram.webp"
+ },
+ "animata/kinetic-center-build": {
+  "image": "/previews/animata/kinetic-center-build.webp"
+ },
+ "animata/led-board": {
+  "image": "/previews/animata/led-board.webp"
+ },
+ "animata/line-by-line-slide": {
+  "image": "/previews/animata/line-by-line-slide.webp"
+ },
+ "animata/list": {
+  "image": "/previews/animata/list.webp"
+ },
+ "animata/live-score": {
+  "image": "/previews/animata/live-score.webp"
+ },
+ "animata/marquee": {
+  "image": "/previews/animata/marquee.webp"
+ },
+ "animata/mask-reveal-up": {
+  "image": "/previews/animata/mask-reveal-up.webp"
+ },
+ "animata/menu-animation": {
+  "image": "/previews/animata/menu-animation.webp"
+ },
+ "animata/metis-text": {
+  "image": "/previews/animata/metis-text.webp"
+ },
+ "animata/micro-scale-fade": {
+  "image": "/previews/animata/micro-scale-fade.webp"
+ },
+ "animata/mirror-text": {
+  "image": "/previews/animata/mirror-text.webp"
+ },
+ "animata/mobile-detail": {
+  "image": "/previews/animata/mobile-detail.webp"
+ },
+ "animata/modal": {
+  "image": "/previews/animata/modal.webp"
+ },
+ "animata/moving-gradient": {
+  "image": "/previews/animata/moving-gradient.webp"
+ },
+ "animata/music-widget": {
+  "image": "/previews/animata/music-widget.webp"
+ },
+ "animata/notes": {
+  "image": "/previews/animata/notes.webp"
+ },
+ "animata/orbiting-items": {
+  "image": "/previews/animata/orbiting-items.webp"
+ },
+ "animata/orbiting-items-3-d": {
+  "image": "/previews/animata/orbiting-items-3-d.webp"
+ },
+ "animata/per-character-rise": {
+  "image": "/previews/animata/per-character-rise.webp"
+ },
+ "animata/per-word-crossfade": {
+  "image": "/previews/animata/per-word-crossfade.webp"
+ },
+ "animata/product-features": {
+  "image": "/previews/animata/product-features.webp"
+ },
+ "animata/profile": {
+  "image": "/previews/animata/profile.webp"
+ },
+ "animata/progress": {
+  "image": "/previews/animata/progress.webp"
+ },
+ "animata/receipt": {
+  "image": "/previews/animata/receipt.webp"
+ },
+ "animata/reminder": {
+  "image": "/previews/animata/reminder.webp"
+ },
+ "animata/report": {
+  "image": "/previews/animata/report.webp"
+ },
+ "animata/reminder-widget": {
+  "image": "/previews/animata/reminder-widget.webp"
+ },
+ "animata/reveal-image": {
+  "image": "/previews/animata/reveal-image.webp"
+ },
+ "animata/ring-chart": {
+  "image": "/previews/animata/ring-chart.webp"
+ },
+ "animata/ripple-button": {
+  "image": "/previews/animata/ripple-button.webp"
+ },
+ "animata/roll-text": {
+  "image": "/previews/animata/roll-text.webp"
+ },
+ "animata/scale-down-fade": {
+  "image": "/previews/animata/scale-down-fade.webp"
+ },
+ "animata/score-board": {
+  "image": "/previews/animata/score-board.webp"
+ },
+ "animata/scroll-reveal": {
+  "image": "/previews/animata/scroll-reveal.webp"
+ },
+ "animata/security-alert": {
+  "image": "/previews/animata/security-alert.webp"
+ },
+ "animata/shape-shifter": {
+  "image": "/previews/animata/shape-shifter.webp"
+ },
+ "animata/shared-axis-y": {
+  "image": "/previews/animata/shared-axis-y.webp"
+ },
+ "animata/shared-axis-z": {
+  "image": "/previews/animata/shared-axis-z.webp"
+ },
+ "animata/shift-tabs": {
+  "image": "/previews/animata/shift-tabs.webp"
+ },
+ "animata/shimmer-sweep": {
+  "image": "/previews/animata/shimmer-sweep.webp"
+ },
+ "animata/shining-button": {
+  "image": "/previews/animata/shining-button.webp"
+ },
+ "animata/shooting-stars": {
+  "image": "/previews/animata/shooting-stars.webp"
+ },
+ "animata/shopping-list": {
+  "image": "/previews/animata/shopping-list.webp"
+ },
+ "animata/short-slide-down": {
+  "image": "/previews/animata/short-slide-down.webp"
+ },
+ "animata/short-slide-right": {
+  "image": "/previews/animata/short-slide-right.webp"
+ },
+ "animata/sibling-focus-nav": {
+  "image": "/previews/animata/sibling-focus-nav.webp"
+ },
+ "animata/slack-intro": {
+  "image": "/previews/animata/slack-intro.webp"
+ },
+ "animata/skew-image": {
+  "image": "/previews/animata/skew-image.webp"
+ },
+ "animata/sleep-tracker": {
+  "image": "/previews/animata/sleep-tracker.webp"
+ },
+ "animata/slide-arrow-button": {
+  "image": "/previews/animata/slide-arrow-button.webp"
+ },
+ "animata/soft-blur-in": {
+  "image": "/previews/animata/soft-blur-in.webp"
+ },
+ "animata/speed-dial": {
+  "image": "/previews/animata/speed-dial.webp"
+ },
+ "animata/spinner": {
+  "image": "/previews/animata/spinner.webp"
+ },
+ "animata/split-reveal": {
+  "image": "/previews/animata/split-reveal.webp"
+ },
+ "animata/split-text": {
+  "image": "/previews/animata/split-text.webp"
+ },
+ "animata/spring-scale-in": {
+  "image": "/previews/animata/spring-scale-in.webp"
+ },
+ "animata/stacked-sections": {
+  "image": "/previews/animata/stacked-sections.webp"
+ },
+ "animata/status-button": {
+  "image": "/previews/animata/status-button.webp"
+ },
+ "animata/storage-status": {
+  "image": "/previews/animata/storage-status.webp"
+ },
+ "animata/storage-widget": {
+  "image": "/previews/animata/storage-widget.webp"
+ },
+ "animata/study-timer": {
+  "image": "/previews/animata/study-timer.webp"
+ },
+ "animata/swap-text": {
+  "image": "/previews/animata/swap-text.webp"
+ },
+ "animata/swap-text-card": {
+  "image": "/previews/animata/swap-text-card.webp"
+ },
+ "animata/swipe-button": {
+  "image": "/previews/animata/swipe-button.webp"
+ },
+ "animata/text-border-animation": {
+  "image": "/previews/animata/text-border-animation.webp"
+ },
+ "animata/text-explode-imessage": {
+  "image": "/previews/animata/text-explode-imessage.webp"
+ },
+ "animata/text-flip": {
+  "image": "/previews/animata/text-flip.webp"
+ },
+ "animata/three": {
+  "image": "/previews/animata/three.webp"
+ },
+ "animata/ticker": {
+  "image": "/previews/animata/ticker.webp"
+ },
+ "animata/tilted-cover": {
+  "image": "/previews/animata/tilted-cover.webp"
+ },
+ "animata/toggle-switch": {
+  "image": "/previews/animata/toggle-switch.webp"
+ },
+ "animata/top-down-letters": {
+  "image": "/previews/animata/top-down-letters.webp"
+ },
+ "animata/trailing-image": {
+  "image": "/previews/animata/trailing-image.webp"
+ },
+ "animata/transaction-list": {
+  "image": "/previews/animata/transaction-list.webp"
+ },
+ "animata/typing-text": {
+  "image": "/previews/animata/typing-text.webp"
+ },
+ "animata/underline-hover-text": {
+  "image": "/previews/animata/underline-hover-text.webp"
+ },
+ "animata/vertical-tiles": {
+  "image": "/previews/animata/vertical-tiles.webp"
+ },
+ "animata/water-tracker": {
+  "image": "/previews/animata/water-tracker.webp"
+ },
+ "animata/vpn-widget": {
+  "image": "/previews/animata/vpn-widget.webp"
+ },
+ "animata/wave-reveal": {
+  "image": "/previews/animata/wave-reveal.webp"
+ },
+ "animata/weather-card": {
+  "image": "/previews/animata/weather-card.webp"
+ },
+ "animata/wide-card": {
+  "image": "/previews/animata/wide-card.webp"
+ },
+ "animata/weekly-progress": {
+  "image": "/previews/animata/weekly-progress.webp"
+ },
+ "animata/work-button": {
+  "image": "/previews/animata/work-button.webp"
+ },
+ "animata/zigzag": {
+  "image": "/previews/animata/zigzag.webp"
+ },
+ "animate-ui/components-animate-code-tabs": {
+  "image": "/previews/animate-ui/components-animate-code-tabs.webp"
+ },
+ "animate-ui/components-animate-github-stars-wheel": {
+  "image": "/previews/animate-ui/components-animate-github-stars-wheel.webp"
+ },
+ "animate-ui/components-animate-code": {
+  "image": "/previews/animate-ui/components-animate-code.webp"
+ },
+ "animate-ui/components-base-menu": {
+  "image": "/previews/animate-ui/components-base-menu.webp"
+ },
+ "animate-ui/components-base-preview-card": {
+  "image": "/previews/animate-ui/components-base-preview-card.webp"
+ },
+ "animate-ui/components-base-radio": {
+  "image": "/previews/animate-ui/components-base-radio.webp"
+ },
+ "animate-ui/components-buttons-copy": {
+  "image": "/previews/animate-ui/components-buttons-copy.webp"
+ },
+ "animate-ui/components-buttons-flip": {
+  "image": "/previews/animate-ui/components-buttons-flip.webp"
+ },
+ "animate-ui/components-buttons-icon": {
+  "image": "/previews/animate-ui/components-buttons-icon.webp"
+ },
+ "animate-ui/components-buttons-liquid": {
+  "image": "/previews/animate-ui/components-buttons-liquid.webp"
+ },
+ "animate-ui/components-buttons-ripple": {
+  "image": "/previews/animate-ui/components-buttons-ripple.webp"
+ },
+ "animate-ui/components-community-flip-card": {
+  "image": "/previews/animate-ui/components-community-flip-card.webp"
+ },
+ "animate-ui/components-community-management-bar": {
+  "image": "/previews/animate-ui/components-community-management-bar.webp"
+ },
+ "animate-ui/components-community-notification-list": {
+  "image": "/previews/animate-ui/components-community-notification-list.webp"
+ },
+ "animate-ui/components-community-motion-carousel": {
+  "image": "/previews/animate-ui/components-community-motion-carousel.webp"
+ },
+ "animate-ui/components-community-pin-list": {
+  "image": "/previews/animate-ui/components-community-pin-list.webp"
+ },
+ "animate-ui/components-community-playful-todolist": {
+  "image": "/previews/animate-ui/components-community-playful-todolist.webp"
+ },
+ "animate-ui/components-community-radial-intro": {
+  "image": "/previews/animate-ui/components-community-radial-intro.webp"
+ },
+ "animate-ui/components-community-radial-menu": {
+  "image": "/previews/animate-ui/components-community-radial-menu.webp"
+ },
+ "animate-ui/components-community-radial-nav": {
+  "image": "/previews/animate-ui/components-community-radial-nav.webp"
+ },
+ "animate-ui/components-community-share-button": {
+  "image": "/previews/animate-ui/components-community-share-button.webp"
+ },
+ "animate-ui/components-community-user-presence-avatar": {
+  "image": "/previews/animate-ui/components-community-user-presence-avatar.webp"
+ },
+ "animate-ui/components-radix-files": {
+  "image": "/previews/animate-ui/components-radix-files.webp"
+ },
+ "animate-ui/primitives-animate-slot": {
+  "image": "/previews/animate-ui/primitives-animate-slot.webp"
+ },
+ "animate-ui/primitives-base-menu": {
+  "image": "/previews/animate-ui/primitives-base-menu.webp"
+ },
+ "animate-ui/primitives-base-preview-card": {
+  "image": "/previews/animate-ui/primitives-base-preview-card.webp"
+ },
+ "animate-ui/primitives-headless-disclosure": {
+  "image": "/previews/animate-ui/primitives-headless-disclosure.webp"
+ },
+ "animate-ui/primitives-texts-morphing": {
+  "image": "/previews/animate-ui/primitives-texts-morphing.webp"
+ },
+ "animate-ui/primitives-texts-rolling": {
+  "image": "/previews/animate-ui/primitives-texts-rolling.webp"
+ },
+ "animate-ui/primitives-texts-rotating": {
+  "image": "/previews/animate-ui/primitives-texts-rotating.webp"
+ },
+ "animate-ui/primitives-texts-splitting": {
+  "image": "/previews/animate-ui/primitives-texts-splitting.webp"
+ },
+ "animate-ui/primitives-texts-shimmering": {
+  "image": "/previews/animate-ui/primitives-texts-shimmering.webp"
+ },
+ "animate-ui/primitives-texts-typing": {
+  "image": "/previews/animate-ui/primitives-texts-typing.webp"
+ },
+ "coss/calendar": {
+  "image": "/previews/coss/calendar.webp"
+ },
+ "coss/autocomplete": {
+  "image": "/previews/coss/autocomplete.webp"
+ },
+ "coss/card": {
+  "image": "/previews/coss/card.webp"
+ },
+ "coss/checkbox-group": {
+  "image": "/previews/coss/checkbox-group.webp"
+ },
+ "coss/collapsible": {
+  "image": "/previews/coss/collapsible.webp"
+ },
+ "coss/combobox": {
+  "image": "/previews/coss/combobox.webp"
+ },
+ "coss/command": {
+  "image": "/previews/coss/command.webp"
+ },
+ "coss/composer": {
+  "image": "/previews/coss/composer.webp"
+ },
+ "coss/context-menu": {
+  "image": "/previews/coss/context-menu.webp"
+ },
+ "coss/empty": {
+  "image": "/previews/coss/empty.webp"
+ },
+ "coss/drawer": {
+  "image": "/previews/coss/drawer.webp"
+ },
+ "coss/field": {
+  "image": "/previews/coss/field.webp"
+ },
+ "coss/fieldset": {
+  "image": "/previews/coss/fieldset.webp"
+ },
+ "coss/form": {
+  "image": "/previews/coss/form.webp"
+ },
+ "coss/frame": {
+  "image": "/previews/coss/frame.webp"
+ },
+ "coss/group": {
+  "image": "/previews/coss/group.webp"
+ },
+ "coss/input-group": {
+  "image": "/previews/coss/input-group.webp"
+ },
+ "coss/kbd": {
+  "image": "/previews/coss/kbd.webp"
+ },
+ "coss/label": {
+  "image": "/previews/coss/label.webp"
+ },
+ "coss/menu": {
+  "image": "/previews/coss/menu.webp"
+ },
+ "coss/meter": {
+  "image": "/previews/coss/meter.webp"
+ },
+ "coss/number-field": {
+  "image": "/previews/coss/number-field.webp"
+ },
+ "coss/otp-field": {
+  "image": "/previews/coss/otp-field.webp"
+ },
+ "coss/preview-card": {
+  "image": "/previews/coss/preview-card.webp"
+ },
+ "coss/progress": {
+  "image": "/previews/coss/progress.webp"
+ },
+ "coss/radio-group": {
+  "image": "/previews/coss/radio-group.webp"
+ },
+ "coss/scroll-area": {
+  "image": "/previews/coss/scroll-area.webp"
+ },
+ "coss/segmented-control": {
+  "image": "/previews/coss/segmented-control.webp"
+ },
+ "coss/separator": {
+  "image": "/previews/coss/separator.webp"
+ },
+ "coss/sheet": {
+  "image": "/previews/coss/sheet.webp"
+ },
+ "coss/skeleton": {
+  "image": "/previews/coss/skeleton.webp"
+ },
+ "coss/spinner": {
+  "image": "/previews/coss/spinner.webp"
+ },
+ "coss/toast": {
+  "image": "/previews/coss/toast.webp"
+ },
+ "coss/toggle": {
+  "image": "/previews/coss/toggle.webp"
+ },
+ "coss/toggle-group": {
+  "image": "/previews/coss/toggle-group.webp"
+ },
+ "coss/toolbar": {
+  "image": "/previews/coss/toolbar.webp"
+ },
+ "cult-ui/agent-suggest-card-stack": {
+  "image": "/previews/cult-ui/agent-suggest-card-stack.webp"
+ },
+ "cult-ui/ai-instructions": {
+  "image": "/previews/cult-ui/ai-instructions.webp"
+ },
+ "cult-ui/ai-blob-warp": {
+  "image": "/previews/cult-ui/ai-blob-warp.webp"
+ },
+ "cult-ui/analytics-chart": {
+  "image": "/previews/cult-ui/analytics-chart.webp"
+ },
+ "cult-ui/animated-badge": {
+  "image": "/previews/cult-ui/animated-badge.webp"
+ },
+ "cult-ui/animated-button": {
+  "image": "/previews/cult-ui/animated-button.webp"
+ },
+ "cult-ui/animated-card": {
+  "image": "/previews/cult-ui/animated-card.webp"
+ },
+ "cult-ui/animated-composer": {
+  "image": "/previews/cult-ui/animated-composer.webp"
+ },
+ "cult-ui/animated-dropzone": {
+  "image": "/previews/cult-ui/animated-dropzone.webp"
+ },
+ "cult-ui/animated-field": {
+  "image": "/previews/cult-ui/animated-field.webp"
+ },
+ "cult-ui/animated-input": {
+  "image": "/previews/cult-ui/animated-input.webp"
+ },
+ "cult-ui/animated-notification": {
+  "image": "/previews/cult-ui/animated-notification.webp"
+ },
+ "cult-ui/animated-number": {
+  "image": "/previews/cult-ui/animated-number.webp"
+ },
+ "cult-ui/animated-progress": {
+  "image": "/previews/cult-ui/animated-progress.webp"
+ },
+ "cult-ui/animated-search": {
+  "image": "/previews/cult-ui/animated-search.webp"
+ },
+ "cult-ui/animated-segmented": {
+  "image": "/previews/cult-ui/animated-segmented.webp"
+ },
+ "cult-ui/animated-select": {
+  "image": "/previews/cult-ui/animated-select.webp"
+ },
+ "cult-ui/animated-switch": {
+  "image": "/previews/cult-ui/animated-switch.webp"
+ },
+ "cult-ui/animated-tabs": {
+  "image": "/previews/cult-ui/animated-tabs.webp"
+ },
+ "cult-ui/animated-toast": {
+  "image": "/previews/cult-ui/animated-toast.webp"
+ },
+ "cult-ui/animated-toggle-group": {
+  "image": "/previews/cult-ui/animated-toggle-group.webp"
+ },
+ "cult-ui/apple-iphone-17-pro": {
+  "image": "/previews/cult-ui/apple-iphone-17-pro.webp"
+ },
+ "cult-ui/apple-keyboard": {
+  "image": "/previews/cult-ui/apple-keyboard.webp"
+ },
+ "cult-ui/apple-pro-display-xdr": {
+  "image": "/previews/cult-ui/apple-pro-display-xdr.webp"
+ },
+ "cult-ui/apple-watch-ultra": {
+  "image": "/previews/cult-ui/apple-watch-ultra.webp"
+ },
+ "cult-ui/bg-animate-button": {
+  "image": "/previews/cult-ui/bg-animate-button.webp"
+ },
+ "cult-ui/bg-image-texture": {
+  "image": "/previews/cult-ui/bg-image-texture.webp"
+ },
+ "cult-ui/border-beam-button": {
+  "image": "/previews/cult-ui/border-beam-button.webp"
+ },
+ "cult-ui/border-beam-card": {
+  "image": "/previews/cult-ui/border-beam-card.webp"
+ },
+ "cult-ui/border-beam-input": {
+  "image": "/previews/cult-ui/border-beam-input.webp"
+ },
+ "cult-ui/bg-media": {
+  "image": "/previews/cult-ui/bg-media.webp"
+ },
+ "cult-ui/canvas-fractal-grid": {
+  "image": "/previews/cult-ui/canvas-fractal-grid.webp"
+ },
+ "cult-ui/choice-poll": {
+  "image": "/previews/cult-ui/choice-poll.webp"
+ },
+ "cult-ui/circuit-board": {
+  "image": "/previews/cult-ui/circuit-board.webp"
+ },
+ "cult-ui/code-block": {
+  "image": "/previews/cult-ui/code-block.webp"
+ },
+ "cult-ui/collab-avatar": {
+  "image": "/previews/cult-ui/collab-avatar.webp"
+ },
+ "cult-ui/collab-toolbar": {
+  "image": "/previews/cult-ui/collab-toolbar.webp"
+ },
+ "cult-ui/color-picker": {
+  "image": "/previews/cult-ui/color-picker.webp"
+ },
+ "cult-ui/copy-button": {
+  "image": "/previews/cult-ui/copy-button.webp"
+ },
+ "cult-ui/cosmic-button": {
+  "image": "/previews/cult-ui/cosmic-button.webp"
+ },
+ "cult-ui/cutout-card": {
+  "image": "/previews/cult-ui/cutout-card.webp"
+ },
+ "cult-ui/direction-aware-tabs": {
+  "image": "/previews/cult-ui/direction-aware-tabs.webp"
+ },
+ "cult-ui/distorted-glass": {
+  "image": "/previews/cult-ui/distorted-glass.webp"
+ },
+ "cult-ui/dither-image": {
+  "image": "/previews/cult-ui/dither-image.webp"
+ },
+ "cult-ui/dock": {
+  "image": "/previews/cult-ui/dock.webp"
+ },
+ "cult-ui/dynamic-island": {
+  "image": "/previews/cult-ui/dynamic-island.webp"
+ },
+ "cult-ui/edge-blur": {
+  "image": "/previews/cult-ui/edge-blur.webp"
+ },
+ "cult-ui/expandable": {
+  "image": "/previews/cult-ui/expandable.webp"
+ },
+ "cult-ui/family-button": {
+  "image": "/previews/cult-ui/family-button.webp"
+ },
+ "cult-ui/expandable-screen": {
+  "image": "/previews/cult-ui/expandable-screen.webp"
+ },
+ "cult-ui/family-drawer": {
+  "image": "/previews/cult-ui/family-drawer.webp"
+ },
+ "cult-ui/feature-poll": {
+  "image": "/previews/cult-ui/feature-poll.webp"
+ },
+ "cult-ui/feature-carousel": {
+  "image": "/previews/cult-ui/feature-carousel.webp"
+ },
+ "cult-ui/feature-sticky-section": {
+  "image": "/previews/cult-ui/feature-sticky-section.webp"
+ },
+ "cult-ui/feature-voting": {
+  "image": "/previews/cult-ui/feature-voting.webp"
+ },
+ "cult-ui/file-icons": {
+  "image": "/previews/cult-ui/file-icons.webp"
+ },
+ "cult-ui/floating-panel": {
+  "image": "/previews/cult-ui/floating-panel.webp"
+ },
+ "cult-ui/fluid-ai-workloads": {
+  "image": "/previews/cult-ui/fluid-ai-workloads.webp"
+ },
+ "cult-ui/fluted-glass": {
+  "image": "/previews/cult-ui/fluted-glass.webp"
+ },
+ "cult-ui/folded-card": {
+  "image": "/previews/cult-ui/folded-card.webp"
+ },
+ "cult-ui/gateway-endpoint-illustration": {
+  "image": "/previews/cult-ui/gateway-endpoint-illustration.webp"
+ },
+ "cult-ui/gateway-route-illustration": {
+  "image": "/previews/cult-ui/gateway-route-illustration.webp"
+ },
+ "cult-ui/gateway-svg-illustration": {
+  "image": "/previews/cult-ui/gateway-svg-illustration.webp"
+ },
+ "cult-ui/gradient-button-group": {
+  "image": "/previews/cult-ui/gradient-button-group.webp"
+ },
+ "cult-ui/gradient-heading": {
+  "image": "/previews/cult-ui/gradient-heading.webp"
+ },
+ "cult-ui/grid-beam": {
+  "image": "/previews/cult-ui/grid-beam.webp"
+ },
+ "cult-ui/globe": {
+  "image": "/previews/cult-ui/globe.webp"
+ },
+ "cult-ui/halo-badge": {
+  "image": "/previews/cult-ui/halo-badge.webp"
+ },
+ "cult-ui/halo-button": {
+  "image": "/previews/cult-ui/halo-button.webp"
+ },
+ "cult-ui/halo-card": {
+  "image": "/previews/cult-ui/halo-card.webp"
+ },
+ "cult-ui/halo-dropzone": {
+  "image": "/previews/cult-ui/halo-dropzone.webp"
+ },
+ "cult-ui/halo-field": {
+  "image": "/previews/cult-ui/halo-field.webp"
+ },
+ "cult-ui/halo-input": {
+  "image": "/previews/cult-ui/halo-input.webp"
+ },
+ "cult-ui/halo-notification": {
+  "image": "/previews/cult-ui/halo-notification.webp"
+ },
+ "cult-ui/halo-progress": {
+  "image": "/previews/cult-ui/halo-progress.webp"
+ },
+ "cult-ui/halo-search": {
+  "image": "/previews/cult-ui/halo-search.webp"
+ },
+ "cult-ui/halo-segmented": {
+  "image": "/previews/cult-ui/halo-segmented.webp"
+ },
+ "cult-ui/halo-select": {
+  "image": "/previews/cult-ui/halo-select.webp"
+ },
+ "cult-ui/halo-switch": {
+  "image": "/previews/cult-ui/halo-switch.webp"
+ },
+ "cult-ui/halo-tabs": {
+  "image": "/previews/cult-ui/halo-tabs.webp"
+ },
+ "cult-ui/halo-toast": {
+  "image": "/previews/cult-ui/halo-toast.webp"
+ },
+ "cult-ui/halo-toggle-group": {
+  "image": "/previews/cult-ui/halo-toggle-group.webp"
+ },
+ "cult-ui/hero-dithering": {
+  "image": "/previews/cult-ui/hero-dithering.webp"
+ },
+ "cult-ui/hero-static-radial-gradient": {
+  "image": "/previews/cult-ui/hero-static-radial-gradient.webp"
+ },
+ "cult-ui/hero-heatmap": {
+  "image": "/previews/cult-ui/hero-heatmap.webp"
+ },
+ "cult-ui/hover-video-player": {
+  "image": "/previews/cult-ui/hover-video-player.webp"
+ },
+ "cult-ui/hero-liquid-metal": {
+  "image": "/previews/cult-ui/hero-liquid-metal.webp"
+ },
+ "cult-ui/illustration-card-grid": {
+  "image": "/previews/cult-ui/illustration-card-grid.webp"
+ },
+ "cult-ui/illustration-comment-bubble": {
+  "image": "/previews/cult-ui/illustration-comment-bubble.webp"
+ },
+ "cult-ui/illustration-fluid-rendering": {
+  "image": "/previews/cult-ui/illustration-fluid-rendering.webp"
+ },
+ "cult-ui/illustration-cursor": {
+  "image": "/previews/cult-ui/illustration-cursor.webp"
+ },
+ "cult-ui/illustration-globe-vercel": {
+  "image": "/previews/cult-ui/illustration-globe-vercel.webp"
+ },
+ "cult-ui/illustration-graph": {
+  "image": "/previews/cult-ui/illustration-graph.webp"
+ },
+ "cult-ui/intro-disclosure": {
+  "image": "/previews/cult-ui/intro-disclosure.webp"
+ },
+ "cult-ui/kanban-board": {
+  "image": "/previews/cult-ui/kanban-board.webp"
+ },
+ "cult-ui/loading-carousel": {
+  "image": "/previews/cult-ui/loading-carousel.webp"
+ },
+ "cult-ui/lightboard": {
+  "image": "/previews/cult-ui/lightboard.webp"
+ },
+ "cult-ui/logo-carousel": {
+  "image": "/previews/cult-ui/logo-carousel.webp"
+ },
+ "cult-ui/mac-screen": {
+  "image": "/previews/cult-ui/mac-screen.webp"
+ },
+ "cult-ui/marketing-feature-code": {
+  "image": "/previews/cult-ui/marketing-feature-code.webp"
+ },
+ "cult-ui/marketing-hero-analytics": {
+  "image": "/previews/cult-ui/marketing-hero-analytics.webp"
+ },
+ "cult-ui/merging-bubbles": {
+  "image": "/previews/cult-ui/merging-bubbles.webp"
+ },
+ "cult-ui/metal-button": {
+  "image": "/previews/cult-ui/metal-button.webp"
+ },
+ "cult-ui/minimal-card": {
+  "image": "/previews/cult-ui/minimal-card.webp"
+ },
+ "cult-ui/mock-browser-window": {
+  "image": "/previews/cult-ui/mock-browser-window.webp"
+ },
+ "cult-ui/morph-surface": {
+  "image": "/previews/cult-ui/morph-surface.webp"
+ },
+ "cult-ui/neumorph-button": {
+  "image": "/previews/cult-ui/neumorph-button.webp"
+ },
+ "cult-ui/neumorph-eyebrow": {
+  "image": "/previews/cult-ui/neumorph-eyebrow.webp"
+ },
+ "cult-ui/onboarding": {
+  "image": "/previews/cult-ui/onboarding.webp"
+ },
+ "cult-ui/organic-button": {
+  "image": "/previews/cult-ui/organic-button.webp"
+ },
+ "cult-ui/organic-card": {
+  "image": "/previews/cult-ui/organic-card.webp"
+ },
+ "cult-ui/organic-card-small": {
+  "image": "/previews/cult-ui/organic-card-small.webp"
+ },
+ "cult-ui/pixel-heading-character": {
+  "image": "/previews/cult-ui/pixel-heading-character.webp"
+ },
+ "cult-ui/pixel-heading-word": {
+  "image": "/previews/cult-ui/pixel-heading-word.webp"
+ },
+ "cult-ui/pixel-paragraph-words": {
+  "image": "/previews/cult-ui/pixel-paragraph-words.webp"
+ },
+ "cult-ui/pixel-paragraph-words-inverse": {
+  "image": "/previews/cult-ui/pixel-paragraph-words-inverse.webp"
+ },
+ "cult-ui/poll-widget": {
+  "image": "/previews/cult-ui/poll-widget.webp"
+ },
+ "cult-ui/popover": {
+  "image": "/previews/cult-ui/popover.webp"
+ },
+ "cult-ui/popover-form": {
+  "image": "/previews/cult-ui/popover-form.webp"
+ },
+ "cult-ui/prompt-composer": {
+  "image": "/previews/cult-ui/prompt-composer.webp"
+ },
+ "cult-ui/prompt-library": {
+  "image": "/previews/cult-ui/prompt-library.webp"
+ },
+ "cult-ui/rolling-number": {
+  "image": "/previews/cult-ui/rolling-number.webp"
+ },
+ "cult-ui/security-checkpoint": {
+  "image": "/previews/cult-ui/security-checkpoint.webp"
+ },
+ "cult-ui/shader-lens-blur": {
+  "image": "/previews/cult-ui/shader-lens-blur.webp"
+ },
+ "cult-ui/shadow-card": {
+  "image": "/previews/cult-ui/shadow-card.webp"
+ },
+ "cult-ui/shift-card": {
+  "image": "/previews/cult-ui/shift-card.webp"
+ },
+ "cult-ui/side-panel": {
+  "image": "/previews/cult-ui/side-panel.webp"
+ },
+ "cult-ui/sortable-list": {
+  "image": "/previews/cult-ui/sortable-list.webp"
+ },
+ "cult-ui/speech-bubble": {
+  "image": "/previews/cult-ui/speech-bubble.webp"
+ },
+ "cult-ui/squiggle-arrow": {
+  "image": "/previews/cult-ui/squiggle-arrow.webp"
+ },
+ "cult-ui/stripe-bg-guides": {
+  "image": "/previews/cult-ui/stripe-bg-guides.webp"
+ },
+ "cult-ui/svg-bands": {
+  "image": "/previews/cult-ui/svg-bands.webp"
+ },
+ "cult-ui/svg-shapes": {
+  "image": "/previews/cult-ui/svg-shapes.webp"
+ },
+ "cult-ui/svg-shapes-animated": {
+  "image": "/previews/cult-ui/svg-shapes-animated.webp"
+ },
+ "cult-ui/tabs-illustration-vercel": {
+  "image": "/previews/cult-ui/tabs-illustration-vercel.webp"
+ },
+ "cult-ui/terminal-animation": {
+  "image": "/previews/cult-ui/terminal-animation.webp"
+ },
+ "cult-ui/text-animate": {
+  "image": "/previews/cult-ui/text-animate.webp"
+ },
+ "cult-ui/text-gif": {
+  "image": "/previews/cult-ui/text-gif.webp"
+ },
+ "cult-ui/texture-button": {
+  "image": "/previews/cult-ui/texture-button.webp"
+ },
+ "cult-ui/texture-card": {
+  "image": "/previews/cult-ui/texture-card.webp"
+ },
+ "cult-ui/texture-overlay": {
+  "image": "/previews/cult-ui/texture-overlay.webp"
+ },
+ "cult-ui/timer": {
+  "image": "/previews/cult-ui/timer.webp"
+ },
+ "cult-ui/toolbar-expandable": {
+  "image": "/previews/cult-ui/toolbar-expandable.webp"
+ },
+ "cult-ui/tweet-grid": {
+  "image": "/previews/cult-ui/tweet-grid.webp"
+ },
+ "cult-ui/typewriter": {
+  "image": "/previews/cult-ui/typewriter.webp"
+ },
+ "cult-ui/vote-tally": {
+  "image": "/previews/cult-ui/vote-tally.webp"
+ },
+ "cult-ui/wizard-expandable": {
+  "image": "/previews/cult-ui/wizard-expandable.webp"
+ },
+ "cult-ui/youtube-video-player": {
+  "image": "/previews/cult-ui/youtube-video-player.webp"
+ },
+ "cult-ui/three-d-carousel": {
+  "image": "/previews/cult-ui/three-d-carousel.webp"
+ },
+ "eldora/animated-frameworks": {
+  "image": "/previews/eldora/animated-frameworks.webp"
+ },
+ "eldora/animated-badge": {
+  "image": "/previews/eldora/animated-badge.webp"
+ },
+ "eldora/animated-list": {
+  "image": "/previews/eldora/animated-list.webp"
+ },
+ "eldora/blur-in-text": {
+  "image": "/previews/eldora/blur-in-text.webp"
+ },
+ "eldora/animated-shiny-button": {
+  "image": "/previews/eldora/animated-shiny-button.webp"
+ },
+ "eldora/browser": {
+  "image": "/previews/eldora/browser.webp"
+ },
+ "eldora/card-flip-hover": {
+  "image": "/previews/eldora/card-flip-hover.webp"
+ },
+ "eldora/clerk-otp": {
+  "image": "/previews/eldora/clerk-otp.webp"
+ },
+ "eldora/dock-text": {
+  "image": "/previews/eldora/dock-text.webp"
+ },
+ "eldora/fade-text": {
+  "image": "/previews/eldora/fade-text.webp"
+ },
+ "eldora/font-weight-text": {
+  "image": "/previews/eldora/font-weight-text.webp"
+ },
+ "eldora/github-inline-comments": {
+  "image": "/previews/eldora/github-inline-comments.webp"
+ },
+ "eldora/gradual-spacing-text": {
+  "image": "/previews/eldora/gradual-spacing-text.webp"
+ },
+ "eldora/grid": {
+  "image": "/previews/eldora/grid.webp"
+ },
+ "eldora/hacker-background": {
+  "image": "/previews/eldora/hacker-background.webp"
+ },
+ "eldora/cobe-globe": {
+  "image": "/previews/eldora/cobe-globe.webp"
+ },
+ "eldora/integrations": {
+  "image": "/previews/eldora/integrations.webp"
+ },
+ "eldora/ipad": {
+  "image": "/previews/eldora/ipad.webp"
+ },
+ "eldora/iphone-17-pro": {
+  "image": "/previews/eldora/iphone-17-pro.webp"
+ },
+ "eldora/letter-pull-up-text": {
+  "image": "/previews/eldora/letter-pull-up-text.webp"
+ },
+ "eldora/live-button": {
+  "image": "/previews/eldora/live-button.webp"
+ },
+ "eldora/logo-timeline": {
+  "image": "/previews/eldora/logo-timeline.webp"
+ },
+ "eldora/macbook-pro": {
+  "image": "/previews/eldora/macbook-pro.webp"
+ },
+ "eldora/map": {
+  "image": "/previews/eldora/map.webp"
+ },
+ "eldora/novatrix-background": {
+  "image": "/previews/eldora/novatrix-background.webp"
+ },
+ "eldora/multi-direction-slide-text": {
+  "image": "/previews/eldora/multi-direction-slide-text.webp"
+ },
+ "eldora/scale-letter-text": {
+  "image": "/previews/eldora/scale-letter-text.webp"
+ },
+ "eldora/safari-browser": {
+  "image": "/previews/eldora/safari-browser.webp"
+ },
+ "eldora/photon-beam": {
+  "image": "/previews/eldora/photon-beam.webp"
+ },
+ "eldora/seperate-away-text": {
+  "image": "/previews/eldora/seperate-away-text.webp"
+ },
+ "eldora/terminal": {
+  "image": "/previews/eldora/terminal.webp"
+ },
+ "eldora/testimonal-slider": {
+  "image": "/previews/eldora/testimonal-slider.webp"
+ },
+ "eldora/word-pull-up-text": {
+  "image": "/previews/eldora/word-pull-up-text.webp"
+ },
+ "eldora/wavy-text": {
+  "image": "/previews/eldora/wavy-text.webp"
+ },
+ "fancy/basic-number-ticker": {
+  "image": "/previews/fancy/basic-number-ticker.webp"
+ },
+ "fancy/animated-gradient-svg": {
+  "image": "/previews/fancy/animated-gradient-svg.webp"
+ },
+ "fancy/box-carousel": {
+  "image": "/previews/fancy/box-carousel.webp"
+ },
+ "fancy/breathing-text": {
+  "image": "/previews/fancy/breathing-text.webp"
+ },
+ "fancy/css-box": {
+  "image": "/previews/fancy/css-box.webp"
+ },
+ "fancy/circling-elements": {
+  "image": "/previews/fancy/circling-elements.webp"
+ },
+ "fancy/cursor-attractor-and-gravity": {
+  "image": "/previews/fancy/cursor-attractor-and-gravity.webp"
+ },
+ "fancy/drag-elements": {
+  "image": "/previews/fancy/drag-elements.webp"
+ },
+ "fancy/elastic-line": {
+  "image": "/previews/fancy/elastic-line.webp"
+ },
+ "fancy/gooey-svg-filter": {
+  "image": "/previews/fancy/gooey-svg-filter.webp"
+ },
+ "fancy/float": {
+  "image": "/previews/fancy/float.webp"
+ },
+ "fancy/gravity": {
+  "image": "/previews/fancy/gravity.webp"
+ },
+ "fancy/letter-3d-swap": {
+  "image": "/previews/fancy/letter-3d-swap.webp"
+ },
+ "fancy/image-trail": {
+  "image": "/previews/fancy/image-trail.webp"
+ },
+ "fancy/letter-swap": {
+  "image": "/previews/fancy/letter-swap.webp"
+ },
+ "fancy/media-between-text": {
+  "image": "/previews/fancy/media-between-text.webp"
+ },
+ "fancy/marquee-along-svg-path": {
+  "image": "/previews/fancy/marquee-along-svg-path.webp"
+ },
+ "fancy/parallax-floating": {
+  "image": "/previews/fancy/parallax-floating.webp"
+ },
+ "fancy/pixel-trail": {
+  "image": "/previews/fancy/pixel-trail.webp"
+ },
+ "fancy/pixelate-svg-filter": {
+  "image": "/previews/fancy/pixelate-svg-filter.webp"
+ },
+ "fancy/random-letter-swap": {
+  "image": "/previews/fancy/random-letter-swap.webp"
+ },
+ "fancy/scramble-hover": {
+  "image": "/previews/fancy/scramble-hover.webp"
+ },
+ "fancy/scramble-in": {
+  "image": "/previews/fancy/scramble-in.webp"
+ },
+ "fancy/screensaver": {
+  "image": "/previews/fancy/screensaver.webp"
+ },
+ "fancy/scroll-and-swap": {
+  "image": "/previews/fancy/scroll-and-swap.webp"
+ },
+ "fancy/stacking-cards": {
+  "image": "/previews/fancy/stacking-cards.webp"
+ },
+ "fancy/sticky-footer": {
+  "image": "/previews/fancy/sticky-footer.webp"
+ },
+ "fancy/text-along-path": {
+  "image": "/previews/fancy/text-along-path.webp"
+ },
+ "fancy/text-cursor-proximity": {
+  "image": "/previews/fancy/text-cursor-proximity.webp"
+ },
+ "fancy/text-highlighter": {
+  "image": "/previews/fancy/text-highlighter.webp"
+ },
+ "fancy/text-rotate": {
+  "image": "/previews/fancy/text-rotate.webp"
+ },
+ "fancy/typewriter": {
+  "image": "/previews/fancy/typewriter.webp"
+ },
+ "fancy/underline-animation": {
+  "image": "/previews/fancy/underline-animation.webp"
+ },
+ "fancy/underline-to-background": {
+  "image": "/previews/fancy/underline-to-background.webp"
+ },
+ "fancy/variable-font-and-cursor": {
+  "image": "/previews/fancy/variable-font-and-cursor.webp"
+ },
+ "fancy/variable-font-cursor-proximity": {
+  "image": "/previews/fancy/variable-font-cursor-proximity.webp"
+ },
+ "fancy/variable-font-hover-by-letter": {
+  "image": "/previews/fancy/variable-font-hover-by-letter.webp"
+ },
+ "fancy/simple-marquee": {
+  "image": "/previews/fancy/simple-marquee.webp"
+ },
+ "fancy/variable-font-hover-by-random-letter": {
+  "image": "/previews/fancy/variable-font-hover-by-random-letter.webp"
+ },
+ "fancy/vertical-cut-reveal": {
+  "image": "/previews/fancy/vertical-cut-reveal.webp"
+ },
+ "kokonut/activity-terrain": {
+  "image": "/previews/kokonut/activity-terrain.webp"
+ },
+ "kokonut/action-search-bar": {
+  "image": "/previews/kokonut/action-search-bar.webp"
+ },
+ "kokonut/ai-agent-lanes": {
+  "image": "/previews/kokonut/ai-agent-lanes.webp"
+ },
+ "kokonut/ai-attachment": {
+  "image": "/previews/kokonut/ai-attachment.webp"
+ },
+ "kokonut/ai-branches": {
+  "image": "/previews/kokonut/ai-branches.webp"
+ },
+ "kokonut/ai-autocomplete": {
+  "image": "/previews/kokonut/ai-autocomplete.webp"
+ },
+ "kokonut/ai-checkout": {
+  "image": "/previews/kokonut/ai-checkout.webp"
+ },
+ "kokonut/ai-citations": {
+  "image": "/previews/kokonut/ai-citations.webp"
+ },
+ "kokonut/ai-code-run": {
+  "image": "/previews/kokonut/ai-code-run.webp"
+ },
+ "kokonut/ai-context-meter": {
+  "image": "/previews/kokonut/ai-context-meter.webp"
+ },
+ "kokonut/ai-connect": {
+  "image": "/previews/kokonut/ai-connect.webp"
+ },
+ "kokonut/ai-diff-review": {
+  "image": "/previews/kokonut/ai-diff-review.webp"
+ },
+ "kokonut/ai-handoff": {
+  "image": "/previews/kokonut/ai-handoff.webp"
+ },
+ "kokonut/ai-inline-edit": {
+  "image": "/previews/kokonut/ai-inline-edit.webp"
+ },
+ "kokonut/ai-input-search": {
+  "image": "/previews/kokonut/ai-input-search.webp"
+ },
+ "kokonut/ai-memory": {
+  "image": "/previews/kokonut/ai-memory.webp"
+ },
+ "kokonut/ai-loading": {
+  "image": "/previews/kokonut/ai-loading.webp"
+ },
+ "kokonut/ai-message-queue": {
+  "image": "/previews/kokonut/ai-message-queue.webp"
+ },
+ "kokonut/ai-model-selector": {
+  "image": "/previews/kokonut/ai-model-selector.webp"
+ },
+ "kokonut/ai-order-status": {
+  "image": "/previews/kokonut/ai-order-status.webp"
+ },
+ "kokonut/ai-prompt": {
+  "image": "/previews/kokonut/ai-prompt.webp"
+ },
+ "kokonut/ai-redact": {
+  "image": "/previews/kokonut/ai-redact.webp"
+ },
+ "kokonut/ai-schedule": {
+  "image": "/previews/kokonut/ai-schedule.webp"
+ },
+ "kokonut/ai-send": {
+  "image": "/previews/kokonut/ai-send.webp"
+ },
+ "kokonut/ai-text-loading": {
+  "image": "/previews/kokonut/ai-text-loading.webp"
+ },
+ "kokonut/ai-token-alternatives": {
+  "image": "/previews/kokonut/ai-token-alternatives.webp"
+ },
+ "kokonut/ai-tool-approval": {
+  "image": "/previews/kokonut/ai-tool-approval.webp"
+ },
+ "kokonut/ai-tool-calls": {
+  "image": "/previews/kokonut/ai-tool-calls.webp"
+ },
+ "kokonut/ai-voice": {
+  "image": "/previews/kokonut/ai-voice.webp"
+ },
+ "kokonut/amount-pad": {
+  "image": "/previews/kokonut/amount-pad.webp"
+ },
+ "kokonut/apple-activity-card": {
+  "image": "/previews/kokonut/apple-activity-card.webp"
+ },
+ "kokonut/avatar-picker": {
+  "image": "/previews/kokonut/avatar-picker.webp"
+ },
+ "kokonut/attract-button": {
+  "image": "/previews/kokonut/attract-button.webp"
+ },
+ "kokonut/background-paths": {
+  "image": "/previews/kokonut/background-paths.webp"
+ },
+ "kokonut/bell-button": {
+  "image": "/previews/kokonut/bell-button.webp"
+ },
+ "kokonut/bento-grid": {
+  "image": "/previews/kokonut/bento-grid.webp"
+ },
+ "kokonut/boarding-pass": {
+  "image": "/previews/kokonut/boarding-pass.webp"
+ },
+ "kokonut/card-flip": {
+  "image": "/previews/kokonut/card-flip.webp"
+ },
+ "kokonut/card-field": {
+  "image": "/previews/kokonut/card-field.webp"
+ },
+ "kokonut/cart-button": {
+  "image": "/previews/kokonut/cart-button.webp"
+ },
+ "kokonut/carousel-cards": {
+  "image": "/previews/kokonut/carousel-cards.webp"
+ },
+ "kokonut/card-stack": {
+  "image": "/previews/kokonut/card-stack.webp"
+ },
+ "kokonut/clip-trimmer": {
+  "image": "/previews/kokonut/clip-trimmer.webp"
+ },
+ "kokonut/command-button": {
+  "image": "/previews/kokonut/command-button.webp"
+ },
+ "kokonut/contact-sheet": {
+  "image": "/previews/kokonut/contact-sheet.webp"
+ },
+ "kokonut/caustics-background": {
+  "image": "/previews/kokonut/caustics-background.webp"
+ },
+ "kokonut/cradle-text": {
+  "image": "/previews/kokonut/cradle-text.webp"
+ },
+ "kokonut/currency-transfer": {
+  "image": "/previews/kokonut/currency-transfer.webp"
+ },
+ "kokonut/detent-dial": {
+  "image": "/previews/kokonut/detent-dial.webp"
+ },
+ "kokonut/dot-field": {
+  "image": "/previews/kokonut/dot-field.webp"
+ },
+ "kokonut/dynamic-text": {
+  "image": "/previews/kokonut/dynamic-text.webp"
+ },
+ "kokonut/empty-state": {
+  "image": "/previews/kokonut/empty-state.webp"
+ },
+ "kokonut/drape-background": {
+  "image": "/previews/kokonut/drape-background.webp"
+ },
+ "kokonut/file-upload": {
+  "image": "/previews/kokonut/file-upload.webp"
+ },
+ "kokonut/flow-field": {
+  "image": "/previews/kokonut/flow-field.webp"
+ },
+ "kokonut/focal-point-picker": {
+  "image": "/previews/kokonut/focal-point-picker.webp"
+ },
+ "kokonut/glitch-text": {
+  "image": "/previews/kokonut/glitch-text.webp"
+ },
+ "kokonut/gradient-button": {
+  "image": "/previews/kokonut/gradient-button.webp"
+ },
+ "kokonut/halftone-background": {
+  "image": "/previews/kokonut/halftone-background.webp"
+ },
+ "kokonut/helpful-rating": {
+  "image": "/previews/kokonut/helpful-rating.webp"
+ },
+ "kokonut/hold-button": {
+  "image": "/previews/kokonut/hold-button.webp"
+ },
+ "kokonut/ink-background": {
+  "image": "/previews/kokonut/ink-background.webp"
+ },
+ "kokonut/inline-alert": {
+  "image": "/previews/kokonut/inline-alert.webp"
+ },
+ "kokonut/lightbox-grid": {
+  "image": "/previews/kokonut/lightbox-grid.webp"
+ },
+ "kokonut/liquid-gauge": {
+  "image": "/previews/kokonut/liquid-gauge.webp"
+ },
+ "kokonut/liquid-glass-card": {
+  "image": "/previews/kokonut/liquid-glass-card.webp"
+ },
+ "kokonut/liquid-slider": {
+  "image": "/previews/kokonut/liquid-slider.webp"
+ },
+ "kokonut/loader": {
+  "image": "/previews/kokonut/loader.webp"
+ },
+ "kokonut/location-picker": {
+  "image": "/previews/kokonut/location-picker.webp"
+ },
+ "kokonut/marker-text": {
+  "image": "/previews/kokonut/marker-text.webp"
+ },
+ "kokonut/marking-menu": {
+  "image": "/previews/kokonut/marking-menu.webp"
+ },
+ "kokonut/metric-card": {
+  "image": "/previews/kokonut/metric-card.webp"
+ },
+ "kokonut/morph-popover": {
+  "image": "/previews/kokonut/morph-popover.webp"
+ },
+ "kokonut/morphic-navbar": {
+  "image": "/previews/kokonut/morphic-navbar.webp"
+ },
+ "kokonut/notification-stack": {
+  "image": "/previews/kokonut/notification-stack.webp"
+ },
+ "kokonut/page-flip": {
+  "image": "/previews/kokonut/page-flip.webp"
+ },
+ "kokonut/particle-button": {
+  "image": "/previews/kokonut/particle-button.webp"
+ },
+ "kokonut/photo-straighten": {
+  "image": "/previews/kokonut/photo-straighten.webp"
+ },
+ "kokonut/plucked-text": {
+  "image": "/previews/kokonut/plucked-text.webp"
+ },
+ "kokonut/profile-dropdown": {
+  "image": "/previews/kokonut/profile-dropdown.webp"
+ },
+ "kokonut/promise-toast": {
+  "image": "/previews/kokonut/promise-toast.webp"
+ },
+ "kokonut/pull-cord": {
+  "image": "/previews/kokonut/pull-cord.webp"
+ },
+ "kokonut/receipt-printer": {
+  "image": "/previews/kokonut/receipt-printer.webp"
+ },
+ "kokonut/save-button": {
+  "image": "/previews/kokonut/save-button.webp"
+ },
+ "kokonut/rain-glass-background": {
+  "image": "/previews/kokonut/rain-glass-background.webp"
+ },
+ "kokonut/save-status": {
+  "image": "/previews/kokonut/save-status.webp"
+ },
+ "kokonut/scroll-index": {
+  "image": "/previews/kokonut/scroll-index.webp"
+ },
+ "kokonut/seat-map": {
+  "image": "/previews/kokonut/seat-map.webp"
+ },
+ "kokonut/shadow-text": {
+  "image": "/previews/kokonut/shadow-text.webp"
+ },
+ "kokonut/shape-hero": {
+  "image": "/previews/kokonut/shape-hero.webp"
+ },
+ "kokonut/signature-pad": {
+  "image": "/previews/kokonut/signature-pad.webp"
+ },
+ "kokonut/slide-text-button": {
+  "image": "/previews/kokonut/slide-text-button.webp"
+ },
+ "kokonut/slide-to-confirm": {
+  "image": "/previews/kokonut/slide-to-confirm.webp"
+ },
+ "kokonut/slot-picker": {
+  "image": "/previews/kokonut/slot-picker.webp"
+ },
+ "kokonut/smooth-drawer": {
+  "image": "/previews/kokonut/smooth-drawer.webp"
+ },
+ "kokonut/smooth-tab": {
+  "image": "/previews/kokonut/smooth-tab.webp"
+ },
+ "kokonut/spending-ring": {
+  "image": "/previews/kokonut/spending-ring.webp"
+ },
+ "kokonut/split-flap-text": {
+  "image": "/previews/kokonut/split-flap-text.webp"
+ },
+ "kokonut/spoiler-text": {
+  "image": "/previews/kokonut/spoiler-text.webp"
+ },
+ "kokonut/stack-panel": {
+  "image": "/previews/kokonut/stack-panel.webp"
+ },
+ "kokonut/status-island": {
+  "image": "/previews/kokonut/status-island.webp"
+ },
+ "kokonut/stay-picker": {
+  "image": "/previews/kokonut/stay-picker.webp"
+ },
+ "kokonut/switch-button": {
+  "image": "/previews/kokonut/switch-button.webp"
+ },
+ "kokonut/swoosh-text": {
+  "image": "/previews/kokonut/swoosh-text.webp"
+ },
+ "kokonut/synced-transcript": {
+  "image": "/previews/kokonut/synced-transcript.webp"
+ },
+ "kokonut/team-selector": {
+  "image": "/previews/kokonut/team-selector.webp"
+ },
+ "kokonut/tear-button": {
+  "image": "/previews/kokonut/tear-button.webp"
+ },
+ "kokonut/timezone-planner": {
+  "image": "/previews/kokonut/timezone-planner.webp"
+ },
+ "kokonut/tip-selector": {
+  "image": "/previews/kokonut/tip-selector.webp"
+ },
+ "kokonut/toolbar": {
+  "image": "/previews/kokonut/toolbar.webp"
+ },
+ "kokonut/topo-background": {
+  "image": "/previews/kokonut/topo-background.webp"
+ },
+ "kokonut/type-writer": {
+  "image": "/previews/kokonut/type-writer.webp"
+ },
+ "kokonut/undo-button": {
+  "image": "/previews/kokonut/undo-button.webp"
+ },
+ "kokonut/uptime-card": {
+  "image": "/previews/kokonut/uptime-card.webp"
+ },
+ "kokonut/v0-button": {
+  "image": "/previews/kokonut/v0-button.webp"
+ },
+ "kokonut/wheel-picker": {
+  "image": "/previews/kokonut/wheel-picker.webp"
+ },
+ "magicui/animated-circular-progress-bar": {
+  "image": "/previews/magicui/animated-circular-progress-bar.webp"
+ },
+ "magicui/animated-grid-pattern": {
+  "image": "/previews/magicui/animated-grid-pattern.webp"
+ },
+ "magicui/animated-gradient-text": {
+  "image": "/previews/magicui/animated-gradient-text.webp"
+ },
+ "magicui/animated-list": {
+  "image": "/previews/magicui/animated-list.webp"
+ },
+ "magicui/animated-shiny-text": {
+  "image": "/previews/magicui/animated-shiny-text.webp"
+ },
+ "magicui/aurora-text": {
+  "image": "/previews/magicui/aurora-text.webp"
+ },
+ "magicui/avatar-circles": {
+  "image": "/previews/magicui/avatar-circles.webp"
+ },
+ "magicui/backlight": {
+  "image": "/previews/magicui/backlight.webp"
+ },
+ "magicui/bento-grid": {
+  "image": "/previews/magicui/bento-grid.webp"
+ },
+ "magicui/border-beam": {
+  "image": "/previews/magicui/border-beam.webp"
+ },
+ "magicui/code-comparison": {
+  "image": "/previews/magicui/code-comparison.webp"
+ },
+ "magicui/comic-text": {
+  "image": "/previews/magicui/comic-text.webp"
+ },
+ "magicui/confetti": {
+  "image": "/previews/magicui/confetti.webp"
+ },
+ "magicui/cool-mode": {
+  "image": "/previews/magicui/cool-mode.webp"
+ },
+ "magicui/animated-theme-toggler": {
+  "image": "/previews/magicui/animated-theme-toggler.webp"
+ },
+ "magicui/dia-text-reveal": {
+  "image": "/previews/magicui/dia-text-reveal.webp"
+ },
+ "magicui/dither-field": {
+  "image": "/previews/magicui/dither-field.webp"
+ },
+ "magicui/dock": {
+  "image": "/previews/magicui/dock.webp"
+ },
+ "magicui/dot-pattern": {
+  "image": "/previews/magicui/dot-pattern.webp"
+ },
+ "magicui/dotted-map": {
+  "image": "/previews/magicui/dotted-map.webp"
+ },
+ "magicui/file-tree": {
+  "image": "/previews/magicui/file-tree.webp"
+ },
+ "magicui/flickering-grid": {
+  "image": "/previews/magicui/flickering-grid.webp"
+ },
+ "magicui/floating-3d-particles": {
+  "image": "/previews/magicui/floating-3d-particles.webp"
+ },
+ "magicui/glare-hover": {
+  "image": "/previews/magicui/glare-hover.webp"
+ },
+ "magicui/glyph-matrix": {
+  "image": "/previews/magicui/glyph-matrix.webp"
+ },
+ "magicui/grid-pattern": {
+  "image": "/previews/magicui/grid-pattern.webp"
+ },
+ "magicui/globe": {
+  "image": "/previews/magicui/globe.webp"
+ },
+ "magicui/hero-video-dialog": {
+  "image": "/previews/magicui/hero-video-dialog.webp"
+ },
+ "magicui/highlighter": {
+  "image": "/previews/magicui/highlighter.webp"
+ },
+ "magicui/hexagon-pattern": {
+  "image": "/previews/magicui/hexagon-pattern.webp"
+ },
+ "magicui/hyper-text": {
+  "image": "/previews/magicui/hyper-text.webp"
+ },
+ "magicui/icon-cloud": {
+  "image": "/previews/magicui/icon-cloud.webp"
+ },
+ "magicui/interactive-grid-pattern": {
+  "image": "/previews/magicui/interactive-grid-pattern.webp"
+ },
+ "magicui/interactive-hover-button": {
+  "image": "/previews/magicui/interactive-hover-button.webp"
+ },
+ "magicui/iphone": {
+  "image": "/previews/magicui/iphone.webp"
+ },
+ "magicui/kinetic-text": {
+  "image": "/previews/magicui/kinetic-text.webp"
+ },
+ "magicui/lens": {
+  "image": "/previews/magicui/lens.webp"
+ },
+ "magicui/light-rays": {
+  "image": "/previews/magicui/light-rays.webp"
+ },
+ "magicui/line-shadow-text": {
+  "image": "/previews/magicui/line-shadow-text.webp"
+ },
+ "magicui/magic-card": {
+  "image": "/previews/magicui/magic-card.webp"
+ },
+ "magicui/marquee": {
+  "image": "/previews/magicui/marquee.webp"
+ },
+ "magicui/meteors": {
+  "image": "/previews/magicui/meteors.webp"
+ },
+ "magicui/morphing-text": {
+  "image": "/previews/magicui/morphing-text.webp"
+ },
+ "magicui/neon-gradient-card": {
+  "image": "/previews/magicui/neon-gradient-card.webp"
+ },
+ "magicui/noise-texture": {
+  "image": "/previews/magicui/noise-texture.webp"
+ },
+ "magicui/number-ticker": {
+  "image": "/previews/magicui/number-ticker.webp"
+ },
+ "magicui/orbiting-circles": {
+  "image": "/previews/magicui/orbiting-circles.webp"
+ },
+ "magicui/particles": {
+  "image": "/previews/magicui/particles.webp"
+ },
+ "magicui/pixel-image": {
+  "image": "/previews/magicui/pixel-image.webp"
+ },
+ "magicui/pointer": {
+  "image": "/previews/magicui/pointer.webp"
+ },
+ "magicui/progressive-blur": {
+  "image": "/previews/magicui/progressive-blur.webp"
+ },
+ "magicui/pulsating-button": {
+  "image": "/previews/magicui/pulsating-button.webp"
+ },
+ "magicui/rainbow-button": {
+  "image": "/previews/magicui/rainbow-button.webp"
+ },
+ "magicui/retro-grid": {
+  "image": "/previews/magicui/retro-grid.webp"
+ },
+ "magicui/ripple": {
+  "image": "/previews/magicui/ripple.webp"
+ },
+ "magicui/ripple-button": {
+  "image": "/previews/magicui/ripple-button.webp"
+ },
+ "magicui/safari": {
+  "image": "/previews/magicui/safari.webp"
+ },
+ "magicui/scroll-based-velocity": {
+  "image": "/previews/magicui/scroll-based-velocity.webp"
+ },
+ "magicui/scroll-progress": {
+  "image": "/previews/magicui/scroll-progress.webp"
+ },
+ "magicui/shine-border": {
+  "image": "/previews/magicui/shine-border.webp"
+ },
+ "magicui/shimmer-button": {
+  "image": "/previews/magicui/shimmer-button.webp"
+ },
+ "magicui/shiny-button": {
+  "image": "/previews/magicui/shiny-button.webp"
+ },
+ "magicui/smooth-cursor": {
+  "image": "/previews/magicui/smooth-cursor.webp"
+ },
+ "magicui/sparkles-text": {
+  "image": "/previews/magicui/sparkles-text.webp"
+ },
+ "magicui/spinning-text": {
+  "image": "/previews/magicui/spinning-text.webp"
+ },
+ "magicui/striped-pattern": {
+  "image": "/previews/magicui/striped-pattern.webp"
+ },
+ "magicui/terminal": {
+  "image": "/previews/magicui/terminal.webp"
+ },
+ "magicui/text-3d-flip": {
+  "image": "/previews/magicui/text-3d-flip.webp"
+ },
+ "magicui/text-reveal": {
+  "image": "/previews/magicui/text-reveal.webp"
+ },
+ "magicui/tweet-card": {
+  "image": "/previews/magicui/tweet-card.webp"
+ },
+ "magicui/typing-animation": {
+  "image": "/previews/magicui/typing-animation.webp"
+ },
+ "magicui/video-text": {
+  "image": "/previews/magicui/video-text.webp"
+ },
+ "magicui/warp-background": {
+  "image": "/previews/magicui/warp-background.webp"
+ },
+ "magicui/word-rotate": {
+  "image": "/previews/magicui/word-rotate.webp"
+ },
+ "magicui/text-animate": {
+  "image": "/previews/magicui/text-animate.webp"
+ },
+ "motion-primitives/animated-background": {
+  "image": "/previews/motion-primitives/animated-background.webp"
+ },
+ "motion-primitives/accordion": {
+  "image": "/previews/motion-primitives/accordion.webp"
+ },
+ "motion-primitives/animated-group": {
+  "image": "/previews/motion-primitives/animated-group.webp"
+ },
+ "motion-primitives/animated-number": {
+  "image": "/previews/motion-primitives/animated-number.webp"
+ },
+ "motion-primitives/carousel": {
+  "image": "/previews/motion-primitives/carousel.webp"
+ },
+ "motion-primitives/border-trail": {
+  "image": "/previews/motion-primitives/border-trail.webp"
+ },
+ "motion-primitives/cursor": {
+  "image": "/previews/motion-primitives/cursor.webp"
+ },
+ "motion-primitives/dialog": {
+  "image": "/previews/motion-primitives/dialog.webp"
+ },
+ "motion-primitives/disclosure": {
+  "image": "/previews/motion-primitives/disclosure.webp"
+ },
+ "motion-primitives/dock": {
+  "image": "/previews/motion-primitives/dock.webp"
+ },
+ "motion-primitives/glow-effect": {
+  "image": "/previews/motion-primitives/glow-effect.webp"
+ },
+ "motion-primitives/image-comparison": {
+  "image": "/previews/motion-primitives/image-comparison.webp"
+ },
+ "motion-primitives/infinite-slider": {
+  "image": "/previews/motion-primitives/infinite-slider.webp"
+ },
+ "motion-primitives/in-view": {
+  "image": "/previews/motion-primitives/in-view.webp"
+ },
+ "motion-primitives/magnetic": {
+  "image": "/previews/motion-primitives/magnetic.webp"
+ },
+ "motion-primitives/morphing-dialog": {
+  "image": "/previews/motion-primitives/morphing-dialog.webp"
+ },
+ "motion-primitives/morphing-popover": {
+  "image": "/previews/motion-primitives/morphing-popover.webp"
+ },
+ "motion-primitives/progressive-blur": {
+  "image": "/previews/motion-primitives/progressive-blur.webp"
+ },
+ "motion-primitives/scroll-progress": {
+  "image": "/previews/motion-primitives/scroll-progress.webp"
+ },
+ "motion-primitives/sliding-number": {
+  "image": "/previews/motion-primitives/sliding-number.webp"
+ },
+ "motion-primitives/spinning-text": {
+  "image": "/previews/motion-primitives/spinning-text.webp"
+ },
+ "motion-primitives/spotlight": {
+  "image": "/previews/motion-primitives/spotlight.webp"
+ },
+ "motion-primitives/text-effect": {
+  "image": "/previews/motion-primitives/text-effect.webp"
+ },
+ "motion-primitives/text-loop": {
+  "image": "/previews/motion-primitives/text-loop.webp"
+ },
+ "motion-primitives/text-morph": {
+  "image": "/previews/motion-primitives/text-morph.webp"
+ },
+ "motion-primitives/text-roll": {
+  "image": "/previews/motion-primitives/text-roll.webp"
+ },
+ "motion-primitives/text-scramble": {
+  "image": "/previews/motion-primitives/text-scramble.webp"
+ },
+ "motion-primitives/text-shimmer": {
+  "image": "/previews/motion-primitives/text-shimmer.webp"
+ },
+ "motion-primitives/text-shimmer-wave": {
+  "image": "/previews/motion-primitives/text-shimmer-wave.webp"
+ },
+ "motion-primitives/tilt": {
+  "image": "/previews/motion-primitives/tilt.webp"
+ },
+ "motion-primitives/toolbar-dynamic": {
+  "image": "/previews/motion-primitives/toolbar-dynamic.webp"
+ },
+ "motion-primitives/toolbar-expandable": {
+  "image": "/previews/motion-primitives/toolbar-expandable.webp"
+ },
+ "motion-primitives/transition-panel": {
+  "image": "/previews/motion-primitives/transition-panel.webp"
+ },
+ "reui/cascader-footer": {
+  "image": "/previews/reui/cascader-footer.webp"
+ },
+ "reui/cascader-nav": {
+  "image": "/previews/reui/cascader-nav.webp"
+ },
+ "reui/cascader-async": {
+  "image": "/previews/reui/cascader-async.webp"
+ },
+ "reui/code-block-highlight": {
+  "image": "/previews/reui/code-block-highlight.webp"
+ },
+ "reui/cascader-virtual": {
+  "image": "/previews/reui/cascader-virtual.webp"
+ },
+ "reui/data-grid-cell-selection": {
+  "image": "/previews/reui/data-grid-cell-selection.webp"
+ },
+ "reui/data-grid-column-filter": {
+  "image": "/previews/reui/data-grid-column-filter.webp"
+ },
+ "reui/data-grid-column-visibility": {
+  "image": "/previews/reui/data-grid-column-visibility.webp"
+ },
+ "reui/data-grid-column-header": {
+  "image": "/previews/reui/data-grid-column-header.webp"
+ },
+ "reui/data-grid-table": {
+  "image": "/previews/reui/data-grid-table.webp"
+ },
+ "reui/data-grid-pagination": {
+  "image": "/previews/reui/data-grid-pagination.webp"
+ },
+ "reui/data-grid-scroll-area": {
+  "image": "/previews/reui/data-grid-scroll-area.webp"
+ },
+ "reui/data-grid-table-dnd-rows": {
+  "image": "/previews/reui/data-grid-table-dnd-rows.webp"
+ },
+ "reui/data-grid-table-virtual": {
+  "image": "/previews/reui/data-grid-table-virtual.webp"
+ },
+ "reui/data-grid-table-dnd": {
+  "image": "/previews/reui/data-grid-table-dnd.webp"
+ },
+ "reui/event-calendar-agenda-view": {
+  "image": "/previews/reui/event-calendar-agenda-view.webp"
+ },
+ "reui/event-calendar-dnd": {
+  "image": "/previews/reui/event-calendar-dnd.webp"
+ },
+ "reui/event-calendar-content": {
+  "image": "/previews/reui/event-calendar-content.webp"
+ },
+ "reui/event-calendar-event": {
+  "image": "/previews/reui/event-calendar-event.webp"
+ },
+ "reui/event-calendar-month-view": {
+  "image": "/previews/reui/event-calendar-month-view.webp"
+ },
+ "reui/event-calendar-nav": {
+  "image": "/previews/reui/event-calendar-nav.webp"
+ },
+ "reui/event-calendar-recurrence": {
+  "image": "/previews/reui/event-calendar-recurrence.webp"
+ },
+ "reui/event-calendar-resource-view": {
+  "image": "/previews/reui/event-calendar-resource-view.webp"
+ },
+ "reui/event-calendar-time-grid": {
+  "image": "/previews/reui/event-calendar-time-grid.webp"
+ },
+ "reui/filters-date": {
+  "image": "/previews/reui/filters-date.webp"
+ },
+ "reui/filters-chip": {
+  "image": "/previews/reui/filters-chip.webp"
+ },
+ "reui/filters-dnd": {
+  "image": "/previews/reui/filters-dnd.webp"
+ },
+ "reui/filters-editors": {
+  "image": "/previews/reui/filters-editors.webp"
+ },
+ "reui/filters-query": {
+  "image": "/previews/reui/filters-query.webp"
+ },
+ "reui/filters-operators": {
+  "image": "/previews/reui/filters-operators.webp"
+ },
+ "reui/gantt-bar": {
+  "image": "/previews/reui/gantt-bar.webp"
+ },
+ "reui/gantt-nav": {
+  "image": "/previews/reui/gantt-nav.webp"
+ },
+ "reui/gantt-dnd": {
+  "image": "/previews/reui/gantt-dnd.webp"
+ },
+ "reui/gantt-recurrence": {
+  "image": "/previews/reui/gantt-recurrence.webp"
+ },
+ "reui/gantt-view": {
+  "image": "/previews/reui/gantt-view.webp"
+ },
+ "scrollx/accordion": {
+  "image": "/previews/scrollx/accordion.webp"
+ },
+ "scrollx/alert-dialog": {
+  "image": "/previews/scrollx/alert-dialog.webp"
+ },
+ "scrollx/animated-button": {
+  "image": "/previews/scrollx/animated-button.webp"
+ },
+ "scrollx/animated-tabs": {
+  "image": "/previews/scrollx/animated-tabs.webp"
+ },
+ "scrollx/animated-textgenerate": {
+  "image": "/previews/scrollx/animated-textgenerate.webp"
+ },
+ "scrollx/animated-testimonials": {
+  "image": "/previews/scrollx/animated-testimonials.webp"
+ },
+ "scrollx/aspect-ratio": {
+  "image": "/previews/scrollx/aspect-ratio.webp"
+ },
+ "scrollx/aurora-dots": {
+  "image": "/previews/scrollx/aurora-dots.webp"
+ },
+ "scrollx/avatar": {
+  "image": "/previews/scrollx/avatar.webp"
+ },
+ "scrollx/avatar-group": {
+  "image": "/previews/scrollx/avatar-group.webp"
+ },
+ "scrollx/background-paths": {
+  "image": "/previews/scrollx/background-paths.webp"
+ },
+ "scrollx/backgroundmeteors": {
+  "image": "/previews/scrollx/backgroundmeteors.webp"
+ },
+ "scrollx/badge": {
+  "image": "/previews/scrollx/badge.webp"
+ },
+ "scrollx/barswave": {
+  "image": "/previews/scrollx/barswave.webp"
+ },
+ "scrollx/beams-upstream": {
+  "image": "/previews/scrollx/beams-upstream.webp"
+ },
+ "scrollx/bento-grid": {
+  "image": "/previews/scrollx/bento-grid.webp"
+ },
+ "scrollx/bolt-strike": {
+  "image": "/previews/scrollx/bolt-strike.webp"
+ },
+ "scrollx/border-glide": {
+  "image": "/previews/scrollx/border-glide.webp"
+ },
+ "scrollx/button": {
+  "image": "/previews/scrollx/button.webp"
+ },
+ "scrollx/calendar": {
+  "image": "/previews/scrollx/calendar.webp"
+ },
+ "scrollx/card": {
+  "image": "/previews/scrollx/card.webp"
+ },
+ "scrollx/card-flip": {
+  "image": "/previews/scrollx/card-flip.webp"
+ },
+ "scrollx/card-tilt": {
+  "image": "/previews/scrollx/card-tilt.webp"
+ },
+ "scrollx/carousel": {
+  "image": "/previews/scrollx/carousel.webp"
+ },
+ "scrollx/checkbox-pro": {
+  "image": "/previews/scrollx/checkbox-pro.webp"
+ },
+ "scrollx/checklist-cell": {
+  "image": "/previews/scrollx/checklist-cell.webp"
+ },
+ "scrollx/clock": {
+  "image": "/previews/scrollx/clock.webp"
+ },
+ "scrollx/codeblock": {
+  "image": "/previews/scrollx/codeblock.webp"
+ },
+ "scrollx/collapsible": {
+  "image": "/previews/scrollx/collapsible.webp"
+ },
+ "scrollx/columnlines": {
+  "image": "/previews/scrollx/columnlines.webp"
+ },
+ "scrollx/cosmic-background": {
+  "image": "/previews/scrollx/cosmic-background.webp"
+ },
+ "scrollx/cursor-highlight": {
+  "image": "/previews/scrollx/cursor-highlight.webp"
+ },
+ "scrollx/cursorimagetrail": {
+  "image": "/previews/scrollx/cursorimagetrail.webp"
+ },
+ "scrollx/decorated-text": {
+  "image": "/previews/scrollx/decorated-text.webp"
+ },
+ "scrollx/dot-wave": {
+  "image": "/previews/scrollx/dot-wave.webp"
+ },
+ "scrollx/draggable-avatar": {
+  "image": "/previews/scrollx/draggable-avatar.webp"
+ },
+ "scrollx/drift-card": {
+  "image": "/previews/scrollx/drift-card.webp"
+ },
+ "scrollx/dropdown-menu": {
+  "image": "/previews/scrollx/dropdown-menu.webp"
+ },
+ "scrollx/dualsparks": {
+  "image": "/previews/scrollx/dualsparks.webp"
+ },
+ "scrollx/electric-text": {
+  "image": "/previews/scrollx/electric-text.webp"
+ },
+ "scrollx/expandable-cards": {
+  "image": "/previews/scrollx/expandable-cards.webp"
+ },
+ "scrollx/expandable-dock": {
+  "image": "/previews/scrollx/expandable-dock.webp"
+ },
+ "scrollx/fancy-text": {
+  "image": "/previews/scrollx/fancy-text.webp"
+ },
+ "scrollx/facescape": {
+  "image": "/previews/scrollx/facescape.webp"
+ },
+ "scrollx/flex-navbar": {
+  "image": "/previews/scrollx/flex-navbar.webp"
+ },
+ "scrollx/flashy-card": {
+  "image": "/previews/scrollx/flashy-card.webp"
+ },
+ "scrollx/flipflow": {
+  "image": "/previews/scrollx/flipflow.webp"
+ },
+ "scrollx/flowing-logos": {
+  "image": "/previews/scrollx/flowing-logos.webp"
+ },
+ "scrollx/flipstack": {
+  "image": "/previews/scrollx/flipstack.webp"
+ },
+ "scrollx/folder": {
+  "image": "/previews/scrollx/folder.webp"
+ },
+ "scrollx/folder-tree": {
+  "image": "/previews/scrollx/folder-tree.webp"
+ },
+ "scrollx/followcursor": {
+  "image": "/previews/scrollx/followcursor.webp"
+ },
+ "scrollx/glass": {
+  "image": "/previews/scrollx/glass.webp"
+ },
+ "scrollx/globe-wireframe": {
+  "image": "/previews/scrollx/globe-wireframe.webp"
+ },
+ "scrollx/globe": {
+  "image": "/previews/scrollx/globe.webp"
+ },
+ "scrollx/glowingbordercard": {
+  "image": "/previews/scrollx/glowingbordercard.webp"
+ },
+ "scrollx/gravity": {
+  "image": "/previews/scrollx/gravity.webp"
+ },
+ "scrollx/hold-toconfirm": {
+  "image": "/previews/scrollx/hold-toconfirm.webp"
+ },
+ "scrollx/hyperlink": {
+  "image": "/previews/scrollx/hyperlink.webp"
+ },
+ "scrollx/infinite-canvas": {
+  "image": "/previews/scrollx/infinite-canvas.webp"
+ },
+ "scrollx/interactive-input": {
+  "image": "/previews/scrollx/interactive-input.webp"
+ },
+ "scrollx/input-otp": {
+  "image": "/previews/scrollx/input-otp.webp"
+ },
+ "scrollx/iphone": {
+  "image": "/previews/scrollx/iphone.webp"
+ },
+ "scrollx/keyboard": {
+  "image": "/previews/scrollx/keyboard.webp"
+ },
+ "scrollx/kbd": {
+  "image": "/previews/scrollx/kbd.webp"
+ },
+ "scrollx/kinetic-testimonials": {
+  "image": "/previews/scrollx/kinetic-testimonials.webp"
+ },
+ "scrollx/label": {
+  "image": "/previews/scrollx/label.webp"
+ },
+ "scrollx/lamphome": {
+  "image": "/previews/scrollx/lamphome.webp"
+ },
+ "scrollx/layered-button": {
+  "image": "/previews/scrollx/layered-button.webp"
+ },
+ "scrollx/layer-stack": {
+  "image": "/previews/scrollx/layer-stack.webp"
+ },
+ "scrollx/layered-text": {
+  "image": "/previews/scrollx/layered-text.webp"
+ },
+ "scrollx/lean-card": {
+  "image": "/previews/scrollx/lean-card.webp"
+ },
+ "scrollx/loader": {
+  "image": "/previews/scrollx/loader.webp"
+ },
+ "scrollx/loginform": {
+  "image": "/previews/scrollx/loginform.webp"
+ },
+ "scrollx/logo-stepper": {
+  "image": "/previews/scrollx/logo-stepper.webp"
+ },
+ "scrollx/lustretext": {
+  "image": "/previews/scrollx/lustretext.webp"
+ },
+ "scrollx/magicdock": {
+  "image": "/previews/scrollx/magicdock.webp"
+ },
+ "scrollx/media-card": {
+  "image": "/previews/scrollx/media-card.webp"
+ },
+ "scrollx/meteor-orbit": {
+  "image": "/previews/scrollx/meteor-orbit.webp"
+ },
+ "scrollx/modern-loader": {
+  "image": "/previews/scrollx/modern-loader.webp"
+ },
+ "scrollx/morphotextflip": {
+  "image": "/previews/scrollx/morphotextflip.webp"
+ },
+ "scrollx/morphy-button": {
+  "image": "/previews/scrollx/morphy-button.webp"
+ },
+ "scrollx/motion-grid": {
+  "image": "/previews/scrollx/motion-grid.webp"
+ },
+ "scrollx/motion-navbar": {
+  "image": "/previews/scrollx/motion-navbar.webp"
+ },
+ "scrollx/movinglines-background": {
+  "image": "/previews/scrollx/movinglines-background.webp"
+ },
+ "scrollx/motioncards": {
+  "image": "/previews/scrollx/motioncards.webp"
+ },
+ "scrollx/navbar-flow": {
+  "image": "/previews/scrollx/navbar-flow.webp"
+ },
+ "scrollx/orb-button": {
+  "image": "/previews/scrollx/orb-button.webp"
+ },
+ "scrollx/not-found": {
+  "image": "/previews/scrollx/not-found.webp"
+ },
+ "scrollx/pagination": {
+  "image": "/previews/scrollx/pagination.webp"
+ },
+ "scrollx/parallaxcards": {
+  "image": "/previews/scrollx/parallaxcards.webp"
+ },
+ "scrollx/pixel-background": {
+  "image": "/previews/scrollx/pixel-background.webp"
+ },
+ "scrollx/particles": {
+  "image": "/previews/scrollx/particles.webp"
+ },
+ "scrollx/pixel-highlight": {
+  "image": "/previews/scrollx/pixel-highlight.webp"
+ },
+ "scrollx/popover": {
+  "image": "/previews/scrollx/popover.webp"
+ },
+ "scrollx/profilecard": {
+  "image": "/previews/scrollx/profilecard.webp"
+ },
+ "scrollx/progress": {
+  "image": "/previews/scrollx/progress.webp"
+ },
+ "scrollx/radial-socials": {
+  "image": "/previews/scrollx/radial-socials.webp"
+ },
+ "scrollx/radio-group": {
+  "image": "/previews/scrollx/radio-group.webp"
+ },
+ "scrollx/radialflow": {
+  "image": "/previews/scrollx/radialflow.webp"
+ },
+ "scrollx/reel": {
+  "image": "/previews/scrollx/reel.webp"
+ },
+ "scrollx/reveal-text": {
+  "image": "/previews/scrollx/reveal-text.webp"
+ },
+ "scrollx/scroll-areapro": {
+  "image": "/previews/scrollx/scroll-areapro.webp"
+ },
+ "scrollx/search-cell": {
+  "image": "/previews/scrollx/search-cell.webp"
+ },
+ "scrollx/select": {
+  "image": "/previews/scrollx/select.webp"
+ },
+ "scrollx/sensitive-text": {
+  "image": "/previews/scrollx/sensitive-text.webp"
+ },
+ "scrollx/seperatorpro": {
+  "image": "/previews/scrollx/seperatorpro.webp"
+ },
+ "scrollx/shiny-button": {
+  "image": "/previews/scrollx/shiny-button.webp"
+ },
+ "scrollx/showcase": {
+  "image": "/previews/scrollx/showcase.webp"
+ },
+ "scrollx/side-sheet": {
+  "image": "/previews/scrollx/side-sheet.webp"
+ },
+ "scrollx/signupform": {
+  "image": "/previews/scrollx/signupform.webp"
+ },
+ "scrollx/slide-text": {
+  "image": "/previews/scrollx/slide-text.webp"
+ },
+ "scrollx/slider": {
+  "image": "/previews/scrollx/slider.webp"
+ },
+ "scrollx/social-orbit": {
+  "image": "/previews/scrollx/social-orbit.webp"
+ },
+ "scrollx/spark-waves": {
+  "image": "/previews/scrollx/spark-waves.webp"
+ },
+ "scrollx/splitter": {
+  "image": "/previews/scrollx/splitter.webp"
+ },
+ "scrollx/spotlightcard": {
+  "image": "/previews/scrollx/spotlightcard.webp"
+ },
+ "scrollx/squonk": {
+  "image": "/previews/scrollx/squonk.webp"
+ },
+ "scrollx/stagger-button": {
+  "image": "/previews/scrollx/stagger-button.webp"
+ },
+ "scrollx/stagger-chars": {
+  "image": "/previews/scrollx/stagger-chars.webp"
+ },
+ "scrollx/statscarousel": {
+  "image": "/previews/scrollx/statscarousel.webp"
+ },
+ "scrollx/statscount": {
+  "image": "/previews/scrollx/statscount.webp"
+ },
+ "scrollx/stripe-button": {
+  "image": "/previews/scrollx/stripe-button.webp"
+ },
+ "scrollx/striped-grid": {
+  "image": "/previews/scrollx/striped-grid.webp"
+ },
+ "scrollx/status": {
+  "image": "/previews/scrollx/status.webp"
+ },
+ "scrollx/table": {
+  "image": "/previews/scrollx/table.webp"
+ },
+ "scrollx/testimonial-carousel": {
+  "image": "/previews/scrollx/testimonial-carousel.webp"
+ },
+ "scrollx/text-highlighter": {
+  "image": "/previews/scrollx/text-highlighter.webp"
+ },
+ "scrollx/text-modifier": {
+  "image": "/previews/scrollx/text-modifier.webp"
+ },
+ "scrollx/text-spotlight": {
+  "image": "/previews/scrollx/text-spotlight.webp"
+ },
+ "scrollx/thunder-loader": {
+  "image": "/previews/scrollx/thunder-loader.webp"
+ },
+ "scrollx/theme-switch": {
+  "image": "/previews/scrollx/theme-switch.webp"
+ },
+ "scrollx/timeline": {
+  "image": "/previews/scrollx/timeline.webp"
+ },
+ "scrollx/toast": {
+  "image": "/previews/scrollx/toast.webp"
+ },
+ "scrollx/toggle-vault": {
+  "image": "/previews/scrollx/toggle-vault.webp"
+ },
+ "scrollx/tooltip": {
+  "image": "/previews/scrollx/tooltip.webp"
+ },
+ "scrollx/top-sheet": {
+  "image": "/previews/scrollx/top-sheet.webp"
+ },
+ "scrollx/transition": {
+  "image": "/previews/scrollx/transition.webp"
+ },
+ "scrollx/typeanimation": {
+  "image": "/previews/scrollx/typeanimation.webp"
+ },
+ "scrollx/venom-beam": {
+  "image": "/previews/scrollx/venom-beam.webp"
+ },
+ "scrollx/vercel-card": {
+  "image": "/previews/scrollx/vercel-card.webp"
+ },
+ "scrollx/wavy-button": {
+  "image": "/previews/scrollx/wavy-button.webp"
+ },
+ "scrollx/whitestripes": {
+  "image": "/previews/scrollx/whitestripes.webp"
+ },
+ "shadcn/alert": {
+  "image": "/previews/shadcn/alert.webp"
+ },
+ "shadcn/alert-dialog": {
+  "image": "/previews/shadcn/alert-dialog.webp"
+ },
+ "shadcn/accordion": {
+  "image": "/previews/shadcn/accordion.webp"
+ },
+ "shadcn/aspect-ratio": {
+  "image": "/previews/shadcn/aspect-ratio.webp"
+ },
+ "shadcn/attachment": {
+  "image": "/previews/shadcn/attachment.webp"
+ },
+ "shadcn/avatar": {
+  "image": "/previews/shadcn/avatar.webp"
+ },
+ "shadcn/badge": {
+  "image": "/previews/shadcn/badge.webp"
+ },
+ "shadcn/breadcrumb": {
+  "image": "/previews/shadcn/breadcrumb.webp"
+ },
+ "shadcn/bubble": {
+  "image": "/previews/shadcn/bubble.webp"
+ },
+ "shadcn/calendar": {
+  "image": "/previews/shadcn/calendar.webp"
+ },
+ "shadcn/button": {
+  "image": "/previews/shadcn/button.webp"
+ },
+ "shadcn/button-group": {
+  "image": "/previews/shadcn/button-group.webp"
+ },
+ "shadcn/card": {
+  "image": "/previews/shadcn/card.webp"
+ },
+ "shadcn/carousel": {
+  "image": "/previews/shadcn/carousel.webp"
+ },
+ "shadcn/code-block": {
+  "image": "/previews/shadcn/code-block.webp"
+ },
+ "shadcn/checkbox": {
+  "image": "/previews/shadcn/checkbox.webp"
+ },
+ "shadcn/chart": {
+  "image": "/previews/shadcn/chart.webp"
+ },
+ "shadcn/collapsible": {
+  "image": "/previews/shadcn/collapsible.webp"
+ },
+ "shadcn/combobox": {
+  "image": "/previews/shadcn/combobox.webp"
+ },
+ "shadcn/command": {
+  "image": "/previews/shadcn/command.webp"
+ },
+ "shadcn/context-menu": {
+  "image": "/previews/shadcn/context-menu.webp"
+ },
+ "shadcn/dialog": {
+  "image": "/previews/shadcn/dialog.webp"
+ },
+ "shadcn/direction": {
+  "image": "/previews/shadcn/direction.webp"
+ },
+ "shadcn/drawer": {
+  "image": "/previews/shadcn/drawer.webp"
+ },
+ "shadcn/dropdown-menu": {
+  "image": "/previews/shadcn/dropdown-menu.webp"
+ },
+ "shadcn/empty": {
+  "image": "/previews/shadcn/empty.webp"
+ },
+ "shadcn/form": {
+  "image": "/previews/shadcn/form.webp"
+ },
+ "shadcn/hover-card": {
+  "image": "/previews/shadcn/hover-card.webp"
+ },
+ "shadcn/field": {
+  "image": "/previews/shadcn/field.webp"
+ },
+ "shadcn/input": {
+  "image": "/previews/shadcn/input.webp"
+ },
+ "shadcn/input-otp": {
+  "image": "/previews/shadcn/input-otp.webp"
+ },
+ "shadcn/input-group": {
+  "image": "/previews/shadcn/input-group.webp"
+ },
+ "shadcn/item": {
+  "image": "/previews/shadcn/item.webp"
+ },
+ "shadcn/kbd": {
+  "image": "/previews/shadcn/kbd.webp"
+ },
+ "shadcn/label": {
+  "image": "/previews/shadcn/label.webp"
+ },
+ "shadcn/marker": {
+  "image": "/previews/shadcn/marker.webp"
+ },
+ "shadcn/menubar": {
+  "image": "/previews/shadcn/menubar.webp"
+ },
+ "shadcn/message": {
+  "image": "/previews/shadcn/message.webp"
+ },
+ "shadcn/message-scroller": {
+  "image": "/previews/shadcn/message-scroller.webp"
+ },
+ "shadcn/native-select": {
+  "image": "/previews/shadcn/native-select.webp"
+ },
+ "shadcn/navigation-menu": {
+  "image": "/previews/shadcn/navigation-menu.webp"
+ },
+ "shadcn/pagination": {
+  "image": "/previews/shadcn/pagination.webp"
+ },
+ "shadcn/popover": {
+  "image": "/previews/shadcn/popover.webp"
+ },
+ "shadcn/progress": {
+  "image": "/previews/shadcn/progress.webp"
+ },
+ "shadcn/questionnaire": {
+  "image": "/previews/shadcn/questionnaire.webp"
+ },
+ "shadcn/radio-group": {
+  "image": "/previews/shadcn/radio-group.webp"
+ },
+ "shadcn/resizable": {
+  "image": "/previews/shadcn/resizable.webp"
+ },
+ "shadcn/scroll-area": {
+  "image": "/previews/shadcn/scroll-area.webp"
+ },
+ "shadcn/select": {
+  "image": "/previews/shadcn/select.webp"
+ },
+ "shadcn/separator": {
+  "image": "/previews/shadcn/separator.webp"
+ },
+ "shadcn/sheet": {
+  "image": "/previews/shadcn/sheet.webp"
+ },
+ "shadcn/skeleton": {
+  "image": "/previews/shadcn/skeleton.webp"
+ },
+ "shadcn/sidebar": {
+  "image": "/previews/shadcn/sidebar.webp"
+ },
+ "shadcn/slider": {
+  "image": "/previews/shadcn/slider.webp"
+ },
+ "shadcn/sonner": {
+  "image": "/previews/shadcn/sonner.webp"
+ },
+ "shadcn/spinner": {
+  "image": "/previews/shadcn/spinner.webp"
+ },
+ "shadcn/switch": {
+  "image": "/previews/shadcn/switch.webp"
+ },
+ "shadcn/table": {
+  "image": "/previews/shadcn/table.webp"
+ },
+ "shadcn/tabs": {
+  "image": "/previews/shadcn/tabs.webp"
+ },
+ "shadcn/textarea": {
+  "image": "/previews/shadcn/textarea.webp"
+ },
+ "shadcn/toast": {
+  "image": "/previews/shadcn/toast.webp"
+ },
+ "shadcn/toggle": {
+  "image": "/previews/shadcn/toggle.webp"
+ },
+ "shadcn/toggle-group": {
+  "image": "/previews/shadcn/toggle-group.webp"
+ },
+ "shadcn/trace": {
+  "image": "/previews/shadcn/trace.webp"
+ },
+ "shadcn/tooltip": {
+  "image": "/previews/shadcn/tooltip.webp"
+ },
+ "smoothui/image-metadata-preview": {
+  "image": "/previews/smoothui/image-metadata-preview.webp"
+ },
+ "spell/badge": {
+  "image": "/previews/spell/badge.webp"
+ },
+ "spell/animated-checkbox": {
+  "image": "/previews/spell/animated-checkbox.webp"
+ },
+ "spell/animated-gradient": {
+  "image": "/previews/spell/animated-gradient.webp"
+ },
+ "spell/blur-reveal": {
+  "image": "/previews/spell/blur-reveal.webp"
+ },
+ "spell/bars-spinner": {
+  "image": "/previews/spell/bars-spinner.webp"
+ },
+ "spell/chart": {
+  "image": "/previews/spell/chart.webp"
+ },
+ "spell/color-selector": {
+  "image": "/previews/spell/color-selector.webp"
+ },
+ "spell/copy-button": {
+  "image": "/previews/spell/copy-button.webp"
+ },
+ "spell/exploding-input": {
+  "image": "/previews/spell/exploding-input.webp"
+ },
+ "spell/fallback-avatar": {
+  "image": "/previews/spell/fallback-avatar.webp"
+ },
+ "spell/flow-button": {
+  "image": "/previews/spell/flow-button.webp"
+ },
+ "spell/gradient-wave-text": {
+  "image": "/previews/spell/gradient-wave-text.webp"
+ },
+ "spell/highlighted-text": {
+  "image": "/previews/spell/highlighted-text.webp"
+ },
+ "spell/kbd": {
+  "image": "/previews/spell/kbd.webp"
+ },
+ "spell/label-input": {
+  "image": "/previews/spell/label-input.webp"
+ },
+ "spell/logos-carousel": {
+  "image": "/previews/spell/logos-carousel.webp"
+ },
+ "spell/light-rays": {
+  "image": "/previews/spell/light-rays.webp"
+ },
+ "spell/marquee": {
+  "image": "/previews/spell/marquee.webp"
+ },
+ "spell/perspective-book": {
+  "image": "/previews/spell/perspective-book.webp"
+ },
+ "spell/pop-button": {
+  "image": "/previews/spell/pop-button.webp"
+ },
+ "spell/qr-code": {
+  "image": "/previews/spell/qr-code.webp"
+ },
+ "spell/randomized-text": {
+  "image": "/previews/spell/randomized-text.webp"
+ },
+ "spell/rich-button": {
+  "image": "/previews/spell/rich-button.webp"
+ },
+ "spell/shimmer-text": {
+  "image": "/previews/spell/shimmer-text.webp"
+ },
+ "spell/signature": {
+  "image": "/previews/spell/signature.webp"
+ },
+ "spell/slide-up-text": {
+  "image": "/previews/spell/slide-up-text.webp"
+ },
+ "spell/special-text": {
+  "image": "/previews/spell/special-text.webp"
+ },
+ "spell/spinner": {
+  "image": "/previews/spell/spinner.webp"
+ },
+ "spell/spotify-card": {
+  "image": "/previews/spell/spotify-card.webp"
+ },
+ "spell/text-marquee": {
+  "image": "/previews/spell/text-marquee.webp"
+ },
+ "spell/tilt-card": {
+  "image": "/previews/spell/tilt-card.webp"
+ },
+ "spell/tweet": {
+  "image": "/previews/spell/tweet.webp"
+ },
+ "spell/words-stagger": {
+  "image": "/previews/spell/words-stagger.webp"
+ },
+ "syntaxui/breadcrumb": {
+  "image": "/previews/syntaxui/breadcrumb.webp"
+ },
+ "syntaxui/accordion": {
+  "image": "/previews/syntaxui/accordion.webp"
+ },
+ "syntaxui/background": {
+  "image": "/previews/syntaxui/background.webp"
+ },
+ "syntaxui/emoji-confetti": {
+  "image": "/previews/syntaxui/emoji-confetti.webp"
+ },
+ "syntaxui/hovers": {
+  "image": "/previews/syntaxui/hovers.webp"
+ },
+ "syntaxui/image-fade": {
+  "image": "/previews/syntaxui/image-fade.webp"
+ },
+ "syntaxui/skewed-infinite-scroll": {
+  "image": "/previews/syntaxui/skewed-infinite-scroll.webp"
+ },
+ "syntaxui/stepper": {
+  "image": "/previews/syntaxui/stepper.webp"
+ },
+ "syntaxui/tabs": {
+  "image": "/previews/syntaxui/tabs.webp"
+ }
+}
