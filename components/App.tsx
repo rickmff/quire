@@ -48,6 +48,15 @@ export default function App() {
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
+
+  // Quire registers no service worker. One left on this origin by another app
+  // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
+  useEffect(() => {
+    navigator.serviceWorker
+      ?.getRegistrations()
+      .then((rs) => rs.forEach((r) => r.unregister()))
+      .catch(() => {});
+  }, []);
   const [input, setInput] = useState("");
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
