@@ -8,7 +8,7 @@ import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 
 // The reference gallery: every component in the user's library, organized by
-// type, shown the way inspo shows a page (preview, credit, tags, details).
+// library, shown the way inspo shows a page (preview, credit, tags, details).
 
 const PAGE = 48;
 
@@ -18,16 +18,22 @@ export function Gallery({
   libraries,
   onOpen,
   empty,
+  sections,
+  onSite,
 }: {
   items: GalleryItem[];
   title: string;
   libraries: CatalogLibrary[];
   onOpen: (item: GalleryItem) => void;
   empty?: React.ReactNode;
+  // Library view: one row of cards per library, each opening its own page.
+  sections?: { key: string; name: string; items: GalleryItem[] }[];
+  onSite?: (key: string) => void;
 }) {
   const [q, setQ] = useState("");
   const [trigger, setTrigger] = useState<string | null>(null);
   const [library, setLibrary] = useState<string | null>(null);
+  const [type, setType] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
   const more = useRef<HTMLDivElement>(null);
 
@@ -39,12 +45,19 @@ export function Gallery({
     return items.filter((i) => {
       if (trigger && !i.triggers.includes(trigger)) return false;
       if (library && i.library !== library) return false;
+      if (type && i.type !== type) return false;
       if (!words.length) return true;
       const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${nameOf(i)} ${i.tech.join(" ")}`.toLowerCase();
       return words.every((w) => hay.includes(w));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, trigger, library]);
+  }, [items, q, trigger, library, type]);
+
+  const typeCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const i of items) m.set(i.type, (m.get(i.type) ?? 0) + 1);
+    return [...m].sort((a, b) => b[1] - a[1]);
+  }, [items]);
 
   const triggerCounts = useMemo(() => {
     const m = new Map<string, number>();
@@ -57,7 +70,8 @@ export function Gallery({
     return [...m].sort((a, b) => b[1] - a[1]);
   }, [items]);
 
-  useEffect(() => setShown(PAGE), [items, q, trigger, library]);
+  useEffect(() => setShown(PAGE), [items, q, trigger, library, type]);
+  useEffect(() => setType(null), [items]);
   useEffect(() => {
     const el = more.current;
     if (!el) return;
@@ -81,6 +95,26 @@ export function Gallery({
             aria-label="Filter components"
             className="h-7 w-28 rounded-md bg-transparent px-2 text-right outline-none transition-[width,background-color] placeholder:text-faint focus:w-44 focus:bg-field-focus focus:text-left"
           />
+          {libCounts.length <= 1 && typeCounts.length > 1 && (
+            <label className="relative">
+              <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${type ? "text-fg" : "text-faint hover:text-muted"}`}>
+                {type ? typeById(type).name : "All types"}
+              </span>
+              <select
+                value={type ?? ""}
+                onChange={(e) => setType(e.target.value || null)}
+                aria-label="Filter by type"
+                className="absolute inset-0 cursor-pointer opacity-0"
+              >
+                <option value="">All types</option>
+                {typeCounts.map(([id, n]) => (
+                  <option key={id} value={id}>
+                    {typeById(id).name} ({n})
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {libCounts.length > 1 && (
             <label className="relative">
               <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${library ? "text-fg" : "text-faint hover:text-muted"}`}>
@@ -120,7 +154,26 @@ export function Gallery({
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {sections && !q && !trigger && !library && !type ? (
+        <div className="flex flex-col gap-12">
+          {sections.map((sec) => (
+            <section key={sec.key}>
+              <button onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
+                <span className="font-medium">{sec.name}</span>
+                <span className="text-faint tabular-nums">{sec.items.length}</span>
+                <span className="text-[12px] text-faint opacity-0 transition group-hover:opacity-100">View all</span>
+              </button>
+              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {sec.items.slice(0, 4).map((i, n) => (
+                  <div key={i.id} className={n === 3 ? "xl:hidden 2xl:block" : undefined}>
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         empty ?? <p className="pt-16 text-center text-muted">Nothing here yet.</p>
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
