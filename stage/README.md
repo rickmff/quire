@@ -72,3 +72,7 @@ node mirror/fetch-assets.mjs mirror/urls.txt mirror
 
 Copy the resulting `mirror/` folder (files plus `manifest.json`) next to
 `capture.mjs`. Both capture scripts then serve those URLs from it.
+
+Some demo URLs are dead at their origin too (a replaced avatar, a removed icon).
+The stage hides an image that fails to load, so the preview shows an empty slot
+instead of a broken-image icon with its alt text.

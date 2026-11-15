@@ -16,6 +16,13 @@ if (q.get("zoom")) document.documentElement.style.setProperty("--stage-zoom", q.
 const w = window as any;
 w.__errors = [];
 addEventListener("error", (e) => w.__errors.push(String(e.message)));
+// An image whose URL is dead at its origin shows nothing, not a broken icon with alt text.
+// A rule per dead URL, so it also holds when a component re-mounts or restyles the image.
+const dead = document.head.appendChild(document.createElement("style"));
+addEventListener("error", (e) => {
+  const img = e.target;
+  if (img instanceof HTMLImageElement && img.getAttribute("src")) dead.textContent += `img[src=${JSON.stringify(img.getAttribute("src"))}]{visibility:hidden!important}\n`;
+}, true);
 addEventListener("unhandledrejection", (e) => w.__errors.push(String(e.reason)));
 
 class Boundary extends Component<{ children: any }, { err?: string }> {

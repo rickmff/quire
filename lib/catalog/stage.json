@@ -123,9 +123,7 @@
  },
  "magicui/dotted-map": {
   "image": "/previews/magicui/dotted-map.webp",
-  "imageDark": "/previews/magicui/dotted-map-dark.webp",
-  "video": "/previews/magicui/dotted-map.mp4",
-  "videoDark": "/previews/magicui/dotted-map-dark.mp4"
+  "imageDark": "/previews/magicui/dotted-map-dark.webp"
  },
  "magicui/file-tree": {
   "image": "/previews/magicui/file-tree.webp",
@@ -183,7 +181,9 @@
  },
  "magicui/icon-cloud": {
   "image": "/previews/magicui/icon-cloud.webp",
-  "imageDark": "/previews/magicui/icon-cloud-dark.webp"
+  "imageDark": "/previews/magicui/icon-cloud-dark.webp",
+  "video": "/previews/magicui/icon-cloud.mp4",
+  "videoDark": "/previews/magicui/icon-cloud-dark.mp4"
  },
  "magicui/interactive-grid-pattern": {
   "image": "/previews/magicui/interactive-grid-pattern.webp",
@@ -395,7 +395,9 @@
  },
  "magicui/video-text": {
   "image": "/previews/magicui/video-text.webp",
-  "imageDark": "/previews/magicui/video-text-dark.webp"
+  "imageDark": "/previews/magicui/video-text-dark.webp",
+  "video": "/previews/magicui/video-text.mp4",
+  "videoDark": "/previews/magicui/video-text-dark.mp4"
  },
  "magicui/warp-background": {
   "image": "/previews/magicui/warp-background.webp",

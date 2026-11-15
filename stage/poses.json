@@ -628,5 +628,9 @@
     "wait": 700
    }
   ]
+ },
+ "animate-ui/components-radix-sidebar": {
+  "fill": true,
+  "wait": 2000
  }
 }
