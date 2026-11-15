@@ -6,8 +6,13 @@
 //   GET  /media/<file>   serves the files (public, cacheable)
 //   GET  /health
 //
-// Env: CAPTURE_TOKEN (required), PUBLIC_URL (e.g. https://capture.quire.fyi),
+// Env: CAPTURE_TOKEN (required), PUBLIC_URL (e.g. https://capture.example.com),
 //      PORT (8080), MEDIA_DIR (/data/media), CONCURRENCY (2)
+//
+// Storage: with the R2_* variables set, files go to a Cloudflare R2 bucket and
+// the returned URLs point at its public address (R2_PUBLIC_URL). The VPS then
+// only captures; the local disk is a cache. Without them, the VPS serves /media.
+//      R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL
 
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
@@ -17,13 +22,39 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { chromium } from "playwright";
 import sharp from "sharp";
+import { AwsClient } from "aws4fetch";
+
+// Read .env next to this file, so it runs the same with or without Docker.
+try {
+  for (const line of (await readFile(new URL(".env", import.meta.url), "utf8")).split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+} catch {}
 
 const TOKEN = process.env.CAPTURE_TOKEN;
 const PORT = Number(process.env.PORT || 8080);
-const MEDIA = process.env.MEDIA_DIR || "/data/media";
+const MEDIA = process.env.MEDIA_DIR || new URL("./media", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
 const PUBLIC = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
 const CONCURRENCY = Number(process.env.CONCURRENCY || 2);
 if (!TOKEN) throw new Error("Set CAPTURE_TOKEN");
+
+const R2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"].every((k) => process.env[k])
+  ? {
+      client: new AwsClient({ accessKeyId: process.env.R2_ACCESS_KEY_ID, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY, service: "s3", region: "auto" }),
+      endpoint: `${process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`}/${process.env.R2_BUCKET}`,
+      public: process.env.R2_PUBLIC_URL.replace(/\/$/, ""),
+    }
+  : null;
+
+async function upload(file, name, type) {
+  const r = await R2.client.fetch(`${R2.endpoint}/previews/${name}`, {
+    method: "PUT",
+    body: await readFile(file),
+    headers: { "content-type": type, "cache-control": "public, max-age=31536000, immutable" },
+  });
+  if (!r.ok) throw new Error(`R2 upload ${r.status}`);
+}
 await mkdir(MEDIA, { recursive: true });
 
 // Where a component's live demo usually sits on a docs page, best guess first.
@@ -122,9 +153,14 @@ async function capture(url, withVideo) {
     if (vid) await rename(vid, video).catch(() => {});
     await rm(tmp, { recursive: true, force: true }).catch(() => {});
   }
+  if (R2) {
+    await upload(image, `${id}.webp`, "image/webp");
+    if (withVideo && (await have(video))) await upload(video, `${id}.webm`, "video/webm");
+  }
   return out(id, withVideo);
 }
-const out = (id, withVideo) => ({ image: `${PUBLIC}/media/${id}.webp`, ...(withVideo ? { video: `${PUBLIC}/media/${id}.webm` } : {}) });
+const base = () => (R2 ? `${R2.public}/previews` : `${PUBLIC}/media`);
+const out = (id, withVideo) => ({ image: `${base()}/${id}.webp`, ...(withVideo ? { video: `${base()}/${id}.webm` } : {}) });
 
 const TYPES = { ".webp": "image/webp", ".webm": "video/webm" };
 const send = (res, status, body, headers = {}) => {
@@ -134,7 +170,7 @@ const send = (res, status, body, headers = {}) => {
 
 createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
-  if (req.method === "GET" && path === "/health") return send(res, 200, { ok: true, running, queued: queue.length });
+  if (req.method === "GET" && path === "/health") return send(res, 200, { ok: true, storage: R2 ? "r2" : "disk", running, queued: queue.length });
   if (req.method === "GET" && path.startsWith("/media/")) {
     const file = path.slice(7);
     if (!/^[a-f0-9]{16}\.(webp|webm)$/.test(file)) return send(res, 404, { error: "not-found" });

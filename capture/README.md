@@ -1,18 +1,39 @@
 # Quire capture service
 
+## Run it on your computer
+
+Needs Node 20 or newer.
+
+```bash
+cd capture
+npm install
+npx playwright install chromium
+cp .env.example .env        # then set CAPTURE_TOKEN to any long string
+npm start
+```
+
+Then add to Quire's `.env.local`:
+
+```
+QUIRE_CAPTURE_URL=http://localhost:8080
+QUIRE_CAPTURE_TOKEN=<the same token>
+```
+
+Media is saved in `capture/media/` and served at `http://localhost:8080/media/`.
+
 Records a still and a short clip of each component, so cards in the gallery
 show the component moving. It opens the component page in real Chromium,
 finds the live demo, sweeps the pointer over it and saves a WebP and a WebM.
 
-## Install on a VPS
+## Install on a server (optional)
 
 Needs Ubuntu or Debian, 2 GB RAM or more (4 cores and 8 GB run 3 captures at once).
 
-1. Point a DNS A record at the VPS, for example `capture.quire.fyi`.
+1. Point a DNS A record at the VPS, for example `capture.example.com`.
 2. On the VPS, as root:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/rickmff/quire/main/capture/install.sh | DOMAIN=capture.quire.fyi bash
+   curl -fsSL https://raw.githubusercontent.com/rickmff/quire/main/capture/install.sh | DOMAIN=capture.example.com bash
    ```
 
    The script installs Docker if needed, clones the repo to `/opt/quire`, writes
@@ -37,7 +58,7 @@ Private addresses are refused, so the token cannot be used to reach your network
 From the Quire repo, with the service running:
 
 ```bash
-QUIRE_CAPTURE_URL=https://capture.quire.fyi QUIRE_CAPTURE_TOKEN=... \
+QUIRE_CAPTURE_URL=https://capture.example.com QUIRE_CAPTURE_TOKEN=... \
   node scripts/capture-catalog.ts --parallel 3 --apply
 ```
 

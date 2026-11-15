@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # One-time setup on a fresh Ubuntu or Debian VPS. Run as root:
-#   curl -fsSL https://raw.githubusercontent.com/rickmff/quire/main/capture/install.sh | DOMAIN=capture.quire.fyi bash
+#   curl -fsSL https://raw.githubusercontent.com/rickmff/quire/main/capture/install.sh | DOMAIN=capture.example.com bash
 set -euo pipefail
-DOMAIN="${DOMAIN:?Set DOMAIN, e.g. DOMAIN=capture.quire.fyi}"
+DOMAIN="${DOMAIN:?Set DOMAIN, e.g. DOMAIN=capture.example.com}"
 DIR=/opt/quire
 
 if ! command -v docker >/dev/null; then

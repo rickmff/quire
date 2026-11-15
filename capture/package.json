@@ -2,9 +2,12 @@
   "name": "quire-capture",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node server.mjs" },
+  "scripts": {
+    "start": "node server.mjs"
+  },
   "dependencies": {
     "playwright": "1.56.1",
-    "sharp": "0.34.4"
+    "sharp": "0.34.4",
+    "aws4fetch": "1.0.20"
   }
 }

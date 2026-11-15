@@ -13,7 +13,7 @@
   <a href="https://quire.fyi">Website</a> ·
   <a href="#features">Features</a> ·
   <a href="#browser-extension">Extension</a> ·
-  <a href="#getting-started">Getting started</a> ·
+  <a href="#run-it-locally">Run locally</a> ·
   <a href="#contributing">Contributing</a>
 </p>
 
@@ -67,7 +67,9 @@ Previews come from the libraries' own repos where they keep them. The rest come 
 
 The extension saves to [quire.fyi](https://quire.fyi). To use your own instance, set its address in the extension options.
 
-## Getting started
+## Run it locally
+
+Nothing to sign up for. Needs Node 20 or newer.
 
 ```bash
 git clone https://github.com/rickmff/quire.git
@@ -76,18 +78,31 @@ npm install
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). The landing page is at `/` and the app is at `/app`.
+1. Open [localhost:3000/app](http://localhost:3000/app) and pick **Curated library** or **From scratch**.
+2. Paste the link of a component library in the top field. A curated site turns on; any other site is imported.
+3. Open **Agents**, click **Connect my library**, and copy the command for your agent, for example:
+
+   ```bash
+   claude mcp add --transport http quire "http://localhost:3000/api/mcp?key=<your key>"
+   ```
+
+   Without a key, the MCP serves the curated library. Synced libraries are saved in `.data/`.
+4. Extension: load `extension/` in Chrome (below), open its options and set the address to `http://localhost:3000`.
+5. Previews for components you add by link (optional): run the capture service on your computer, see [`capture/`](capture/README.md).
+
+For a production build: `npm run build`, then `QUIRE_FILE_STORE=1 npm start` to keep saving libraries in `.data/`.
 
 The link preview API (`/api/meta`) blocks private network addresses. In a sandbox without DNS, set `QUIRE_SKIP_DNS_CHECK=1` for local testing only.
 
-### Environment
+### Optional services
 
-| Variable | Needed for |
+| Variable | What it adds |
 | --- | --- |
-| `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, `CF_API_TOKEN` | Syncing personal libraries so the MCP can read them (Cloudflare KV, token with KV edit rights). Upstash also works: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. In development, libraries go to `.data/`. |
-| `QUIRE_CAPTURE_URL`, `QUIRE_CAPTURE_TOKEN` | Previews for components added by link. See [`capture/`](capture/README.md). |
+| `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, `CF_API_TOKEN` | Store synced libraries in Cloudflare KV, for a hosted deploy. Upstash also works: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. |
+| `QUIRE_CAPTURE_URL`, `QUIRE_CAPTURE_TOKEN` | Previews for components added by link, from the [capture service](capture/README.md). |
+| `QUIRE_FILE_STORE=1` | Keep saving libraries in `.data/` under `npm start`. |
 
-Without them, the curated library and its MCP still work.
+Put them in `.env.local`. Without any of them, everything above works on your machine.
 
 ## Tech stack
 
