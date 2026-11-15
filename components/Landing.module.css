@@ -26,8 +26,8 @@
 .wordmark { display: block; height: 22px; width: auto; color: var(--fg); }
 
 .main {
-  display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; min-height: 0;
-  gap: clamp(14px, 3.5dvh, 40px); padding-bottom: clamp(10px, 5dvh, 56px); pointer-events: none;
+  display: grid; justify-items: center; align-content: center; min-height: 0;
+  gap: clamp(14px, 3.5dvh, 40px); pointer-events: none;
 }
 .copy { position: relative; z-index: 1; display: grid; justify-items: center; gap: clamp(12px, 2.4dvh, 22px); text-align: center; }
 .copy a { pointer-events: auto; }
@@ -77,8 +77,8 @@
 }
 
 /* The WebGL2 quire. The canvas covers the page and sits under the text; the
-   stage only reserves the space above the copy, and the quire is sized to it. */
-.stage { position: relative; align-self: stretch; justify-self: stretch; min-height: 0; display: grid; place-items: center; }
+   stage reserves the space the quire is sized to. */
+.stage { position: relative; width: min(520px, 100%); height: min(520px, 56dvh); display: grid; place-items: center; }
 .canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: auto; touch-action: none; }
 
 @media (max-width: 520px) {

@@ -25,6 +25,7 @@ const FLOOR = -1.05;
 const FOV = 12 * DEG; // half angle
 const DIST = 11;
 const TAN = Math.tan(FOV);
+const MAX_FIT = 180; // px per world unit: the sheet never gets wider than about 370 px
 
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a: number, b: number, x: number) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -145,18 +146,18 @@ export default function Quire3D() {
     const scheme = matchMedia("(prefers-color-scheme: dark)");
     let dark = scheme.matches ? 1 : 0;
 
-    // The canvas covers the page. The quire is sized to the free space above the
-    // copy, so it is the largest thing on the page at any window size.
+    // The canvas covers the page, so sheets can travel anywhere. The quire itself
+    // is sized to the stage box, up to a fixed limit.
     const view = { cx: 0, cy: 0, fit: 100 }; // CSS px; fit is px per world unit
     let scale = Math.min(devicePixelRatio || 1, 2), slow = 0;
     const resize = () => {
       const w = Math.max(1, Math.round(canvas.clientWidth * scale));
       const h = Math.max(1, Math.round(canvas.clientHeight * scale));
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-      const b = stage.getBoundingClientRect(), top = 10, fw = innerWidth - 24, fh = Math.max(60, b.bottom - top);
-      view.fit = Math.min(fh / 2.92, fw / 2.5);
+      const b = stage.getBoundingClientRect(), fw = innerWidth - 24, fh = Math.max(60, b.height);
+      view.fit = Math.min(fh / 2.92, fw / 2.5, MAX_FIT);
       view.cx = innerWidth / 2;
-      view.cy = top + fh / 2;
+      view.cy = b.top + fh / 2;
     };
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
