@@ -20,7 +20,10 @@ const float RAD = 0.085;
 const float THICK = 0.014;
 const vec3 INK = vec3(0.067);
 
-uniform vec2 uRes;
+uniform vec2 uCenter;
+uniform float uUnit;
+uniform vec4 uG[N];
+uniform vec3 uHover;
 uniform float uTime;
 uniform float uDark;
 uniform float uFov;
@@ -77,61 +80,57 @@ void over(inout vec2 g, float tone, float a) {
   g.y = oa;
 }
 
-vec2 gSwitch(vec2 p, float e, float t) {
+vec2 gSwitch(vec2 p, float e, vec4 s) {
   vec2 g = vec2(0.0);
-  float c = t / 1.9, f = fract(c);
-  float prev = mod(floor(c), 2.0);
-  float k = mix(prev, 1.0 - prev, spring(f * 1.5));
-  float kc = clamp(k, 0.0, 1.0);
+  float k = s.x, kc = clamp(k, 0.0, 1.0);
   float tr = sdRR(p, vec2(0.36, 0.19), 0.19);
   over(g, 0.0, fillA(tr, e) * mix(0.16, 0.92, kc));
   over(g, 0.0, strokeA(tr, 0.005, e) * 0.45);
-  float stretch = 0.06 * sin(3.14159 * clamp(f * 3.2, 0.0, 1.0));
-  float kn = sdRR(p - vec2(mix(-0.17, 0.17, k), 0.0), vec2(0.135 + stretch, 0.135), 0.135);
+  float kn = sdRR(p - vec2(mix(-0.17, 0.17, k), 0.0), vec2(0.135 + s.y, 0.135 - s.y * 0.25), 0.135 - s.y * 0.25);
   over(g, 0.0, fillA(kn - 0.012, e * 3.0) * 0.18);
   over(g, 1.0, fillA(kn, e));
   return g;
 }
 
-vec2 gButton(vec2 p, float e, float t) {
+vec2 gButton(vec2 p, float e, vec4 st, float t) {
   vec2 g = vec2(0.0);
-  float f = fract(t / 2.6);
-  float press = smoothstep(0.40, 0.45, f) - smoothstep(0.53, 0.62, f);
-  float s = 1.0 - 0.05 * press;
+  float press = st.x, rr = clamp(st.y, 0.0, 1.0);
+  float s = 1.0 + 0.035 * st.z - 0.07 * press;
   vec2 bp = p / s;
   vec2 hb = vec2(0.46, 0.135);
-  float rr = clamp((f - 0.45) / 0.45, 0.0, 1.0);
-  float grow = 0.16 * (1.0 - pow(1.0 - rr, 3.0));
-  over(g, 0.0, strokeA(sdRR(p, hb + grow, 0.07 + grow), 0.006, e) * (1.0 - rr) * (1.0 - rr) * 0.55 * step(0.45, f));
+  float grow = 0.17 * (1.0 - pow(1.0 - rr, 3.0));
+  over(g, 0.0, strokeA(sdRR(p, hb + grow, 0.07 + grow), 0.006, e) * (1.0 - rr) * (1.0 - rr) * 0.6);
   float b = sdRR(bp, hb, 0.07) * s;
   over(g, 0.0, fillA(b, e) * 0.93);
   float band = exp(-pow((bp.x + bp.y * 0.6 - mix(-0.9, 0.9, fract(t * 0.42))) / 0.09, 2.0));
   over(g, 1.0, fillA(b + 0.004, e) * band * 0.38);
   over(g, 1.0, fillA(sdRR(bp - vec2(0.05, 0.0), vec2(0.17, 0.02), 0.02) * s, e) * 0.96);
   over(g, 1.0, strokeA((length(bp - vec2(-0.2, 0.0)) - 0.036) * s, 0.011, e) * 0.96);
-  // The pointer that comes in and clicks.
-  float go = ease(f / 0.36) - ease((f - 0.72) / 0.28);
-  vec2 cp = mix(vec2(0.78, -0.5), vec2(0.24, -0.05), go);
-  float cs = 1.0 - 0.14 * press;
-  vec2 q = (p - cp) / cs;
-  float ar = sdTri(q, vec2(0.0), vec2(0.0, -0.125), vec2(0.088, -0.088)) * cs - 0.006;
-  float ca = smoothstep(0.0, 0.12, go);
-  over(g, 0.0, fillA(ar - 0.014, e) * ca);
-  over(g, 1.0, fillA(ar, e) * ca);
+  // The demo pointer. It leaves when a real one arrives.
+  float go = st.w;
+  if (go > 0.001) {
+    vec2 cp = mix(vec2(0.78, -0.5), vec2(0.24, -0.05), go);
+    float cs = 1.0 - 0.14 * press;
+    vec2 q = (p - cp) / cs;
+    float ar = sdTri(q, vec2(0.0), vec2(0.0, -0.125), vec2(0.088, -0.088)) * cs - 0.006;
+    float ca = smoothstep(0.0, 0.12, go);
+    over(g, 0.0, fillA(ar - 0.014, e) * ca);
+    over(g, 1.0, fillA(ar, e) * ca);
+  }
   return g;
 }
 
-vec2 gSlider(vec2 p, float e, float t) {
+vec2 gSlider(vec2 p, float e, vec4 s) {
   vec2 g = vec2(0.0);
-  float v = ease(0.5 + 0.5 * sin(t * 0.95)) * 0.84 + 0.08;
+  float v = clamp(s.x, 0.0, 1.0);
   float x = mix(-0.56, 0.56, v);
   p.y += 0.08;
   over(g, 0.0, fillA(sdSeg(p, vec2(-0.56, 0.0), vec2(0.56, 0.0)) - 0.02, e) * 0.17);
   over(g, 0.0, fillA(sdSeg(p, vec2(-0.56, 0.0), vec2(x, 0.0)) - 0.02, e) * 0.93);
-  float th = length(p - vec2(x, 0.0)) - 0.078;
+  float th = length(p - vec2(x, 0.0)) - 0.078 * (1.0 + 0.22 * s.y);
   over(g, 0.0, fillA(th - 0.014, e));
   over(g, 1.0, fillA(th, e));
-  vec2 bq = p - vec2(x, 0.235);
+  vec2 bq = p - vec2(x, 0.235 + 0.03 * s.y);
   float bub = min(sdRR(bq, vec2(0.092, 0.058), 0.03), sdTri(bq, vec2(-0.03, -0.05), vec2(0.03, -0.05), vec2(0.0, -0.092)));
   over(g, 0.0, fillA(bub, e) * 0.93);
   over(g, 1.0, fillA(sdRR(bq, vec2(0.02 + 0.045 * v, 0.013), 0.013), e) * 0.96);
@@ -140,20 +139,18 @@ vec2 gSlider(vec2 p, float e, float t) {
 
 float tabW(float j, float idx) { return 0.26 + 0.3 * fract(sin(j * 12.9 + idx * 4.1) * 43758.5); }
 
-vec2 gTabs(vec2 p, float e, float t) {
+vec2 gTabs(vec2 p, float e, vec4 s) {
   vec2 g = vec2(0.0);
-  float c = t / 1.7, f = fract(c), n = floor(c);
-  float a0 = mod(n, 3.0), a1 = mod(n + 1.0, 3.0);
-  float k = spring(f * 1.4);
-  float pos = mix(a0, a1, k);
+  float pos = s.x;
+  float a0 = floor(clamp(pos, 0.0, 1.999)), a1 = a0 + 1.0, kc = clamp(pos - a0, 0.0, 1.0);
   vec2 tp = p - vec2(0.0, 0.17);
   over(g, 0.0, fillA(sdRR(tp, vec2(0.6, 0.105), 0.06), e) * 0.13);
   over(g, 1.0, fillA(sdRR(tp - vec2((pos - 1.0) * 0.39, 0.0), vec2(0.185, 0.078), 0.042), e) * 0.97);
   for (int i = 0; i < 3; i++) {
     float on = 1.0 - clamp(abs(pos - float(i)), 0.0, 1.0);
-    over(g, 0.0, fillA(sdRR(tp - vec2((float(i) - 1.0) * 0.39, 0.0), vec2(0.085, 0.017), 0.017), e) * mix(0.32, 0.93, on));
+    float hov = 1.0 - step(0.5, abs(s.y - float(i)));
+    over(g, 0.0, fillA(sdRR(tp - vec2((float(i) - 1.0) * 0.39, 0.0), vec2(0.085, 0.017), 0.017), e) * mix(mix(0.32, 0.6, hov), 0.93, on));
   }
-  float kc = clamp(k, 0.0, 1.0);
   for (int j = 0; j < 3; j++) {
     float w = mix(tabW(float(j), a0), tabW(float(j), a1), kc);
     vec2 lp = p - vec2(-0.6 + w, -0.07 - float(j) * 0.1);
@@ -162,23 +159,21 @@ vec2 gTabs(vec2 p, float e, float t) {
   return g;
 }
 
-vec2 gSkeleton(vec2 p, float e, float t) {
+vec2 gSkeleton(vec2 p, float e, vec4 s) {
   vec2 g = vec2(0.0);
   float d = length(p - vec2(-0.47, 0.17)) - 0.13;
   d = min(d, sdRR(p - vec2(0.1, 0.225), vec2(0.36, 0.034), 0.034));
   d = min(d, sdRR(p - vec2(-0.02, 0.115), vec2(0.24, 0.028), 0.028));
   d = min(d, sdRR(p - vec2(0.0, -0.16), vec2(0.6, 0.12), 0.05));
-  float band = exp(-pow((p.x - p.y * 0.35 - mix(-1.3, 1.3, fract(t * 0.5))) / 0.2, 2.0));
-  over(g, 0.0, fillA(d, e) * (0.13 + 0.2 * band));
+  float band = exp(-pow((p.x - p.y * 0.35 - s.x) / 0.2, 2.0));
+  over(g, 0.0, fillA(d, e) * 0.17);
+  over(g, 1.0, fillA(d, e) * band * 0.6);
   return g;
 }
 
-vec2 gOtp(vec2 p, float e, float t) {
+vec2 gOtp(vec2 p, float e, vec4 s, float t) {
   vec2 g = vec2(0.0);
-  float c = t / 0.42, f = fract(c);
-  float n = mod(floor(c), 10.0);
-  float filled = min(n, 6.0);
-  float done = step(6.0, n);
+  float filled = s.x, done = s.z;
   over(g, 0.0, fillA(sdRR(p, vec2(0.022, 0.006), 0.006), e) * 0.4);
   for (int i = 0; i < 6; i++) {
     float fi = float(i);
@@ -189,17 +184,16 @@ vec2 gOtp(vec2 p, float e, float t) {
     over(g, 1.0, fillA(box, e) * 0.5);
     over(g, 0.0, strokeA(box, 0.006, e) * mix(0.26, 0.95, max(act, done)));
     float has = step(fi + 0.5, filled);
-    float pop = (fi + 1.5 > filled && done < 0.5) ? spring(f * 1.6) : 1.0;
+    float pop = fi + 1.5 > filled ? s.y : 1.0;
     over(g, 0.0, fillA(length(q) - 0.03 * pop, e) * has * 0.93);
     over(g, 0.0, fillA(sdRR(q, vec2(0.005, 0.048), 0.005), e) * act * step(fract(t * 1.5), 0.55) * 0.9);
   }
   return g;
 }
 
-vec2 gToast(vec2 p, float e, float t) {
+vec2 gToast(vec2 p, float e, vec4 st) {
   vec2 g = vec2(0.0);
-  float f = fract(t / 2.1);
-  float s = spring(f * 1.25);
+  float s = st.x;
   for (int k = 3; k >= 0; k--) {
     float D = float(k) - 1.0 + s;
     float a = clamp(1.0 - D * 0.34, 0.0, 1.0) * clamp(1.0 + D * 1.6, 0.0, 1.0);
@@ -220,21 +214,22 @@ vec2 gToast(vec2 p, float e, float t) {
   return g;
 }
 
+// The state of each component lives in JS, so a pointer can drive it.
 vec2 glyph(int i, vec2 p, float e, float t) {
-  if (i == 0) return gSwitch(p, e, t);
-  if (i == 1) return gButton(p, e, t);
-  if (i == 2) return gSlider(p, e, t);
-  if (i == 3) return gTabs(p, e, t);
-  if (i == 4) return gSkeleton(p, e, t);
-  if (i == 5) return gOtp(p, e, t);
-  return gToast(p, e, t);
+  vec4 s = uG[i];
+  if (i == 0) return gSwitch(p, e, s);
+  if (i == 1) return gButton(p, e, s, t);
+  if (i == 2) return gSlider(p, e, s);
+  if (i == 3) return gTabs(p, e, s);
+  if (i == 4) return gSkeleton(p, e, s);
+  if (i == 5) return gOtp(p, e, s, t);
+  return gToast(p, e, s);
 }
 
 vec3 foilAt(float h) { return 0.80 + 0.20 * cos(TAU * (h - vec3(0.0, 0.3333, 0.6667))); }
 
 void main() {
-  float unit = min(uRes.y, uRes.x / 1.3);
-  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / unit;
+  vec2 uv = (gl_FragCoord.xy - uCenter) * 2.0 / uUnit;
   vec3 ro = uCamPos;
   vec3 rd = normalize(uCam * vec3(uv * uFov, 1.0));
 
@@ -276,8 +271,8 @@ void main() {
     float a = mix(mix(0.8, 0.44, uDark), mix(0.95, 0.9, uDark), pres);
 
     // Soft key light that follows the pointer.
-    vec2 hp = q - vec2(uPointer.x * 0.6, -0.25 + uPointer.y * 0.45);
-    float hl = exp(-dot(hp, hp) / 0.55);
+    vec2 hp = q - mix(vec2(uPointer.x * 0.6, -0.25 + uPointer.y * 0.45), vec2(uHover.x, -uHover.y), uHover.z * pres);
+    float hl = exp(-dot(hp, hp) / mix(0.55, 0.34, uHover.z * pres)) * (1.0 + 0.2 * uHover.z * pres);
     col = mix(col, vec3(1.0), hl * mix(0.3, 0.16, uDark));
 
     // Glass edge.
@@ -312,8 +307,8 @@ void main() {
     // Mirror glint, and one sweep of light when a sheet is handed over.
     vec3 rr = reflect(ld, vec3(0.0, sign(-ld.y), 0.0));
     float spec = pow(max(dot(rr, uLight * uR[i]), 0.0), 18.0);
-    float sweep = exp(-pow((q.x * 0.8 - q.y * 0.6 - uGlint) / 0.2, 2.0)) * pres;
-    float add = spec * 0.22 + sweep * mix(0.5, 0.28, uDark);
+    float sweep = exp(-pow((q.x * 0.8 - q.y * 0.6 - uGlint) / 0.13, 2.0)) * pres;
+    float add = spec * 0.22 + sweep * mix(0.24, 0.2, uDark);
     rgb += add * mix(vec3(1.0), foil, 0.3);
     a = min(a + add * 0.5, 1.0);
     C[i] = vec4(min(rgb, vec3(1.0)) * cov, a * cov) ;
@@ -334,7 +329,7 @@ void main() {
 
   // Floor: a soft shadow by day, the light that falls through the stack by night.
   float tf = (uFloorY - ro.y) / rd.y;
-  if (tf > 0.0) {
+  if (tf > 0.0 && acc.a < 0.985) {
     vec3 f = ro + tf * rd;
     float occ = 0.0;
     vec3 tint = vec3(0.0);
