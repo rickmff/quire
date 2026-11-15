@@ -52,8 +52,9 @@ node scripts/build-catalog.ts            # all sites
 node scripts/build-catalog.ts magicui    # one site
 ```
 
-Previews come from the libraries' own repos where they keep them. The rest come from the capture service in
-[`capture/`](capture/README.md), which runs Chromium on a VPS and records a still and a short clip of each component.
+Every card in the gallery shows a preview. Previews come from the libraries' own repos where they keep them.
+The rest are recorded by the capture service in [`capture/`](capture/README.md), which runs Chromium on your
+computer, and saved in `public/previews/`. Components without a preview stay out of the gallery.
 
 ## Browser extension
 

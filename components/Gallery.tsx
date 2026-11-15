@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CatalogLibrary } from "@/lib/catalog/schema";
 import type { GalleryItem } from "@/lib/useCatalog";
+import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 
@@ -167,14 +168,21 @@ export function Preview({ item, site, large }: { item: GalleryItem; site: string
         className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.015]"
       />
     );
-  // No capture yet: a quiet typographic tile.
+  // A saved page whose preview is still being recorded.
+  return <Pending item={item} site={site} large={large} />;
+}
+
+function Pending({ item, site, large }: { item: GalleryItem; site: string; large?: boolean }) {
+  const capture = useCaptureAvailable();
   return (
     <div className="flex size-full flex-col justify-between p-4">
       <span className="text-[11px] text-faint">{typeById(item.type).name}</span>
       <span className={`font-medium tracking-tight text-muted ${large ? "text-[28px]" : "text-[19px]"} leading-[1.1] line-clamp-3`}>
         {item.title}
       </span>
-      <span className="text-[11px] text-faint">{site}</span>
+      <span className={`text-[11px] text-faint ${capture ? "animate-pulse" : ""}`}>
+        {capture === false ? "No preview. Start the capture service to record one." : `Recording preview · ${site}`}
+      </span>
     </div>
   );
 }

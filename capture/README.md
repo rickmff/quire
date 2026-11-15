@@ -55,12 +55,19 @@ Private addresses are refused, so the token cannot be used to reach your network
 
 ## Fill the curated catalog
 
-From the Quire repo, with the service running:
+From the Quire repo, with the service running on your computer:
 
 ```bash
-QUIRE_CAPTURE_URL=https://capture.example.com QUIRE_CAPTURE_TOKEN=... \
-  node scripts/capture-catalog.ts --parallel 3 --apply
+node scripts/capture-catalog.ts --parallel 3
 ```
 
-It captures every component without a preview (about 1,400) and writes
-`lib/catalog/captures.json`. Commit that file; `build-catalog.ts` merges it.
+It reads the token from `capture/.env` and captures every component without a
+preview. Each still is saved into `public/previews/<library>/<name>.webp`, so it
+ships with the site and needs no server. `lib/catalog/captures.json` maps ids to
+those files; `build-catalog.ts` merges it on every build.
+
+Pages that cannot be captured (404, blank demo, timeout) go to
+`lib/catalog/no-preview.json` with the reason. The gallery leaves components
+without a preview out; the MCP still serves them. `--retry` tries them again,
+`--library <id>` limits the run to one site, `--video` also keeps clips.
+Commit `public/previews/`, `captures.json`, `no-preview.json` and `data.json`.

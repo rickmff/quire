@@ -1,7 +1,7 @@
 // Quire capture service: opens a component page in real Chromium and records
 // a still and a short clip of the component moving. Runs on any VPS.
 //
-//   POST /capture  { "url": "https://...", "video": true }   Authorization: Bearer $CAPTURE_TOKEN
+//   POST /capture  { "url": "https://...", "video": true, "width": 1280 }   Authorization: Bearer $CAPTURE_TOKEN
 //   ->  { "image": "https://capture.example.com/media/<id>.webp", "video": ".../<id>.webm" }
 //   GET  /media/<file>   serves the files (public, cacheable)
 //   GET  /health
@@ -97,8 +97,9 @@ const queue = [];
 const slot = () => (running < CONCURRENCY ? (running++, Promise.resolve()) : new Promise((r) => queue.push(r)));
 const free = () => (queue.length ? queue.shift()() : running--);
 
-async function capture(url, withVideo) {
-  const id = createHash("sha1").update(url).digest("hex").slice(0, 16);
+async function capture(url, withVideo, width = 1280) {
+  const height = Math.round((width * 10) / 16);
+  const id = createHash("sha1").update(width === 1280 ? url : `${url}#${width}`).digest("hex").slice(0, 16);
   const image = join(MEDIA, `${id}.webp`);
   const video = join(MEDIA, `${id}.webm`);
   const have = async (p) => stat(p).then(() => true, () => false);
@@ -116,14 +117,16 @@ async function capture(url, withVideo) {
   const page = await ctx.newPage();
   try {
     await page.route("**/*", (r) => (/\.(woff2?|ttf)$/.test(r.request().url()) || !NOISE.test(r.request().url()) ? r.continue() : r.abort()));
-    await page.goto(url, { waitUntil: "networkidle", timeout: 25000 }).catch(() => page.waitForLoadState("domcontentloaded"));
+    const res = await page.goto(url, { waitUntil: "networkidle", timeout: 25000 }).catch(() => page.waitForLoadState("domcontentloaded").then(() => null));
+    if (res && res.status() >= 400) throw new Error(`page returned ${res.status()}`);
     await page.addStyleTag({ content: `[class*="cookie" i],[id*="cookie" i],[class*="consent" i]{display:none!important}` }).catch(() => {});
     await page.waitForTimeout(1200);
 
     let target = null;
     for (const sel of PREVIEW_SELECTORS) {
       const el = page.locator(sel).first();
-      const box = await el.boundingBox().catch(() => null);
+      if (!(await el.count().catch(() => 0))) continue;
+      const box = await el.boundingBox({ timeout: 1500 }).catch(() => null);
       if (box && box.width > 240 && box.height > 140 && box.height < 1400) {
         target = { el, box };
         break;
@@ -145,7 +148,10 @@ async function capture(url, withVideo) {
     }
 
     const png = target ? await target.el.screenshot({ timeout: 8000 }) : await page.screenshot();
-    await sharp(png).resize({ width: 1280, height: 800, fit: "cover", position: "centre" }).webp({ quality: 78 }).toFile(image);
+    // A flat image means the demo did not render (blocked, empty or still loading).
+    const { channels } = await sharp(png).stats();
+    if (channels.slice(0, 3).every((c) => c.stdev < 2)) throw new Error("blank page");
+    await sharp(png).resize({ width, height, fit: "cover", position: "centre" }).webp({ quality: width < 1280 ? 72 : 78 }).toFile(image);
   } finally {
     await page.close().catch(() => {});
     const vid = withVideo ? await page.video()?.path().catch(() => null) : null;
@@ -198,7 +204,8 @@ createServer(async (req, res) => {
     if (!u) return send(res, 400, { error: "bad-url" });
     await slot();
     try {
-      return send(res, 200, await capture(u.href, input.video !== false));
+      const width = Math.max(320, Math.min(1280, Math.round(Number(input.width) || 1280)));
+      return send(res, 200, await capture(u.href, input.video !== false, width));
     } catch (e) {
       return send(res, 502, { error: String(e?.message || e).slice(0, 200) });
     } finally {

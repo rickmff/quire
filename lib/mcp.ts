@@ -31,12 +31,12 @@ function card(c: CatalogComponent) {
   };
 }
 
-function full(c: CatalogComponent) {
+function full(c: CatalogComponent, base: string) {
   return {
     ...card(c),
     ...(c.category ? { siteCategory: c.category } : {}),
     ...(c.dependencies?.length ? { dependencies: c.dependencies } : {}),
-    ...(c.preview ? { preview: c.preview } : {}),
+    ...(c.preview ? { preview: c.preview.startsWith("/") ? `${base}${c.preview}` : c.preview } : {}),
     sourceAvailable: Boolean(c.item || (c.repo && c.files?.length)),
   };
 }
@@ -135,7 +135,7 @@ async function callTool(name: string, args: any, ctx: Ctx) {
     }
     case "get_component": {
       const c = find(String(args?.id ?? ""));
-      return c ? text(full(c)) : text(`No component ${args?.id}. Use search_components to find ids.`, true);
+      return c ? text(full(c, ctx.base)) : text(`No component ${args?.id}. Use search_components to find ids.`, true);
     }
     case "get_component_source": {
       const c = find(String(args?.id ?? ""));

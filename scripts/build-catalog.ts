@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { classify } from "../lib/types.ts";
 import { techFrom, triggersFor } from "../lib/motion.ts";
 import { SOURCES, type Source } from "./catalog/sources.ts";
+import { dedupe } from "./catalog/dedupe.ts";
 import type { CatalogComponent, CatalogLibrary, Catalog } from "../lib/catalog/schema.ts";
 
 const ROOT = new URL("..", import.meta.url).pathname;
@@ -260,7 +261,8 @@ if (existsSync(CAPTURES)) {
   }
 }
 
-components = components.sort((a, b) => a.id.localeCompare(b.id));
+components = dedupe(components);
+for (const l of libraries) l.count = components.filter((c) => c.library === l.id).length;
 const catalog: Catalog = { version: 1, generatedAt: new Date().toISOString().slice(0, 10), libraries, components };
 mkdirSync(join(ROOT, "lib/catalog"), { recursive: true });
 writeFileSync(OUT, JSON.stringify(catalog));

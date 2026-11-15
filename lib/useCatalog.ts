@@ -32,3 +32,11 @@ export function useSyncAvailable() {
   }, []);
   return ok;
 }
+
+export function useCaptureAvailable() {
+  const [ok, setOk] = useState<boolean | null>(null);
+  useEffect(() => {
+    getStatus().then((s) => setOk(s.capture));
+  }, []);
+  return ok;
+}

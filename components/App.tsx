@@ -164,9 +164,24 @@ export default function App() {
       const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
       return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
     });
-    const have = new Set(saved.map((s) => s.id));
-    const curated = (catalog?.components ?? []).filter((c) => followed.has(c.library) && !have.has(c.id));
-    return [...saved, ...mix(curated)];
+    // One card per component: a saved copy of a curated component (same id or
+    // same page) replaces the curated card, and a page saved twice shows once.
+    const page = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase();
+    const ids = new Set<string>();
+    const pages = new Set<string>();
+    const unique = saved.filter((s) => {
+      const p = page(s.docs);
+      if (ids.has(s.id) || pages.has(p)) return false;
+      ids.add(s.id);
+      pages.add(p);
+      return true;
+    });
+    // Every card shows a preview. Curated components without one stay out of
+    // the gallery (the MCP still serves them); saved ones wait for a capture.
+    const curated = (catalog?.components ?? []).filter(
+      (c) => c.preview && followed.has(c.library) && !ids.has(c.id) && !pages.has(page(c.docs)),
+    );
+    return [...unique, ...mix(curated)];
   }, [lib.bookmarks, catalog, followed]);
 
   const galleryView = useMemo(() => {
@@ -342,6 +357,7 @@ export default function App() {
         .filter((i) => !have.has(i.url))
         .map((i, n) => ({
           id: uid(),
+          ...(byDocs.get(i.url.replace(/\/$/, "")) ? { ref: byDocs.get(i.url.replace(/\/$/, ""))!.id } : {}),
           url: i.url,
           title: i.title,
           description: i.description,
