@@ -47,10 +47,6 @@ const EXAMPLES = [
   "ui.shadcn.com/docs/components/command",
 ];
 
-// The first-load deal plays once per page load, not on later visits to /app
-// within the same tab.
-let dealtOnce = false;
-
 export default function App() {
   const { lib, ready, update } = useLibrary();
   const [view, setViewRaw] = useState<View>("starred");
@@ -62,10 +58,10 @@ export default function App() {
   // First load: "deal" hides the chrome while the gallery deals its cards,
   // "show" brings the sidebar and headers in, then the attribute is dropped
   // so later views mount without an entrance.
-  const [intro, setIntro] = useState<"deal" | "show" | null>(() => (dealtOnce ? null : "deal"));
+  // Every entry into /app plays it: a refresh, or arriving from the landing.
+  const [intro, setIntro] = useState<"deal" | "show" | null>("deal");
   const dealing = useRef(false);
   useEffect(() => {
-    dealtOnce = true;
     if (intro === "show") {
       const t = setTimeout(() => setIntro(null), 900);
       return () => clearTimeout(t);
@@ -98,11 +94,6 @@ export default function App() {
     );
   }, [view, intro]);
 
-  // The onboarding has no cards to deal.
-  const onboarding = isGallery(view) && ready && catalog && !lib.mode && lib.bookmarks.length === 0;
-  useEffect(() => {
-    if (onboarding && intro === "deal") setIntro("show");
-  }, [onboarding, intro]);
   const onDeal = useCallback((ms: number) => {
     dealing.current = true;
     setTimeout(() => setIntro("show"), ms);
@@ -283,6 +274,13 @@ export default function App() {
       return words.every((w) => hay.includes(w));
     });
   }, [galleryItems, view, words]);
+
+  // Nothing to deal (the onboarding, an empty Starred): show the page now.
+  const nothingToDeal =
+    Boolean(ready && catalog) && (!isGallery(view) || (!lib.mode && lib.bookmarks.length === 0) || galleryView.length === 0);
+  useEffect(() => {
+    if (nothingToDeal && intro === "deal") setIntro("show");
+  }, [nothingToDeal, intro]);
 
   // Library first: every site in the library, with its own components.
   const sites = useMemo(() => {
