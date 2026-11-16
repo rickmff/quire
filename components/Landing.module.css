@@ -92,6 +92,21 @@
 
 @media (max-width: 520px) {
   .page { padding: 20px; }
-  .wordmark { height: 24px; }
   .main { gap: 40px; }
+}
+
+/* Keep the logo and the X/GitHub icons on the exact spot they take in /app,
+   so nothing jumps when moving between the two pages. */
+@media (min-width: 768px) {
+  .bar { margin: -9px 12px 0 22px; }
+  .bar > nav { position: relative; top: -2px; }
+}
+@media (max-width: 767px) {
+  .wordmark { height: 24px; }
+}
+@media (min-width: 521px) and (max-width: 767px) {
+  .bar { margin: -3px 0 0 -8px; }
+}
+@media (max-width: 520px) {
+  .bar { margin-top: 1px; }
 }
