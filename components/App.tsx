@@ -30,8 +30,10 @@ import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 type View = "library" | "all" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
-// "site:<key>" = one library and its own components.
-const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5) : null);
+// "site:<key>" = one library and its own components; "site:<key>|<group>" =
+// one category of that library (a sidebar group, see groupItems).
+const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
+const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
 const PAGES = new Set(["library", "sites", "agents"]);
 const isGallery = (v: View) => v === "library" || typeView(v) !== null || siteView(v) !== null;
 // Curated components group by library id; your own links by the site they came from.
@@ -258,6 +260,8 @@ export default function App() {
   const galleryView = useMemo(() => {
     const t = typeView(view);
     const s = siteView(view);
+    const g = groupView(view);
+    if (s && g) return groupItems(galleryItems.filter((i) => siteKey(i) === s)).find((x) => x.key === g)?.items ?? [];
     if (s) return galleryItems.filter((i) => siteKey(i) === s);
     return t ? galleryItems.filter((i) => i.type === t) : galleryItems;
   }, [galleryItems, view]);
@@ -431,7 +435,12 @@ export default function App() {
         : viewType
             ? typeById(viewType).name
             : siteView(view)
-              ? (sites.find((x) => x.key === siteView(view))?.name ?? "Library")
+              ? [
+                  sites.find((x) => x.key === siteView(view))?.name ?? "Library",
+                  groupView(view) && groupLabel(groupView(view)!),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
               : (current?.name ?? "Saved");
   const exportView = view;
 
@@ -1012,7 +1021,13 @@ function Sidebar(props: {
                     )}
                     <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
                     <Collapse open={activeSite === x.key} className="hidden md:grid">
-                      <SiteGroups items={x.items} openItem={openItem} openId={openId} />
+                      <SiteGroups
+                        items={x.items}
+                        openItem={openItem}
+                        openId={openId}
+                        active={activeSite === x.key ? groupView(view) : null}
+                        onGroup={(g) => setView(g ? `site:${x.key}|${g}` : `site:${x.key}`)}
+                      />
                     </Collapse>
                   </div>
                 );
@@ -1183,16 +1198,44 @@ function Collapse({ open, className = "grid", children }: { open: boolean; class
   );
 }
 
-function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openItem: (item: GalleryItem) => void; openId?: string }) {
+// The sidebar name of a group key from groupItems ("Input", "Effect/text-effect").
+const groupLabel = (key: string) => {
+  const [family, type] = key.split("/");
+  return type ? (TYPE_LABEL[type] ?? typeById(type).name) : (FAMILY_LABEL[family] ?? family);
+};
+
+function SiteGroups({
+  items,
+  openItem,
+  openId,
+  active,
+  onGroup,
+}: {
+  items: GalleryItem[];
+  openItem: (item: GalleryItem) => void;
+  openId?: string;
+  // The category the gallery is filtered to, if any.
+  active: string | null;
+  onGroup: (key: string | null) => void;
+}) {
   const groups = useMemo(() => groupItems(items), [items]);
   // One group open at a time, like an accordion.
   const [open, setOpen] = useState<string | null>(null);
-  // The group that holds the open component opens with it.
+  // The group that holds the open component, or the filtered category, opens with it.
   useEffect(() => {
     const g = groups.find((g) => g.items.some((i) => i.id === openId));
     if (g) setOpen(g.key);
   }, [groups, openId]);
-  const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
+  useEffect(() => {
+    if (active) setOpen(active);
+  }, [active]);
+  // A click filters the gallery to the category and opens it; a click on the
+  // filtered category goes back to the whole library and closes it.
+  const toggle = (k: string) => {
+    const off = active === k;
+    setOpen(off ? null : k);
+    onGroup(off ? null : k);
+  };
 
   return (
     <div className="contents">
@@ -1203,8 +1246,11 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
             <button
               data-row
               aria-expanded={expanded}
+              aria-pressed={active === g.key}
               onClick={() => toggle(g.key)}
-              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+              className={`group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap transition ${
+                active === g.key ? "text-accent" : "text-muted hover:text-fg"
+              }`}
             >
               <span className="flex w-[26px] shrink-0 items-center">
                 <svg
