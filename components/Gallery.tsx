@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { CatalogLibrary } from "@/lib/catalog/schema";
+import type { CatalogLibrary, LiveDemo as Live } from "@/lib/catalog/schema";
 import type { GalleryItem } from "@/lib/useCatalog";
 import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
@@ -262,10 +262,17 @@ function useDark() {
   return dark;
 }
 
-export function Preview({ item, site, large }: { item: GalleryItem; site: string; large?: boolean }) {
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches), []);
+  return reduce;
+}
+
+// still: the image only. A live demo plays over it, so the clip is not needed.
+export function Preview({ item, site, large, still }: { item: GalleryItem; site: string; large?: boolean; still?: boolean }) {
   const dark = useDark();
   const image = (dark && item.previewDark) || item.preview;
-  const video = (dark && item.videoDark) || item.video;
+  const video = still ? undefined : (dark && item.videoDark) || item.video;
   return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
 }
 
@@ -318,6 +325,59 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
       <span className={`text-[11px] text-faint ${capture ? "animate-pulse" : ""}`}>
         {capture === false ? "No preview. Start the capture service to record one." : `Recording preview · ${site}`}
       </span>
+    </div>
+  );
+}
+
+// The component itself, running on the Quire stage (public/stage/, built by stage/build.sh)
+// in a frame on this site's own origin. The frame lays the demo out at the size it was
+// captured at (live.view) and shows the part the stills show (live.frame), scaled to fit.
+// It fades in over the still once the demo has mounted.
+// Cards do not run it: their clips loop on their own and show the interaction already.
+function LiveDemo({ live, title, onEscape }: { live: Live; title: string; onEscape?: () => void }) {
+  const dark = useDark();
+  const src = (dark && live.srcDark) || live.src;
+  return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} />;
+}
+
+function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const win = useRef<HTMLIFrameElement>(null);
+  const [scale, setScale] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [x, y, w] = frame;
+  const events = useRef({ onEscape });
+  events.current = { onEscape };
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / w));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [w]);
+  useEffect(() => {
+    const on = (e: MessageEvent) => {
+      if (e.origin !== location.origin || e.source !== win.current?.contentWindow || e.data?.source !== "quire-stage") return;
+      if (e.data.event === "ready") setReady(true);
+      if (e.data.event === "escape") events.current.onEscape?.();
+    };
+    window.addEventListener("message", on);
+    return () => window.removeEventListener("message", on);
+  }, []);
+
+  return (
+    <div ref={box} className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+      {scale > 0 && (
+        <iframe
+          ref={win}
+          src={src}
+          title={`${title}, live demo`}
+          allow="clipboard-write"
+          className="absolute top-0 left-0 origin-top-left border-0"
+          style={{ width: view[0], height: view[1], transform: `scale(${scale}) translate(${-x}px, ${-y}px)` }}
+        />
+      )}
     </div>
   );
 }
@@ -395,6 +455,7 @@ export function Detail({
 }) {
   const [src, setSrc] = useState<{ state: "idle" | "loading" | "done" | "none"; files: SourceFile[]; from?: string }>({ state: "idle", files: [] });
   const [tab, setTab] = useState(0);
+  const [run, setRun] = useState(0);
   const mine = item.id.startsWith("mine/");
   const [pop, setPop] = useState(false);
 
@@ -439,9 +500,19 @@ export function Detail({
           </button>
         </div>
         <div className="px-5 pb-10">
-          <div className="aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
-            <Preview item={item} site={site} large />
+          <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-hover">
+            <Preview item={item} site={site} large still={Boolean(item.live)} />
+            {item.live && <LiveDemo key={`${item.id}|${run}`} live={item.live} title={item.title} onEscape={onClose} />}
+            <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-line ring-inset" />
           </div>
+          {item.live && (
+            <div className="mt-1.5 flex items-center justify-between text-[12px] text-faint">
+              <span>Live. Hover, click and type in it.</span>
+              <button onClick={() => setRun((n) => n + 1)} className="transition hover:text-muted">
+                Restart
+              </button>
+            </div>
+          )}
 
           <div className="mt-5 flex items-baseline justify-between gap-4">
             <h2 className="text-[17px] font-medium tracking-tight first-letter:uppercase">{item.title}</h2>

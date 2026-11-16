@@ -1,0 +1,1 @@
+import{a as e,c as t}from"./index-pvdpJsYC.js";import{t as n}from"./dist-DLOb9xp3.js";var r=t(e(),1),i=Object.defineProperty,a=(e,t)=>i(e,`name`,{value:t,configurable:!0}),o=r.useId||(()=>void 0),s=0;function c(e){let[t,i]=r.useState(o());return n(()=>{e||i(e=>e??String(s++))},[e]),e||(t?`radix-${t}`:``)}a(c,`useId`);export{c as t};

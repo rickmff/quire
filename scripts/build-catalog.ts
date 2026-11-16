@@ -260,7 +260,7 @@ for (const src of SOURCES) {
 // media: the same framing, size and themes for every card.
 const STAGE = join(ROOT, "lib/catalog/stage.json");
 if (existsSync(STAGE)) {
-  type Shot = { image?: string; imageDark?: string; video?: string; videoDark?: string };
+  type Shot = { image?: string; imageDark?: string; video?: string; videoDark?: string; live?: CatalogComponent["live"] };
   const shots: Record<string, Shot> = JSON.parse(readFileSync(STAGE, "utf8"));
   for (const c of components) {
     const s = shots[c.id];
@@ -269,6 +269,7 @@ if (existsSync(STAGE)) {
     c.previewDark = s.imageDark;
     c.video = s.video;
     c.videoDark = s.videoDark;
+    c.live = s.live;
   }
 }
 

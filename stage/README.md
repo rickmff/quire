@@ -1,7 +1,8 @@
 # Quire stage
 
 Renders the preview of every catalog component from the component's own demo,
-instead of taking a screenshot of the library's docs page.
+instead of taking a screenshot of the library's docs page. The same stage, built
+as a static site, runs each demo live in the gallery.
 
 For each library it:
 
@@ -28,6 +29,7 @@ npm install
 (cd app-magicui && PORT=5181 npx vite) &
 node capture.mjs magicui 5181 out/magicui          # stills
 node video.mjs magicui 5181 out/magicui            # clips
+./build.sh .. magicui animate-ui                   # live demos: public/stage/<library>/
 node publish.mjs .. magicui animate-ui             # copy into public/previews and the catalog
 ```
 
@@ -38,6 +40,32 @@ redo only those. Look at `out/<library>/*.thumb.png` before publishing
 `publish.mjs` writes `public/previews/<library>/<name>.webp` and `<name>-dark.webp`
 (plus `.mp4` and `-dark.mp4` when both themes have a clip), records them in
 `lib/catalog/stage.json`, and updates `lib/catalog/data.json`.
+
+## Live demos
+
+`build.sh` builds each stage app with Vite into `public/stage/<library>/` (base
+`/stage/<library>/`). `publish.mjs` then gives each component a `live` record:
+the stage page with the same options as its stills, the capture viewport
+(1280x800) and the frame the stills were cut from, per theme.
+
+The gallery opens that page in an iframe on its own origin, lays it out at the
+capture viewport and scales the frame to the card, so the live demo lines up
+with the still under it. It fades in when the demo has mounted. With `live=1`
+the stage:
+
+- tells the gallery when the demo is ready (`postMessage`),
+- keeps demo links and forms from navigating the frame,
+- passes Escape to the gallery when the demo has no dialog or menu open,
+- with `grid=1`, opens the card on a click outside the demo's controls (for a
+  card that runs it; the gallery does not use this today).
+
+The detail panel runs the demo with hover, click and keyboard, and has a
+Restart button. Cards do not run it: their clips loop on screen and already show
+the interaction.
+
+Demos that use shiki get a build with only the grammars and themes they use
+(`template/src/shims/shiki.ts`). Files demos load from the docs site's root
+(`/mug.webp`) are rewritten to the base path at build time.
 
 ## Poses
 
