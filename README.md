@@ -124,6 +124,8 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 
 Issues and pull requests are welcome. For a large change, open an issue first to discuss it.
 
+When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing; and draw the transitions in a comment above the state. Examples: `lib/useIntro.ts` (the /app entrance), `useCardLive` in `components/Gallery.tsx` (a card's live demo), `SidebarEdit` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
+
 ## License
 
 [MIT](LICENSE)

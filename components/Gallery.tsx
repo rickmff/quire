@@ -485,34 +485,45 @@ function trackPointer() {
 const SLOW = 0.35; // px/ms: slower than a pass across the grid
 const REST = 50; // ms without a move: the mouse stopped
 const DWELL = 300; // ms on the card: it is meant, however the mouse moves
+// The demo's own phase. The pointer facts (inside, held) sit beside it, since they change on
+// their own: the menu can be held open with the mouse off the card.
+//
+//   off ──start──▶ loading ──ready──▶ shown
+//    ▲                │                 │
+//    └────── end ─────┘    end ──▶ (grace, 250 ms) ──▶ off
+//
+// Timers: rest and dwell arm a start (one after the mouse stops, one after 300 ms on the
+// card); grace delays the end of a shown demo. A start or an end clears all three; a move
+// clears rest and grace only, so dwell keeps counting.
+type Demo = "off" | "loading" | "shown";
 function useCardLive(enabled: boolean) {
-  const [on, setOn] = useState(false);
+  const [demo, setDemo] = useState<Demo>("off");
   const ref = useRef<HTMLDivElement>(null);
-  const wait = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const dwell = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // shown: the demo is ready and on screen.
-  const state = useRef({ inside: false, held: false, shown: false });
+  const timers = useRef<{ rest?: ReturnType<typeof setTimeout>; dwell?: ReturnType<typeof setTimeout>; grace?: ReturnType<typeof setTimeout> }>({});
+  // Read by the page's event listeners, which outlive a render. demo mirrors the state above.
+  const state = useRef<{ inside: boolean; held: boolean; demo: Demo }>({ inside: false, held: false, demo: "off" });
   const [fns] = useState(() => {
-    const stop = () => { state.current.shown = false; setOn(false); };
+    const to = (d: Demo) => { state.current.demo = d; setDemo(d); };
+    const clear = (...names: ("rest" | "dwell" | "grace")[]) => names.forEach((n) => clearTimeout(timers.current[n]));
+    const stop = () => to("off");
     const start = () => {
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       if (liveCard !== stop) liveCard?.();
       liveCard = stop;
-      setOn(true);
+      if (state.current.demo === "off") to("loading");
     };
     const end = () => {
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       const off = () => {
         if (state.current.held || state.current.inside) return;
         if (liveCard === stop) liveCard = undefined;
         stop();
       };
       // Not on screen yet: drop it now. On screen: a short grace, so a slip past the edge keeps it.
-      if (!state.current.shown) return off();
-      wait.current = setTimeout(off, 250);
+      if (state.current.demo !== "shown") return off();
+      timers.current.grace = setTimeout(off, 250);
     };
+    const ready = () => { if (state.current.demo === "loading") to("shown"); };
     // Near: on the card or within the variants ring around its corner.
     const near = (at: Point, m = 150) => {
       const r = ref.current?.getBoundingClientRect();
@@ -526,30 +537,30 @@ function useCardLive(enabled: boolean) {
       state.current.inside = false;
       end();
     };
-    return { stop, start, end, near, watch };
+    return { stop, start, end, ready, near, watch, clear };
   });
   useEffect(() => {
     const el = ref.current;
     if (!el || !enabled) return;
-    const { start, end, stop, watch } = fns;
+    const { start, end, stop, watch, clear } = fns;
+    const t = timers.current;
     trackPointer();
     // Start now when the mouse comes in slowly; else when it slows down or stops on the card.
     const enter = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       state.current.inside = true;
       document.removeEventListener("pointermove", watch);
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       // The page saw no move for a while (the mouse was over a live demo's frame): wait for one.
       if (e.timeStamp - pointer.t < 100 && pointer.v < SLOW) return start();
-      wait.current = setTimeout(start, REST);
-      dwell.current = setTimeout(start, DWELL);
+      t.rest = setTimeout(start, REST);
+      t.dwell = setTimeout(start, DWELL);
     };
     const move = (e: PointerEvent) => {
       if (e.pointerType === "touch" || !state.current.inside || liveCard === stop) return;
-      clearTimeout(wait.current);
+      clear("rest", "grace");
       if (pointer.v < SLOW) return start();
-      wait.current = setTimeout(start, REST);
+      t.rest = setTimeout(start, REST);
     };
     // A short grace, so a slip past the edge keeps the demo as it is.
     const leave = () => {
@@ -564,20 +575,19 @@ function useCardLive(enabled: boolean) {
       el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerleave", leave);
       document.removeEventListener("pointermove", watch);
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       if (liveCard === stop) liveCard = undefined;
     };
   }, [enabled, fns]);
   return {
-    on: enabled && on,
+    on: enabled && demo !== "off",
     ref,
     // The demo is ready and fades in.
-    ready: () => { state.current.shown = true; },
+    ready: fns.ready,
     // at: where the mouse is when the menu closes.
     hold: (held: boolean, at?: Point) => {
       state.current.held = held;
-      clearTimeout(wait.current);
+      fns.clear("rest", "grace");
       if (held) return fns.start();
       if (at) state.current.inside = fns.near(at);
       if (state.current.inside) document.addEventListener("pointermove", fns.watch);
@@ -762,7 +772,8 @@ export function Detail({
   onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
-  const [src, setSrc] = useState<{ state: "idle" | "loading" | "done" | "none"; files: SourceFile[]; from?: string }>({ state: "idle", files: [] });
+  // The component's source: not asked for yet, being read, read, or not readable.
+  const [src, setSrc] = useState<{ state: "idle" | "loading" | "none" } | { state: "done"; files: SourceFile[]; from?: string }>({ state: "idle" });
   const [tab, setTab] = useState(0);
   const [run, setRun] = useState(0);
   const [picked, setPicked] = useState<Picked>({});
@@ -774,10 +785,10 @@ export function Detail({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
-  useEffect(() => setSrc({ state: "idle", files: [] }), [item.id]);
+  useEffect(() => setSrc({ state: "idle" }), [item.id]);
 
   const loadSource = async () => {
-    setSrc({ state: "loading", files: [] });
+    setSrc({ state: "loading" });
     try {
       const r = await fetch(`/api/source?id=${encodeURIComponent(item.id)}`);
       if (!r.ok) throw 0;
@@ -785,7 +796,7 @@ export function Detail({
       setSrc({ state: "done", files: d.files ?? [], from: d.from });
       setTab(0);
     } catch {
-      setSrc({ state: "none", files: [] });
+      setSrc({ state: "none" });
     }
   };
 

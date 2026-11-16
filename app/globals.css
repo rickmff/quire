@@ -73,11 +73,11 @@ textarea:focus-visible { outline: none; }
 .slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
 
-/* First load of the app (lib/deal.ts): the chrome waits while the cards are
-   dealt, then settles in like the landing does. Cards stay hidden only until
-   the deal takes them over. */
-[data-intro="deal"] [data-chrome],
-[data-intro="deal"] [data-card]:not([data-dealt]) > * { opacity: 0; }
+/* First load of the app (lib/useIntro.ts, lib/deal.ts): the chrome waits
+   while the cards are dealt, then settles in like the landing does. Cards stay
+   hidden only until the deal takes them over. */
+:is([data-intro="wait"], [data-intro="deal"]) [data-chrome],
+:is([data-intro="wait"], [data-intro="deal"]) [data-card]:not([data-dealt]) > * { opacity: 0; }
 [data-intro="show"] [data-chrome] { animation: intro-rise 560ms cubic-bezier(.2,.8,.2,1) var(--d, 0ms) both; }
 @keyframes intro-rise { from { opacity: 0; transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) {
