@@ -1,7 +1,3 @@
-// Saves pages to quire. Two ways:
-//   save   one component page -> quire's /add page in a small popup
-//   import a whole component library -> quire's app, which reads every
-//          component on the site and sorts them by type
 const DEFAULT_ORIGIN = "https://quire.fyi";
 
 async function origin() {
@@ -40,7 +36,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "import") importSite(url);
 });
 
-// Save button injected into posts on x.com (see x.js).
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg?.type !== "quire:save" || !/^https:\/\/x\.com\//.test(msg.url)) return;
   openAdd({ url: msg.url, title: msg.title, image: msg.image }, false);

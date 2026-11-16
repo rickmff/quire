@@ -1,4 +1,3 @@
-# Chromium and its system libraries come with the Playwright image.
 FROM mcr.microsoft.com/playwright:v1.56.1-noble
 WORKDIR /app
 COPY package.json ./

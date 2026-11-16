@@ -1,9 +1,6 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 
-// Server-only helpers for fetching user-supplied URLs without reaching
-// private network addresses.
-
 function isPrivate(ip: string) {
   if (ip.includes(":")) {
     const v = ip.toLowerCase();
@@ -28,7 +25,6 @@ export async function safeUrl(raw: string): Promise<URL | null> {
   }
   if (u.protocol !== "http:" && u.protocol !== "https:") return null;
   if (u.hostname === "localhost") return null;
-  // Local sandboxes without DNS can opt out; never set this in production.
   if (process.env.QUIRE_SKIP_DNS_CHECK === "1") return u;
   try {
     const addrs = isIP(u.hostname)
@@ -43,7 +39,6 @@ export async function safeUrl(raw: string): Promise<URL | null> {
 
 const UA = "Mozilla/5.0 (compatible; QuireBot/0.1; +https://github.com/rickmff/quire)";
 
-// Fetch a public URL as text. Checks every redirect hop and caps the size.
 export async function fetchText(
   raw: string,
   opts: { accept?: string; max?: number; timeout?: number } = {},

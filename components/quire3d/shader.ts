@@ -1,7 +1,3 @@
-// The quire, ray traced: seven glass sheets, each one a captured component.
-// One fullscreen pass. Every sheet is a plane with a rounded-rect footprint,
-// so the intersection is analytic and the edges are antialiased from the SDF.
-
 export const SHEETS = 7;
 
 export const VERT = `#version 300 es
@@ -74,7 +70,6 @@ float strokeA(float d, float w, float e) { return fillA(abs(d) - w, e); }
 float ease(float x) { x = clamp(x, 0.0, 1.0); return x * x * (3.0 - 2.0 * x); }
 float spring(float x) { x = clamp(x, 0.0, 1.0); return 1.0 - exp(-7.0 * x) * cos(10.0 * x); }
 
-// A glyph is (tone, alpha): tone 0 is ink, tone 1 is white. Layers go on with "over".
 void over(inout vec2 g, float tone, float a) {
   float oa = a + g.y * (1.0 - a);
   g.x = oa > 1e-4 ? (tone * a + g.x * g.y * (1.0 - a)) / oa : 0.0;
@@ -107,7 +102,6 @@ vec2 gButton(vec2 p, float e, vec4 st, float t) {
   over(g, 1.0, fillA(b + 0.004, e) * band * 0.38);
   over(g, 1.0, fillA(sdRR(bp - vec2(0.05, 0.0), vec2(0.17, 0.02), 0.02) * s, e) * 0.96);
   over(g, 1.0, strokeA((length(bp - vec2(-0.2, 0.0)) - 0.036) * s, 0.011, e) * 0.96);
-  // The demo pointer. It leaves when a real one arrives.
   float go = st.w;
   if (go > 0.001) {
     vec2 cp = mix(vec2(0.78, -0.5), vec2(0.24, -0.05), go);
@@ -215,7 +209,6 @@ vec2 gToast(vec2 p, float e, vec4 st) {
   return g;
 }
 
-// The state of each component lives in JS, so a pointer can drive it.
 vec2 glyph(int i, vec2 p, float e, float t) {
   vec4 s = uG[i];
   if (i == 0) return gSwitch(p, e, s);
@@ -261,7 +254,6 @@ void main() {
     float side = clamp(bot - top, 0.0, 1.0);
     float cosT = abs(ld.y);
 
-    // Foil: a slow liquid pinwheel, shifted by the pointer and the viewing angle.
     vec2 wq = q + 0.16 * vec2(sin(q.y * 2.1 + uTime * 0.31 + fi * 1.3), cos(q.x * 1.7 - uTime * 0.27 + fi * 2.1));
     vec2 dv = wq - vec2(uPointer.x * 0.3, uPointer.y * 0.22);
     float h = atan(dv.y, dv.x) / TAU + fi * 0.061 + uTime * 0.04 + uPointer.x * 0.25 + (1.0 - cosT) * 0.5;
@@ -271,12 +263,10 @@ void main() {
     vec3 col = mix(mix(vec3(1.0), foil, 0.6), foil, uDark);
     float a = mix(mix(0.8, 0.44, uDark), mix(0.95, 0.9, uDark), pres);
 
-    // Soft key light that follows the pointer.
     vec2 hp = q - mix(vec2(uPointer.x * 0.6, -0.25 + uPointer.y * 0.45), vec2(uHover.x, -uHover.y), uHover.z * pres);
     float hl = exp(-dot(hp, hp) / mix(0.55, 0.34, uHover.z * pres)) * (1.0 + 0.2 * uHover.z * pres);
     col = mix(col, vec3(1.0), hl * mix(0.3, 0.16, uDark));
 
-    // Glass edge.
     float rim = exp(-pow(d / (w * 2.2), 2.0)) * top;
     col = mix(col, mix(col * 0.9, vec3(1.0), uDark), rim * mix(0.7, 0.5, uDark));
     col = mix(col, mix(foil * 0.82, foil * 1.12, uDark), side);
@@ -288,7 +278,6 @@ void main() {
       col = mix(col, vec3(1.0), 0.1 * pres * uDark);
       col = mix(col, mix(INK, vec3(1.0), g.x), g.y * pres);
       a = mix(a, 1.0, g.y * pres);
-      // Name and library on top, install command at the bottom.
       const float LW = 1.76, LH = LW / 16.0;
       float u = (gq.x + LW * 0.5) / LW;
       for (int r = 0; r < 2; r++) {
@@ -297,7 +286,7 @@ void main() {
         if (u > 0.0 && u < 1.0 && v > 0.0 && v < 1.0) {
           float rows = float(N * 2);
           vec2 tuv = vec2(u, (fi * 2.0 + float(r) + v) / rows);
-          vec2 sc = vec2(1.0 / LW, -1.0 / (LH * rows)) * 0.8; // a touch of negative LOD bias: crisper glyphs
+          vec2 sc = vec2(1.0 / LW, -1.0 / (LH * rows)) * 0.8;
           float ink = textureGrad(uLabels, tuv, vec2(qx.x, -qx.y) * sc, vec2(qy.x, -qy.y) * sc).r;
           col = mix(col, INK, ink * pres);
         }
@@ -305,7 +294,6 @@ void main() {
     }
 
     vec3 rgb = col * a;
-    // Mirror glint, and one sweep of light when a sheet is handed over.
     vec3 rr = reflect(ld, vec3(0.0, sign(-ld.y), 0.0));
     float spec = pow(max(dot(rr, uLight * uR[i]), 0.0), 18.0);
     float sweep = exp(-pow((q.x * 0.8 - q.y * 0.6 - uGlint) / 0.13, 2.0)) * pres;
@@ -315,7 +303,6 @@ void main() {
     C[i] = vec4(min(rgb, vec3(1.0)) * cov, a * cov) ;
   }
 
-  // Composite front to back, nearest hit first.
   vec4 acc = vec4(0.0);
   float last = -1e9;
   for (int k = 0; k < N; k++) {
@@ -328,7 +315,6 @@ void main() {
     acc += (1.0 - acc.a) * c;
   }
 
-  // Floor: a soft shadow by day, the light that falls through the stack by night.
   float tf = (uFloorY - ro.y) / rd.y;
   if (tf > 0.0 && acc.a < 0.985) {
     vec3 f = ro + tf * rd;

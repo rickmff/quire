@@ -1,8 +1,6 @@
 import { catalog } from "@/lib/catalog";
 import { readSource } from "@/lib/source";
 
-// Source code of one catalog component, for the gallery's detail view.
-
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# One-time setup on a fresh Ubuntu or Debian VPS. Run as root:
-#   curl -fsSL https://raw.githubusercontent.com/rickmff/quire/main/capture/install.sh | DOMAIN=capture.example.com bash
 set -euo pipefail
 DOMAIN="${DOMAIN:?Set DOMAIN, e.g. DOMAIN=capture.example.com}"
 DIR=/opt/quire
@@ -18,7 +16,6 @@ if [ ! -f .env ]; then
   sed -e "s|^DOMAIN=.*|DOMAIN=$DOMAIN|" -e "s|^PUBLIC_URL=.*|PUBLIC_URL=https://$DOMAIN|" -e "s|^CAPTURE_TOKEN=.*|CAPTURE_TOKEN=$TOKEN|" .env.example > .env
 fi
 
-# Docker publishes 80/443 itself; open them if ufw is on.
 if command -v ufw >/dev/null && ufw status | grep -q active; then ufw allow 80,443/tcp; fi
 
 docker compose --env-file .env up -d --build

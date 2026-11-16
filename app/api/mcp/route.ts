@@ -1,11 +1,6 @@
 import { handleRpc } from "@/lib/mcp";
 import { loadLibrary } from "@/lib/sync";
 
-// Hosted MCP endpoint (Streamable HTTP, JSON responses).
-//   claude mcp add --transport http quire https://quire.fyi/api/mcp
-// With a library key, the tools read that user's library:
-//   https://quire.fyi/api/mcp?key=<key>   or header  x-quire-key: <key>
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -43,7 +38,6 @@ export async function POST(req: Request) {
   return json(Array.isArray(body) ? out : out[0]);
 }
 
-// No server-initiated stream: tell clients to use POST only.
 export async function GET() {
   return new Response("Quire MCP: POST JSON-RPC here.", { status: 405, headers: { allow: "POST", ...CORS } });
 }

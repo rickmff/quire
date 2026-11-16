@@ -1,19 +1,3 @@
-// Quire capture service: opens a component page in real Chromium and records
-// a still and a short clip of the component moving. Runs on any VPS.
-//
-//   POST /capture  { "url": "https://...", "video": true, "width": 1280 }   Authorization: Bearer $CAPTURE_TOKEN
-//   ->  { "image": "https://capture.example.com/media/<id>.webp", "video": ".../<id>.webm" }
-//   GET  /media/<file>   serves the files (public, cacheable)
-//   GET  /health
-//
-// Env: CAPTURE_TOKEN (required), PUBLIC_URL (e.g. https://capture.example.com),
-//      PORT (8080), MEDIA_DIR (/data/media), CONCURRENCY (2)
-//
-// Storage: with the R2_* variables set, files go to a Cloudflare R2 bucket and
-// the returned URLs point at its public address (R2_PUBLIC_URL). The VPS then
-// only captures; the local disk is a cache. Without them, the VPS serves /media.
-//      R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL
-
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, rm, stat } from "node:fs/promises";
@@ -24,7 +8,6 @@ import { chromium } from "playwright";
 import sharp from "sharp";
 import { AwsClient } from "aws4fetch";
 
-// Read .env next to this file, so it runs the same with or without Docker.
 try {
   for (const line of (await readFile(new URL(".env", import.meta.url), "utf8")).split(/\r?\n/)) {
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
@@ -57,13 +40,11 @@ async function upload(file, name, type) {
 }
 await mkdir(MEDIA, { recursive: true });
 
-// Where a component's live demo usually sits on a docs page, best guess first.
 const PREVIEW_SELECTORS = [
   "[data-preview]",
   "[data-component-preview]",
   "[class*='ComponentPreview']",
   "[class*='component-preview']",
-  // shadcn-style docs: the bordered demo box.
   "[class*='min-h-[450px]'][class*='border']",
   "[class*='min-h-[350px]'][class*='border']",
   "[class*='preview' i]:not(nav *):not(header *)",
@@ -138,7 +119,6 @@ async function capture(url, withVideo, width = 1280) {
     if (target) await target.el.scrollIntoViewIfNeeded().catch(() => {});
     const box = target ? await target.el.boundingBox() : { x: 0, y: 0, width: 1280, height: 800 };
 
-    // Sweep the pointer over the preview so hover and cursor effects show.
     if (withVideo && box) {
       const steps = 24;
       for (let i = 0; i <= steps; i++) {
@@ -151,7 +131,6 @@ async function capture(url, withVideo, width = 1280) {
     }
 
     const png = target ? await target.el.screenshot({ timeout: 8000 }) : await page.screenshot();
-    // A flat image means the demo did not render (blocked, empty or still loading).
     const { channels } = await sharp(png).stats();
     if (channels.slice(0, 3).every((c) => c.stdev < 2)) throw new Error("blank page");
     await sharp(png).resize({ width, height, fit: "cover", position: "centre" }).webp({ quality: width < 1280 ? 72 : 78 }).toFile(image);

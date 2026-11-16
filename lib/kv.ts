@@ -1,15 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-// Small key-value store for synced libraries. Server only.
-//
-// Backends, first one configured wins:
-//   Cloudflare KV over its REST API   CF_ACCOUNT_ID, CF_KV_NAMESPACE_ID, CF_API_TOKEN
-//   Upstash Redis REST (or Vercel KV) UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
-//   Local files in .data/             development only
-//
-// The REST APIs work from any host, so no platform binding is needed.
-
 export type KV = {
   name: string;
   get(key: string): Promise<string | null>;

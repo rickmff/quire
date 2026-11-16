@@ -1,10 +1,6 @@
 import { fetchText } from "./net";
 import type { CatalogComponent } from "./catalog/schema";
 
-// Reads the real source code of a component, for agents.
-// 1. The live shadcn registry item on the site: JSON with every file inline.
-// 2. The files in the site's GitHub repo.
-
 export type SourceFile = { path: string; content: string; truncated?: boolean };
 export type SourceResult = { from: string; files: SourceFile[]; dependencies?: string[]; registryDependencies?: string[] };
 

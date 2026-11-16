@@ -5,7 +5,6 @@ import s from "./Landing.module.css";
 
 const SHEETS = 7;
 
-/** A stack of holographic sheets that follows the pointer and fans open as it comes near. */
 export default function Quire() {
   const ref = useRef<HTMLDivElement>(null);
 

@@ -1,10 +1,3 @@
-// Downloads the external assets the Quire stage demos load, for hosts the capture machine
-// cannot reach. Run it on a machine with open network access:
-//
-//   node fetch-assets.mjs urls.txt <outDir>
-//
-// Writes one file per URL plus manifest.json ({ url: { file, type } }). JSON responses
-// (the react-tweet API) are scanned for twimg URLs, which are fetched too.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
@@ -35,7 +28,6 @@ while (queue.length) {
     if (type === "application/json") {
       for (const m of buf.toString("utf8").matchAll(/https:\/\/(?:pbs|abs|video)\.twimg\.com\/[^"\s\\]+/g)) {
         queue.push(m[0]);
-        // react-tweet asks for media in named sizes.
         if (m[0].includes("/media/")) {
           const u = new URL(m[0]), ext = u.pathname.split(".").pop();
           for (const size of ["small", "medium", "large", "360x360", "900x900"]) queue.push(`${u.origin}${u.pathname.replace(/\.\w+$/, "")}?format=${ext}&name=${size}`);

@@ -2,10 +2,8 @@
 
 import { useId } from "react";
 
-// The star used to save components (gallery cards) and on the GitHub "Star" link.
 const STAR = "M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z";
 
-// Filled: a gold star with a soft glow and a glint that sweeps across it.
 export default function StarIcon({ filled, className = "size-4" }: { filled: boolean; className?: string }) {
   const id = useId().replace(/:/g, "");
   if (!filled)

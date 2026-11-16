@@ -1,4 +1,3 @@
-// The GitHub mark, shared by the app's top bar and the landing.
 export default function GitHubMark({ size = 15, className }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" className={className}>

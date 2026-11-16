@@ -1,9 +1,5 @@
 "use client";
 
-// shadcn/ui Tooltip (Radix), restyled with Quire's tokens: a small inverted
-// label that opens after a short delay on hover or keyboard focus, never on
-// touch. `Tip` is the shorthand used across the app.
-
 import * as React from "react";
 import { Tooltip as TooltipPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
@@ -49,8 +45,6 @@ function TooltipContent({
   );
 }
 
-// Wraps one element (a button, a link) in a tooltip. With no label it renders
-// the element alone. `shortcut` shows a key hint after the label.
 function Tip({
   label,
   shortcut,

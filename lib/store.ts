@@ -16,15 +16,10 @@ export type Bookmark = {
   install?: string;
   tags: string[];
   note?: string;
-  // Component type from lib/types.ts. Older cards have none and are
-  // classified on the fly from their title and description.
   type?: string;
-  // The site's own category, e.g. "Inputs" on rareui.com.
   category?: string;
-  // Pointer to the source in a shadcn registry, e.g. owner/repo/otp-input.
   registry?: string;
   dependencies?: string[];
-  // Catalog id when the card was saved from the curated library.
   ref?: string;
   collectionId: string | null;
   createdAt: number;
@@ -36,15 +31,9 @@ export type Library = {
   version: 1;
   bookmarks: Bookmark[];
   collections: Collection[];
-  // How the user started: with the curated catalog or from scratch.
-  // Unset until they choose.
   mode?: "curated" | "scratch";
-  // Catalog libraries the user follows (ids from lib/catalog).
   sources?: string[];
-  // The user's order of the libraries in the sidebar (site keys).
-  // Libraries missing from it follow, by name.
   siteOrder?: string[];
-  // Secret key of the synced copy that the MCP reads.
   syncKey?: string;
   syncedAt?: number;
 };
@@ -116,7 +105,6 @@ export function useLibrary() {
     });
   }, []);
 
-  // Push the library to the server when it has a key, so agents see changes.
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!ready || !lib.syncKey) return;
@@ -125,8 +113,6 @@ export function useLibrary() {
       pushLibrary(lib).then((ok) => ok && writeLibrary({ ...readLibrary(), syncedAt: Date.now() }));
     }, 1200);
     return () => window.clearTimeout(timer.current);
-    // syncedAt changes must not trigger another push
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, lib.syncKey, lib.bookmarks, lib.sources, lib.mode]);
 
   return { lib, ready, update };
@@ -134,7 +120,6 @@ export function useLibrary() {
 
 export const typeOf = (b: Bookmark) => b.type ?? classify({ title: b.title, description: b.description });
 
-// A view is "all", null (Inbox), "type:<id>" or a collection id.
 export function selectView(lib: Library, view: string | null) {
   if (view === "all") return { name: "All bookmarks", items: lib.bookmarks };
   if (view === null) return { name: "Inbox", items: lib.bookmarks.filter((b) => b.collectionId === null) };
@@ -196,7 +181,6 @@ export function exportJSON(lib: Library, view: string | null) {
   );
 }
 
-// A saved card as a component record: the shape the MCP and the gallery read.
 export function toComponent(b: Bookmark): CatalogComponent {
   const text = { title: b.title, description: b.description, category: b.category };
   return {

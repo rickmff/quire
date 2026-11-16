@@ -1,9 +1,3 @@
-// Quire stage installer: resolves a library's demo registry items (and everything they
-// depend on) from the libraries' GitHub repos, writes the files into a Vite app, and
-// generates src/demos.tsx mapping each catalog component to its demo, and lists the
-// variants of each demo (other examples, docs controls) in demos.json for the gallery.
-//
-//   node install.mjs <library> <appDir>
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -14,12 +8,10 @@ const REG = {
   "animate-ui": { repo: "imskyleen/animate-ui", dir: "apps/v1/apps/www/public/r" },
   shadcn: { repo: "shadcn-ui/ui", dir: "apps/v4/public/r/styles/new-york-v4" },
 };
-// Optional local checkouts of the registries (REG_LOCAL_<LIB>=path/to/public/r), read before GitHub.
 const LOCAL = {
   magicui: process.env.REG_LOCAL_MAGICUI,
   "animate-ui": process.env.REG_LOCAL_ANIMATE_UI,
 };
-// The docs app of each library: demos import helpers from it and load images from its public/.
 const DOCS = {
   magicui: ["magicuidesign/magicui/HEAD/apps/www"],
   "animate-ui": ["imskyleen/animate-ui/HEAD/apps/v1/apps/www", "imskyleen/animate-ui/HEAD/apps/v1/packages/ui/src"],
@@ -41,7 +33,6 @@ async function load(reg, name) {
   return JSON.parse(text);
 }
 
-// shadcn new-york-v4 ui source straight from the repo (the published JSON there is the older style).
 async function shadcnUi(name) {
   const cache = join(SCRATCH, "shadcn-src", name + ".tsx");
   let text, kind = "ui";
@@ -60,7 +51,6 @@ async function shadcnUi(name) {
   return { name, dependencies: npm, registryDependencies: regDeps, files: [kind === "hook" || /^use-/.test(name) ? { path: `hooks/${name}.ts`, type: "registry:hook", content: text } : { path: `ui/${name}.tsx`, type: "registry:ui", content: text }] };
 }
 
-// Turn a registryDependencies entry into [registry, name].
 function ref(dep, from) {
   if (/^https?:/.test(dep)) {
     const u = new URL(dep);
@@ -77,18 +67,15 @@ function ref(dep, from) {
 }
 
 function dest(reg, f) {
-  if (reg === "magicui" && f.path.startsWith("registry/")) return f.path; // imported as @/registry/...
+  if (reg === "magicui" && f.path.startsWith("registry/")) return f.path;
   if (f.target) return f.target.replace(/^~\//, "");
   const base = f.path.split("/").pop();
-  if (reg === "magicui") return f.path; // registry/magicui/x.tsx, registry/example/x.tsx: imported as @/registry/...
+  if (reg === "magicui") return f.path;
   if (f.type === "registry:lib") return `lib/${base}`;
   if (f.type === "registry:hook") return `hooks/${base}`;
   return `components/ui/${base}`;
 }
 
-// Variants the gallery's gear menu offers (live.variants in the catalog).
-// Animate UI: the docs controls of a demo (meta.demoProps) that offer a choice, a list of
-// options or on/off. The stage page takes the picked values as props (p=<json>).
 const NAMES = { btt: "Bottom to top", ttb: "Top to bottom", ltr: "Left to right", rtl: "Right to left", xs: "Extra small", sm: "Small", md: "Medium", lg: "Large", "icon-sm": "Icon small", "icon-lg": "Icon large", svg: "SVG", cta: "CTA", "3d": "3D" };
 const words = (k) => NAMES[String(k).toLowerCase()] ?? String(k).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/-/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
 function variantsOf(item) {
@@ -100,8 +87,6 @@ function variantsOf(item) {
     }
   return groups.length ? { variants: groups } : {};
 }
-// "confetti-fireworks" -> "Fireworks", "dock-demo-2" -> "Demo 2", "x-demo" -> "Default",
-// "glare-hover-demo-cta" -> "CTA".
 function exampleLabel(name, example) {
   let s = example.slice(name.length).replace(/^-/, "");
   if (!s || s === "demo") return "Default";
@@ -140,7 +125,6 @@ export async function install(lib, app, names) {
       if (!f.content) continue;
       const p = join(app, "src", dest(reg, f));
       mkdirSync(dirname(p), { recursive: true });
-      // Keep the first writer: shared files (utils) must not be clobbered by a later copy.
       if (!existsSync(p) || reg !== "shadcn") writeFileSync(p, f.content);
     }
     if (item.cssVars) for (const s of ["theme", "light", "dark"]) Object.assign(css[s], item.cssVars[s] ?? {});
@@ -149,11 +133,9 @@ export async function install(lib, app, names) {
     return item;
   }
 
-  // Demos whose name does not follow the library's pattern.
   const ALIAS = { "magicui/bento-grid": "bento-demo", "magicui/backlight": "backlight-svg-demo", "magicui/client-tweet-card": "tweet-card-demo" };
   const demos = [];
   for (const name of names) {
-    // Demos written for Quire where the library has none.
     const custom = join(dirname(new URL(import.meta.url).pathname), "custom", lib, `${name}.tsx`);
     if (existsSync(custom)) {
       mkdirSync(join(app, "src/custom"), { recursive: true });
@@ -171,20 +153,16 @@ export async function install(lib, app, names) {
     if (!found) { demos.push({ name, demo: null }); continue; }
     const item = await add(lib, found);
     const main = item.files.find((f) => f.content && /\.(t|j)sx$/.test(f.path)) ?? item.files[0];
-    // Animate UI demos take their docs controls as props: use the defaults.
     const props = {};
     for (const group of Object.values(item.meta?.demoProps ?? {})) for (const [k, v] of Object.entries(group)) props[k] = v?.value;
     demos.push({ name, demo: found, file: dest(lib, main), props, ...variantsOf(item) });
   }
 
-  // Magic UI: the other examples of a component in the registry (confetti-fireworks,
-  // dock-demo-2), so the gallery's gear menu can switch the live demo to them (v=<example>).
   if (lib === "magicui") {
     const index = await (await fetch(`${RAW}/${REG.magicui.repo}/HEAD/${REG.magicui.dir}/registry.json`)).json();
     const examples = index.items.filter((i) => i.type === "registry:example").map((i) => i.name);
     for (const d of demos) {
       if (!d.demo || d.file.startsWith("custom/")) continue;
-      // An example belongs to the longest component name it starts with.
       const mine = examples.filter((e) => (e === d.name || e.startsWith(d.name + "-")) && !names.some((m) => m.length > d.name.length && (e === m || e.startsWith(m + "-"))));
       if (mine.length < 2 || !mine.includes(d.demo)) continue;
       const options = [{ value: "", label: exampleLabel(d.name, d.demo) }];
@@ -201,7 +179,6 @@ export async function install(lib, app, names) {
     }
   }
 
-  // Close over imports the registry metadata forgot: shadcn ui/hooks and npm packages.
   const { readdirSync, statSync } = await import("node:fs");
   const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
   for (let round = 0; round < 4; round++) {
@@ -212,7 +189,6 @@ export async function install(lib, app, names) {
         const base = join(app, "src", m[1], m[2]);
         if (![".tsx", ".ts", ".jsx", ".js"].some((e) => existsSync(base + e))) { await add("shadcn", m[2], lib); added++; }
       }
-      // Any other @/ import: a file of the library's own docs app (icons, helpers).
       for (const m of text.matchAll(/from\s+["']@\/([\w./-]+)["']/g)) {
         const rel = m[1];
         const base = join(app, "src", rel);
@@ -231,18 +207,14 @@ export async function install(lib, app, names) {
     if (!added) break;
   }
 
-  // demos.tsx: one dynamic import per component; the stage page takes the default or first
-  // function export.
   let src = `export const demos: Record<string, () => Promise<any>> = {\n`;
   const entry = (key, file) => `  ${JSON.stringify(key)}: () => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}),\n`;
   for (const d of demos) if (d.demo) src += entry(d.name, d.file);
-  // Other examples, as <name>~<example> (the stage page takes v=<example>).
   for (const d of demos) for (const [e, file] of Object.entries(d.examples ?? {})) src += entry(`${d.name}~${e}`, file);
   src += "};\n";
   src += `export const props: Record<string, any> = ${JSON.stringify(Object.fromEntries(demos.filter((d) => d.demo && Object.keys(d.props).length).map((d) => [d.name, d.props])), null, 1)};\n`;
   writeFileSync(join(app, "src/demos.tsx"), src);
 
-  // Site-relative assets the demos use (src="/mug.webp") come from the docs app's public/.
   const assets = new Set();
   const scan = (dir) => { for (const e of readdirSync(dir, { withFileTypes: true })) { const f = join(dir, e.name); if (e.isDirectory()) scan(f); else if (/\.(t|j)sx?$/.test(e.name)) for (const m of readFileSync(f, "utf8").matchAll(/["'`](\/[\w./-]+\.(?:png|jpe?g|webp|gif|svg|avif|mp4|webm))["'`]/g)) assets.add(m[1]); } };
   scan(join(app, "src"));

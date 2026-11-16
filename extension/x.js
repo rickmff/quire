@@ -1,11 +1,8 @@
-// Adds a "Save to quire" button to the action bar of every post on x.com.
-// The button sits next to X's own bookmark button and copies its look.
 (() => {
   const ATTR = "data-quire";
   const ACCENT = "rgb(29, 155, 240)";
   const SAVED_KEY = "x-saved";
 
-  // The quire mark: the "q" with the ribbon tail.
   const ICON =
     '<svg viewBox="-100 -100 900 900" aria-hidden="true" style="width:1.25em;height:1.25em;fill:currentColor;display:block">' +
     '<path d="M626 12L626 700L540 632.5L454 700L454 475Q445 492 432 506Q407 533 373.5 547.5Q340 562 301 562Q228 562 177.5 525.5Q127 489 100.5 425Q74 361 74 281Q74 200 100 136.5Q126 73 176 36.5Q226 0 299 0Q360 0 405 31Q438 54 457 91L459 12L626 12ZM353 435Q386 435 408 417.5Q430 400 442 366Q454 332 454 281Q454 230 442 196Q430 162 407.5 144.5Q385 127 353 127Q306 127 278.5 168.5Q251 210 251 281Q251 352 278.5 393.5Q306 435 353 435Z"/></svg>';
@@ -63,7 +60,6 @@
     const data = postData(article);
     if (!data) return;
 
-    // Sit just before X's own bookmark button and borrow its resting color.
     const anchor = bar.querySelector('[data-testid="bookmark"], [data-testid="removeBookmark"]');
     const slot = anchor?.parentElement;
 

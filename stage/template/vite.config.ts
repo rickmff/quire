@@ -5,8 +5,6 @@ import { fileURLToPath } from "node:url";
 import { existsSync, readdirSync } from "node:fs";
 import type { Plugin } from "vite";
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-// Demos load files from the docs site's root (src="/mug.webp"). Those files are in public/.
-// When the stage is built under a base path (/stage/<library>/), point them at it.
 function publicBase(): Plugin {
   let base = "/";
   const files = existsSync(r("./public")) ? readdirSync(r("./public")) : [];

@@ -1,5 +1,3 @@
-// The library ships no demo for Slot (a utility that merges motion props into its child).
-// This one passes hover and tap animations into a plain button.
 import { Slot } from "@/components/animate-ui/primitives/animate/slot";
 
 export default function SlotDemo() {

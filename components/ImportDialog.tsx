@@ -25,7 +25,6 @@ export default function ImportDialog({
   onImport: (choice: ImportChoice) => void;
 }) {
   const [url, setUrl] = useState(initialUrl);
-  // empty: nothing looked up yet. found: the site's components, listed below.
   const [status, setStatus] = useState<
     { kind: "empty" } | { kind: "loading" } | { kind: "error"; message: string } | { kind: "found"; result: ImportResult }
   >({ kind: "empty" });
@@ -54,10 +53,8 @@ export default function ImportDialog({
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Group rows by type, in taxonomy order.
   const groups = useMemo(() => {
     const order = [...TYPES, OTHER].map((t) => t.id);
     const m = new Map<string, number[]>();

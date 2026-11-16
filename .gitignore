@@ -5,7 +5,6 @@ node_modules
 next-env.d.ts
 .env*
 .cache/
-AGENTS.md
 .data/
 capture/media/
 capture/.env

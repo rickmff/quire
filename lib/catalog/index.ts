@@ -8,7 +8,6 @@ export const libraries: CatalogLibrary[] = catalog.libraries;
 const libraryById = new Map(libraries.map((l) => [l.id, l]));
 export const libraryName = (c: CatalogComponent) => c.site ?? libraryById.get(c.library)?.name ?? c.library;
 
-// The set of components a reader sees: the curated catalog, or a user's library.
 export function scope(user: SyncedLibrary | null): CatalogComponent[] {
   if (!user) return catalog.components;
   const follow = new Set(user.sources);
@@ -70,7 +69,6 @@ export function score(c: CatalogComponent, ts: string[]) {
     if (h.meta.includes(t)) s += 2;
     if (h.body.includes(t)) s += 1;
   }
-  // Prefer items with a description and a source the agent can read.
   if (s && c.description) s += 0.5;
   if (s && (c.item || c.files)) s += 0.3;
   return s;
@@ -90,7 +88,6 @@ export function search(items: CatalogComponent[], q: Query) {
   return { total: hits.length, items: hits.slice(0, Math.min(q.limit ?? 12, 50)).map((x) => x.c) };
 }
 
-// Types and triggers named in a free-text brief.
 export function readBrief(brief: string) {
   const text = brief.replace(/[-_/]+/g, " ");
   const types = TYPES.filter((t) => t.re.test(text)).map((t) => t.id);
