@@ -3,9 +3,28 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
+const DESCRIPTION = "Keep every component you find. Hand them to your agent.";
+// public/og.png is a static asset, served by the Workers assets binding.
+const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "quire: Keep every component you find. Hand them to your agent." };
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://quire.fyi"),
   title: "quire",
-  description: "Bookmark UI components from every library. Organize them. Hand them to your AI agent.",
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "quire",
+    title: "quire",
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "quire",
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 // Runs from the server-rendered HTML, before any script bundle. A service worker
