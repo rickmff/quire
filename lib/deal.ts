@@ -10,9 +10,81 @@ const FIRST = 260; // first card leaves the pile
 const STAGGER = 45;
 const FLIGHT = 560;
 
-// Pastel foil, after the cosine palette of the hero shader.
-const FOIL =
-  "linear-gradient(115deg, #ffe3ec 0%, #e4dcff 22%, #d7ecff 42%, #dcfff0 60%, #fff6d6 78%, #ffe3ec 100%)";
+// The hero's foil (components/quire3d/shader.ts): a pinwheel of the cosine
+// palette foilAt(h) = 0.8 + 0.2 cos(2pi (h - [0, 1/3, 2/3])), with the hue
+// turning around the middle of the sheet, washed out at the centre, a soft key
+// light from above, a glass rim and one sweep of light. Levels are matched to
+// the rendered hero: near-white sheets with a faint tint by day, smoky glass
+// with a faint tint by night.
+const TAU = Math.PI * 2;
+const LEVEL = { light: { base: 0.972, tint: 0.2 }, dark: { base: 0.15, tint: 0.24 } };
+function foilStops(dark: boolean, steps = 24): string {
+  const { base, tint } = dark ? LEVEL.dark : LEVEL.light;
+  const out: string[] = [];
+  for (let k = 0; k <= steps; k++) {
+    const h = k / steps;
+    const rgb = [0, 1 / 3, 2 / 3].map((o) => {
+      const f = 0.8 + 0.2 * Math.cos(TAU * (h - o));
+      return Math.round(Math.min(base + (f - 0.8) * tint, 1) * 255);
+    });
+    out.push(`rgb(${rgb.join(" ")}) ${(h * 100).toFixed(1)}%`);
+  }
+  return out.join(", ");
+}
+// Near the pinwheel's centre the shader fades the foil to a flat grey.
+function centre(dark: boolean): string {
+  const v = Math.round((dark ? LEVEL.dark.base + 0.02 : 0.985) * 255);
+  return `rgb(${v} ${v} ${v})`;
+}
+
+function foilSheet(dark: boolean, i: number): { el: HTMLElement; wheel: HTMLElement; sweep: HTMLElement } {
+  const el = document.createElement("div");
+  el.setAttribute("aria-hidden", "true");
+  Object.assign(el.style, {
+    position: "absolute",
+    inset: "0",
+    zIndex: "20",
+    overflow: "hidden",
+    borderRadius: "8px",
+    pointerEvents: "none",
+    // Glass rim: a touch darker by day, a lit edge by night.
+    boxShadow: dark
+      ? "inset 0 0 0 1px rgb(255 255 255 / .1), 0 10px 28px -14px rgb(0 0 0 / .6)"
+      : "inset 0 0 0 1px rgb(150 140 220 / .18), 0 10px 28px -16px rgb(0 0 0 / .14)",
+  });
+  // The pinwheel turns, as the hue shifts with time and viewing angle.
+  const wheel = document.createElement("div");
+  Object.assign(wheel.style, {
+    position: "absolute",
+    left: "-60%",
+    top: "-110%",
+    width: "220%",
+    height: "320%",
+    // Each sheet starts a little further round the wheel, like fi * 0.061.
+    background: `conic-gradient(from ${Math.round(i * 0.061 * 360)}deg, ${foilStops(dark)})`,
+  });
+  const wash = document.createElement("div");
+  Object.assign(wash.style, {
+    position: "absolute",
+    inset: "0",
+    background: [
+      // Key light from above the middle of the sheet.
+      `radial-gradient(ellipse 75% 85% at 50% 38%, rgb(255 255 255 / ${dark ? 0.06 : 0.35}), transparent 70%)`,
+      // Foil washed out at the centre of the pinwheel.
+      `radial-gradient(ellipse 45% 60% at 50% 50%, ${centre(dark)}, transparent)`,
+    ].join(", "),
+  });
+  // The sweep of light the hero plays when a sheet is handed over.
+  const sweep = document.createElement("div");
+  Object.assign(sweep.style, {
+    position: "absolute",
+    inset: "-20% -60%",
+    background: `linear-gradient(115deg, transparent 38%, rgb(255 255 255 / ${dark ? 0.12 : 0.5}) 50%, transparent 62%)`,
+    transform: "translateX(-60%)",
+  });
+  el.append(wheel, wash, sweep);
+  return { el, wheel, sweep };
+}
 
 // Deals every card visible in `root` and returns the time, in ms, when the
 // last card is about to land (0 when there is nothing to deal).
@@ -57,31 +129,24 @@ export function deal(root: HTMLElement): number {
       { duration: total, easing: "linear", fill: "both" },
     );
 
-    // The foil sheen covers the card while it travels and clears as it lands.
-    const foil = document.createElement("div");
-    foil.setAttribute("aria-hidden", "true");
-    Object.assign(foil.style, {
-      position: "absolute",
-      inset: "0",
-      zIndex: "20",
-      borderRadius: "8px",
-      pointerEvents: "none",
-      background: FOIL,
-      backgroundSize: "260% 260%",
-      boxShadow: "inset 0 0 0 1px rgb(255 255 255 / .7), 0 8px 24px -12px rgb(0 0 0 / .25)",
-      opacity: dark ? ".9" : "1",
-    });
+    // The foil covers the card while it travels and clears as it lands.
+    const { el: foil, wheel, sweep } = foilSheet(dark, i);
     face.appendChild(foil);
     // It starts to clear late in the flight, so the card face shows as it lands.
     const end = total + 160;
-    const sheen = foil.animate(
-      [
-        { backgroundPosition: "0% 50%", opacity: 1 },
-        { offset: (start + FLIGHT * 0.65) / end, backgroundPosition: "80% 50%", opacity: 1 },
-        { backgroundPosition: "100% 50%", opacity: 0 },
-      ],
-      { duration: end, easing: "linear", fill: "both" },
-    );
+    const clear = (start + FLIGHT * 0.65) / end;
+    const sheen = foil.animate([{ opacity: 1 }, { offset: clear, opacity: 1 }, { opacity: 0 }], {
+      duration: end,
+      easing: "linear",
+      fill: "both",
+    });
+    wheel.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(70deg)" }], { duration: end, easing: "ease-in-out", fill: "both" });
+    sweep.animate([{ transform: "translateX(-60%)" }, { transform: "translateX(60%)" }], {
+      duration: FLIGHT * 0.8,
+      delay: start,
+      easing: EASE,
+      fill: "both",
+    });
     sheen.finished.then(() => foil.remove(), () => foil.remove());
 
     // Title and tags settle in once the card is down.
