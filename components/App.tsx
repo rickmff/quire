@@ -989,7 +989,9 @@ function Sidebar(props: {
                       />
                     )}
                     <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
-                    {activeSite === x.key && <SiteGroups items={x.items} openItem={openItem} openId={openId} />}
+                    <Collapse open={activeSite === x.key} className="hidden md:grid">
+                      <SiteGroups items={x.items} openItem={openItem} openId={openId} />
+                    </Collapse>
                   </div>
                 );
               })}
@@ -1144,6 +1146,21 @@ function groupItems(items: GalleryItem[]) {
   return groups.sort((a, b) => Number(a.key === OTHER.family) - Number(b.key === OTHER.family) || b.items.length - a.items.length || a.name.localeCompare(b.name));
 }
 
+// Opens and closes its rows with a quick height and fade. Closed rows stay
+// mounted so they can animate out, and inert so they take no focus.
+function Collapse({ open, className = "grid", children }: { open: boolean; className?: string; children: React.ReactNode }) {
+  return (
+    <div
+      inert={!open}
+      className={`${className} transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${
+        open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      }`}
+    >
+      <div className="flex min-h-0 flex-col overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
 function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openItem: (item: GalleryItem) => void; openId?: string }) {
   const groups = useMemo(() => groupItems(items), [items]);
   // One group open at a time, like an accordion.
@@ -1156,7 +1173,7 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
   const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
 
   return (
-    <div className="hidden md:contents">
+    <div className="contents">
       {groups.map((g) => {
         const expanded = open === g.key;
         return (
@@ -1170,7 +1187,7 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
               <span className="flex w-[26px] shrink-0 items-center">
                 <svg
                   viewBox="0 0 8 8"
-                  className={`size-2 transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
+                  className={`size-2 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-90" : ""}`}
                   aria-hidden
                 >
                   <path d="M2.5 1.5 5.5 4l-3 2.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -1179,8 +1196,8 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
               <span className="min-w-0 flex-1 truncate">{g.name}</span>
               <span className="text-[11px] tabular-nums">{g.items.length}</span>
             </button>
-            {expanded &&
-              g.items.map((i) => (
+            <Collapse open={expanded}>
+              {g.items.map((i) => (
                 <button
                   key={i.id}
                   data-row
@@ -1196,6 +1213,7 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
                   </span>
                 </button>
               ))}
+            </Collapse>
           </div>
         );
       })}
