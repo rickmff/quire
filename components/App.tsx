@@ -968,9 +968,13 @@ function Sidebar(props: {
             />
           ) : (
             <button
+              data-row
               onClick={() => setNewCol("")}
-              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:pl-[34px]"
+              className="group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:rounded-none md:px-0"
             >
+              <span className="hidden w-[26px] shrink-0 md:block">
+                <span data-tick className="block h-px bg-faint group-hover:bg-muted" />
+              </span>
               New collection
             </button>
           )}
@@ -1252,7 +1256,7 @@ function SiteGroups({
                 active === g.key ? "text-accent" : "text-muted hover:text-fg"
               }`}
             >
-              <span className="flex w-[26px] shrink-0 items-center">
+              <span className="flex w-[26px] shrink-0 items-center pl-[13px]">
                 <svg
                   viewBox="0 0 8 8"
                   className={`size-2 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-90" : ""}`}

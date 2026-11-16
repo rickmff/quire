@@ -108,11 +108,14 @@ textarea:focus-visible { outline: none; }
     mask-image: linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent);
     padding-block: 10px;
   }
+  /* Each tick sits centered in the 34px gutter before its label, so the
+     space before and after it match as it grows. */
   [data-tick] {
     width: calc(10px + var(--grow, 0) * 10px);
-    transition: width 160ms ease-out, background-color 160ms ease-out;
+    margin-left: calc(12px - var(--grow, 0) * 5px);
+    transition: width 160ms ease-out, margin-left 160ms ease-out, background-color 160ms ease-out;
   }
-  [aria-current="page"] [data-tick] { width: 26px; background: var(--accent); }
+  [aria-current="page"] [data-tick] { width: 26px; margin-left: 4px; background: var(--accent); }
   [aria-current="page"] [data-label] { transform: translateX(14px); color: var(--accent); }
   [data-label] { transition: transform 200ms cubic-bezier(.2,.8,.2,1), color 160ms ease-out; }
 }
