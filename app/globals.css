@@ -257,3 +257,9 @@ textarea:focus-visible { outline: none; }
 @keyframes select-pop { from { opacity: 0; transform: translateY(-3px) scale(.98) } }
 .select-pop[data-state="open"] { animation: select-pop 140ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .select-pop { animation: none !important; } }
+
+/* Tooltips (components/ui/tooltip.tsx) fade in with a 2px drift from the trigger. */
+@keyframes tip-pop { from { opacity: 0; transform: translateY(var(--tip-y, 2px)) scale(.97) } }
+.tip-pop[data-state="delayed-open"], .tip-pop[data-state="instant-open"] { animation: tip-pop 120ms cubic-bezier(.2,.8,.2,1); }
+.tip-pop[data-side="bottom"] { --tip-y: -2px; }
+@media (prefers-reduced-motion: reduce) { .tip-pop { animation: none !important; } }
