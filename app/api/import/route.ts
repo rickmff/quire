@@ -1,5 +1,6 @@
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { fetchJSON, fetchText, safeUrl } from "@/lib/net";
+import { rateLimited } from "@/lib/rateLimit";
 import { classify } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -182,6 +183,8 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
 }
 
 export async function GET(req: Request) {
+  const limited = rateLimited(req, "fetch");
+  if (limited) return limited;
   const raw = new URL(req.url).searchParams.get("url") ?? "";
   const page = await safeUrl(raw);
   if (!page) return Response.json({ error: "Not a public link" }, { status: 400 });
