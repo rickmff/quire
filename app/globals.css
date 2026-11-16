@@ -123,7 +123,7 @@ textarea:focus-visible { outline: none; }
     --btn-drop: 0 0 #0000;
     position: relative;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    height: 32px; padding: 0 12px; border-radius: 8px;
+    height: 30px; padding: 0 12px; border-radius: 8px;
     font-weight: 500; white-space: nowrap; cursor: pointer; user-select: none;
     color: var(--btn-fg);
     background: var(--btn-bg);
@@ -140,8 +140,8 @@ textarea:focus-visible { outline: none; }
     cursor: default; transform: none; opacity: 0.45;
     background: var(--btn-bg); color: var(--btn-fg);
   }
-  .btn-sm { height: 28px; padding: 0 10px; border-radius: 7px; }
-  .btn-lg { height: 36px; padding: 0 16px; border-radius: 10px; }
+  .btn-sm { height: 26px; padding: 0 10px; border-radius: 7px; }
+  .btn-lg { height: 32px; padding: 0 15px; border-radius: 9px; }
 
   /* Primary: ink in light, paper in dark. */
   .btn-primary {
@@ -172,13 +172,13 @@ textarea:focus-visible { outline: none; }
 
   @media (prefers-color-scheme: dark) {
     .btn-primary {
-      --btn-bg: linear-gradient(180deg, #ffffff, #dedede);
-      --btn-bg-hover: linear-gradient(180deg, #ffffff, #ececec);
-      --btn-edge: rgb(255 255 255 / 0.28);
-      --btn-lip: rgb(255 255 255 / 0.9);
-      --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 14px -4px rgb(255 255 255 / 0.16);
+      --btn-bg: linear-gradient(180deg, #f4f4f4, #e6e6e6);
+      --btn-bg-hover: linear-gradient(180deg, #ffffff, #ededed);
+      --btn-edge: rgb(255 255 255 / 0.06);
+      --btn-lip: rgb(255 255 255 / 0.7);
+      --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.6);
     }
-    .btn-primary:active { --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.12), 0 0 1px rgb(0 0 0 / 0.5); }
+    .btn-primary:active { --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.08), 0 0 1px rgb(0 0 0 / 0.6); --btn-bg: #e2e2e2; --btn-bg-hover: #e2e2e2; }
     .btn-secondary {
       --btn-bg: linear-gradient(180deg, rgb(255 255 255 / 0.065), rgb(255 255 255 / 0.03));
       --btn-bg-hover: linear-gradient(180deg, rgb(255 255 255 / 0.095), rgb(255 255 255 / 0.05));
@@ -189,11 +189,8 @@ textarea:focus-visible { outline: none; }
     .btn-secondary:active { --btn-bg: rgb(255 255 255 / 0.03); --btn-bg-hover: rgb(255 255 255 / 0.03); }
   }
 
-  /* A small arrow that leans forward on hover. */
-  .btn-arrow { width: 12px; height: 12px; margin-right: -2px; transition: transform 160ms cubic-bezier(.2,.8,.2,1); }
-  .btn:hover .btn-arrow { transform: translateX(2px); }
   @media (prefers-reduced-motion: reduce) {
-    .btn, .btn-arrow { transition: none; }
+    .btn { transition: none; }
     .btn:active { transform: none; }
   }
 }
