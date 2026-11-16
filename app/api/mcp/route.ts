@@ -1,14 +1,17 @@
 import { handleRpc } from "@/lib/mcp";
 import { loadLibrary } from "@/lib/sync";
+import { rateLimited } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY = 256 * 1024;
+const MAX_BATCH = 20;
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, OPTIONS",
-  "access-control-allow-headers": "content-type, accept, mcp-session-id, mcp-protocol-version, x-quire-key, authorization",
+  "access-control-allow-headers":
+    "content-type, accept, mcp-session-id, mcp-protocol-version, x-quire-key, authorization",
 };
 
 const json = (body: unknown, status = 200) =>
@@ -21,8 +24,11 @@ function keyFrom(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimited(req, "mcp", CORS);
+  if (limited) return limited;
   const raw = await req.text();
-  if (raw.length > MAX_BODY) return json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Body too large" } }, 413);
+  if (raw.length > MAX_BODY)
+    return json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Body too large" } }, 413);
   let body: any;
   try {
     body = JSON.parse(raw);
@@ -33,6 +39,11 @@ export async function POST(req: Request) {
   const user = key ? await loadLibrary(key).catch(() => null) : null;
   const ctx = { user, base: new URL(req.url).origin };
   const batch = Array.isArray(body) ? body : [body];
+  if (batch.length > MAX_BATCH)
+    return json(
+      { jsonrpc: "2.0", id: null, error: { code: -32600, message: `At most ${MAX_BATCH} calls per batch` } },
+      400,
+    );
   const out = (await Promise.all(batch.map((m) => handleRpc(m, ctx)))).filter(Boolean);
   if (!out.length) return new Response(null, { status: 202, headers: CORS });
   return json(Array.isArray(body) ? out : out[0]);

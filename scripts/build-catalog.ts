@@ -16,7 +16,12 @@ const COMPONENT_TYPES = new Set(["registry:ui", "registry:component", "registry:
 const SKIP = /^(index|utils?|style|theme|demo|example)$|-(demo|example)(-\d+)?$/i;
 
 function git(args: string[], cwd?: string) {
-  return execFileSync("git", args, { cwd, encoding: "utf8", maxBuffer: 256 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] });
+  return execFileSync("git", args, {
+    cwd,
+    encoding: "utf8",
+    maxBuffer: 256 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 }
 
 function checkout(repo: string, branch = "HEAD") {
@@ -48,14 +53,17 @@ function frontMatter(text: string) {
   return out;
 }
 
-function entry(src: Source, raw: {
-  name: string;
-  title?: string;
-  description?: string;
-  category?: string;
-  dependencies?: string[];
-  files?: string[];
-}): CatalogComponent {
+function entry(
+  src: Source,
+  raw: {
+    name: string;
+    title?: string;
+    description?: string;
+    category?: string;
+    dependencies?: string[];
+    files?: string[];
+  },
+): CatalogComponent {
   const deps = (raw.dependencies ?? []).map((d) => d.replace(/(?<=.)@[^/]*$/, ""));
   let title = raw.title && !/^[a-z0-9-]+$/.test(raw.title) ? raw.title : titleCase(raw.name);
   if (/^[A-Z][a-z]+[A-Z][A-Za-z0-9]*$/.test(title)) title = title.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
@@ -97,7 +105,11 @@ function mediaIndex(files: string[]) {
   const idx = new Map<string, string[]>();
   for (const f of files) {
     if (!/\.(webp|png|jpe?g|gif|mp4|webm)$/i.test(f) || !MEDIA_DIR.test(f) || /\/blog\//.test(f)) continue;
-    const base = f.split("/").pop()!.replace(/\.[a-z0-9]+$/i, "").replace(/[-_.](dark|light|poster|preview|thumb)$/i, "");
+    const base = f
+      .split("/")
+      .pop()!
+      .replace(/\.[a-z0-9]+$/i, "")
+      .replace(/[-_.](dark|light|poster|preview|thumb)$/i, "");
     const k = norm(base);
     idx.set(k, [...(idx.get(k) ?? []), f]);
   }
@@ -110,11 +122,15 @@ function findMedia(idx: Map<string, string[]>, name: string, category?: string) 
     let list = idx.get(k);
     if (!list) continue;
     if (category && list.length > 1) {
-      const inCat = list.filter((f) => f.toLowerCase().includes(norm(category).slice(0, 6)) || f.toLowerCase().includes(category.toLowerCase()));
+      const inCat = list.filter(
+        (f) => f.toLowerCase().includes(norm(category).slice(0, 6)) || f.toLowerCase().includes(category.toLowerCase()),
+      );
       if (inCat.length) list = inCat;
     }
     const pick = (re: RegExp) =>
-      list!.filter((f) => re.test(f)).sort((a, b) => Number(/dark/i.test(b)) - Number(/dark/i.test(a)) || a.length - b.length)[0];
+      list!
+        .filter((f) => re.test(f))
+        .sort((a, b) => Number(/dark/i.test(b)) - Number(/dark/i.test(a)) || a.length - b.length)[0];
     return { image: pick(/\.(webp|png|jpe?g|gif)$/i), video: pick(/\.(mp4|webm)$/i) };
   }
   return {};
@@ -161,7 +177,7 @@ async function build(src: Source): Promise<CatalogComponent[]> {
 
   if (src.kind === "registry") {
     const reg = JSON.parse(show(src.path!));
-    const items: any[] = Array.isArray(reg) ? reg : reg.items ?? [];
+    const items: any[] = Array.isArray(reg) ? reg : (reg.items ?? []);
     const cats = src.id === "reactbits" ? reactBitsCategories(show) : null;
     const picked = new Map<string, any>();
     const rank = (n: string) => {
@@ -205,7 +221,9 @@ async function build(src: Source): Promise<CatalogComponent[]> {
       } catch {}
     }
     const code = (src.code?.(name, category) ?? []).filter((p) => fileSet.has(p));
-    out.push(withPreview(entry(src, { name, title: fm.title, description: fm.description, category, files: code }), name));
+    out.push(
+      withPreview(entry(src, { name, title: fm.title, description: fm.description, category, files: code }), name),
+    );
   }
   return out;
 }
@@ -243,7 +261,13 @@ for (const src of SOURCES) {
 
 const STAGE = join(ROOT, "lib/catalog/stage.json");
 if (existsSync(STAGE)) {
-  type Shot = { image?: string; imageDark?: string; video?: string; videoDark?: string; live?: CatalogComponent["live"] };
+  type Shot = {
+    image?: string;
+    imageDark?: string;
+    video?: string;
+    videoDark?: string;
+    live?: CatalogComponent["live"];
+  };
   const shots: Record<string, Shot> = JSON.parse(readFileSync(STAGE, "utf8"));
   for (const c of components) {
     const s = shots[c.id];

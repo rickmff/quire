@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import type { CatalogComponent, CatalogLibrary } from "@/lib/catalog/schema";
 
-export type GalleryItem = Omit<CatalogComponent, "files" | "repo" | "dependencies"> & { source?: boolean; saved?: string };
+export type GalleryItem = Omit<CatalogComponent, "files" | "repo" | "dependencies"> & {
+  source?: boolean;
+  saved?: string;
+};
 export type ClientCatalog = { generatedAt: string; libraries: CatalogLibrary[]; components: GalleryItem[] };
 
 let cache: Promise<ClientCatalog> | null = null;
@@ -27,7 +30,10 @@ export function useCatalog() {
 
 type Status = { sync: boolean; capture: boolean };
 let status: Promise<Status> | null = null;
-export const getStatus = () => (status ??= fetch("/api/status").then((r) => r.json()).catch(() => ({ sync: false, capture: false })));
+export const getStatus = () =>
+  (status ??= fetch("/api/status")
+    .then((r) => r.json())
+    .catch(() => ({ sync: false, capture: false })));
 
 export function useSyncAvailable() {
   const [ok, setOk] = useState<boolean | null>(null);

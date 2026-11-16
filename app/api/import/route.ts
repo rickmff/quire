@@ -1,5 +1,6 @@
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { fetchJSON, fetchText, safeUrl } from "@/lib/net";
+import { rateLimited } from "@/lib/rateLimit";
 import { classify } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -59,7 +60,10 @@ function scanLinks(html: string, page: URL) {
   const re = /<h([1-4])[^>]*>([\s\S]*?)<\/h\1>|<a\b[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   for (const m of html.matchAll(re)) {
     if (m[2] !== undefined) {
-      heading = decode(m[2]).replace(/[\[(]\s*\d+\s*[\])]/g, "").trim() || heading;
+      heading =
+        decode(m[2])
+          .replace(/[\[(]\s*\d+\s*[\])]/g, "")
+          .trim() || heading;
       continue;
     }
     let u: URL;
@@ -74,7 +78,9 @@ function scanLinks(html: string, page: URL) {
     u.search = "";
     u.hash = "";
     const key = u.href.replace(/\/$/, "");
-    const text = decode(m[4]).replace(/\bnew\b$/i, "").trim();
+    const text = decode(m[4])
+      .replace(/\bnew\b$/i, "")
+      .trim();
     const prev = found.get(key);
     if (prev) {
       if (prev.category && /new|latest|recent|featured|popular/i.test(prev.category)) prev.category = heading;
@@ -127,10 +133,18 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
     }
   });
   if (entry?.url) {
-    for (const cand of [entry.url.replace(/\{name\}(\.json)?/, "registry.json"), new URL("/r/registry.json", page).href]) {
+    for (const cand of [
+      entry.url.replace(/\{name\}(\.json)?/, "registry.json"),
+      new URL("/r/registry.json", page).href,
+    ]) {
       if (cand.includes("{")) continue;
       const r = await tryRegistry(cand);
-      if (r) return { registry: r, install: (n) => `npx shadcn@latest add ${entry.name}/${n}`, ref: (n) => `${entry.name}/${n}` };
+      if (r)
+        return {
+          registry: r,
+          install: (n) => `npx shadcn@latest add ${entry.name}/${n}`,
+          ref: (n) => `${entry.name}/${n}`,
+        };
     }
   }
 
@@ -142,7 +156,12 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
     const [owner, repo, branch] = [gh[1], gh[2], gh[3]];
     for (const b of branch ? [branch] : ["main", "master"]) {
       const r = await tryRegistry(`https://raw.githubusercontent.com/${owner}/${repo}/${b}/registry.json`);
-      if (r) return { registry: r, install: (n: string) => `npx shadcn@latest add ${owner}/${repo}/${n}`, ref: (n: string) => `${owner}/${repo}/${n}` };
+      if (r)
+        return {
+          registry: r,
+          install: (n: string) => `npx shadcn@latest add ${owner}/${repo}/${n}`,
+          ref: (n: string) => `${owner}/${repo}/${n}`,
+        };
     }
     return null;
   };
@@ -153,13 +172,19 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
     const r = await tryRegistry(new URL(p, page).href);
     if (r) {
       const origin = page.origin;
-      return { registry: r, install: (n) => `npx shadcn@latest add ${origin}/r/${n}.json`, ref: (n) => `${origin}/r/${n}.json` };
+      return {
+        registry: r,
+        install: (n) => `npx shadcn@latest add ${origin}/r/${n}.json`,
+        ref: (n) => `${origin}/r/${n}.json`,
+      };
     }
   }
   return null;
 }
 
 export async function GET(req: Request) {
+  const limited = rateLimited(req, "fetch");
+  if (limited) return limited;
   const raw = new URL(req.url).searchParams.get("url") ?? "";
   const page = await safeUrl(raw);
   if (!page) return Response.json({ error: "Not a public link" }, { status: 400 });

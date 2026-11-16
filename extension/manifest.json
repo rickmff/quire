@@ -9,11 +9,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "activeTab",
-    "storage",
-    "contextMenus"
-  ],
+  "permissions": ["activeTab", "storage", "contextMenus"],
   "options_page": "options.html",
   "icons": {
     "128": "icon.png"
@@ -34,13 +30,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://x.com/*",
-        "https://twitter.com/*"
-      ],
-      "js": [
-        "x.js"
-      ],
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["x.js"],
       "run_at": "document_idle"
     }
   ]

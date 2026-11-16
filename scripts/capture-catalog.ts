@@ -30,7 +30,7 @@ const limit = Number(arg("limit") ?? Infinity);
 const parallel = Number(arg("parallel") ?? 3);
 const withVideo = flag("video");
 
-const read = <T,>(file: string, empty: T): T => (existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : empty);
+const read = <T>(file: string, empty: T): T => (existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : empty);
 const catalog: Catalog = read(DATA, { version: 1, generatedAt: "", libraries: [], components: [] });
 const shots = read<Record<string, { image?: string; video?: string }>>(OUT, {});
 const failed = read<Record<string, string>>(FAILED, {});
@@ -41,7 +41,12 @@ const todo = catalog.components
   .slice(0, limit);
 console.log(`${todo.length} to capture with ${base}`);
 
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "item";
+const slug = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "item";
 
 async function keep(url: string, path: string) {
   const r = await fetch(url, { signal: AbortSignal.timeout(30_000) });
@@ -96,4 +101,6 @@ for (const c of catalog.components) {
 writeFileSync(DATA, JSON.stringify(catalog));
 
 const missing = catalog.components.filter((c) => !c.preview).length;
-console.log(`${Object.keys(shots).length} captures saved. ${Object.keys(failed).length} failed (lib/catalog/no-preview.json). ${missing} components still without a preview.`);
+console.log(
+  `${Object.keys(shots).length} captures saved. ${Object.keys(failed).length} failed (lib/catalog/no-preview.json). ${missing} components still without a preview.`,
+);
