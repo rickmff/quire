@@ -62,6 +62,8 @@ export default function App() {
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
+  // The collection waiting for the user to confirm its removal.
+  const [confirmDel, setConfirmDel] = useState<string | null>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
   const [importing, setImporting] = useState<string | null>(null);
@@ -510,7 +512,7 @@ export default function App() {
         renaming={renaming}
         setRenaming={setRenaming}
         renameCollection={renameCollection}
-        deleteCollection={deleteCollection}
+        deleteCollection={setConfirmDel}
         moveTo={dropTo}
         sites={sites}
         openItem={setOpen}
@@ -764,7 +766,7 @@ export default function App() {
                 <Command.Item onSelect={run(() => setRenaming(current.id))} className={itemCls}>
                   Rename “{current.name}”
                 </Command.Item>
-                <Command.Item onSelect={run(() => deleteCollection(current.id))} className={itemCls}>
+                <Command.Item onSelect={run(() => setConfirmDel(current.id))} className={itemCls}>
                   Delete “{current.name}”
                 </Command.Item>
               </>
@@ -778,6 +780,18 @@ export default function App() {
           </Command.Group>
         </Command.List>
       </Command.Dialog>
+
+      {confirmDel !== null && (
+        <ConfirmRemove
+          name={lib.collections.find((c) => c.id === confirmDel)?.name ?? "this collection"}
+          count={lib.bookmarks.filter((b) => b.collectionId === confirmDel).length}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            deleteCollection(confirmDel);
+            setConfirmDel(null);
+          }}
+        />
+      )}
 
       {importing !== null && (
         <ImportDialog
@@ -1035,6 +1049,54 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ConfirmRemove({
+  name,
+  count,
+  onCancel,
+  onConfirm,
+}: {
+  name: string;
+  count: number;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-40 flex items-start justify-center bg-black/30 p-4 pt-[20vh]"
+      onMouseDown={onCancel}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onCancel();
+      }}
+    >
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-remove-title"
+        aria-describedby="confirm-remove-desc"
+        onMouseDown={(e) => e.stopPropagation()}
+        className="pop w-full max-w-sm rounded-xl border border-line bg-panel p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.25)]"
+      >
+        <p id="confirm-remove-title" className="text-fg">
+          Remove “{name}”?
+        </p>
+        <p id="confirm-remove-desc" className="mt-1 text-muted">
+          {count
+            ? `Its ${count} component${count === 1 ? "" : "s"} stay saved, with no collection.`
+            : "The collection is empty."}
+        </p>
+        <div className="mt-4 flex justify-end gap-1.5">
+          <button onClick={onCancel} className="rounded-md px-3 py-1 text-muted transition hover:bg-hover hover:text-fg">
+            Cancel
+          </button>
+          <button autoFocus onClick={onConfirm} className="rounded-md bg-fg px-3 py-1 text-bg transition hover:opacity-85">
+            Remove
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
