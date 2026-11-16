@@ -21,6 +21,7 @@ import {
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { OTHER, TYPES, typeById } from "@/lib/types";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
 import { AgentButton, Agents, Detail, Gallery, OpenDetails, Onboarding, Sources } from "@/components/Gallery";
@@ -41,6 +42,43 @@ const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? 
 const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
 const PAGES = new Set(["starred", "libraries", "sites", "agents"]);
 const isGallery = (v: View) => v === "starred" || v === "libraries" || typeView(v) !== null || siteView(v) !== null;
+
+// Each view has its own address under /app, so a reload, a shared link and
+// the browser's back and forward land on the same view:
+//   /app                                       Starred
+//   /app/all-libraries                         All libraries
+//   /app/all-libraries/<library>[/<category>]  one library, or one of its categories
+//   /app/types/<type>, /app/collections/<id>, /app/sites, /app/agents
+// A category is its family ("input") or, for a family split by type, the type ("text-effect").
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+const FAMILIES = [...new Set([...TYPES, OTHER].map((t) => t.family))];
+function viewPath(v: View): string {
+  const seg = (...p: string[]) => ["/app", ...p.map(encodeURIComponent)].join("/");
+  if (v === null || v === "starred" || v === "all" || v === "library") return "/app";
+  if (v === "libraries") return seg("all-libraries");
+  if (v === "sites" || v === "agents") return seg(v);
+  const t = typeView(v);
+  if (t) return seg("types", t);
+  const site = siteView(v);
+  if (site) {
+    const g = groupView(v);
+    return g ? seg("all-libraries", site, slug(g.split("/")[1] ?? g)) : seg("all-libraries", site);
+  }
+  return seg("collections", v);
+}
+function pathView(path: string): View {
+  const [root, a, b] = path.split("/").filter(Boolean).slice(1).map(decodeURIComponent);
+  if (root === "all-libraries") {
+    if (!a) return "libraries";
+    if (!b) return `site:${a}`;
+    const family = FAMILIES.find((f) => slug(f) === b);
+    return `site:${a}|${family ?? `${typeById(b).family}/${b}`}`;
+  }
+  if (root === "sites" || root === "agents") return root;
+  if (root === "types" && a) return `type:${a}`;
+  if (root === "collections" && a) return a;
+  return "starred";
+}
 // Curated components group by library id; your own links by the site they came from.
 const siteKey = (i: { library: string; site?: string }) =>
   i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -53,8 +91,18 @@ const EXAMPLES = [
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
-  const [view, setViewRaw] = useState<View>("starred");
-  const setView = useCallback((v: View) => setViewRaw(v === "all" || v === "library" ? "starred" : v), []);
+  // The address is the source of truth: picking a view pushes its path, and
+  // back, forward or a link moves the view. App lives in the /app layout, so
+  // these moves never remount it or replay the first-load deal.
+  const pathname = usePathname();
+  const [view, setViewRaw] = useState<View>(() => pathView(pathname));
+  const setView = useCallback((v: View) => {
+    const next = v === "all" || v === "library" ? "starred" : v;
+    setViewRaw(next);
+    const path = viewPath(next);
+    if (path !== window.location.pathname) window.history.pushState(null, "", path);
+  }, []);
+  useEffect(() => setViewRaw(pathView(pathname)), [pathname]);
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
@@ -410,7 +458,7 @@ export default function App() {
     const u = new URLSearchParams(window.location.search).get("import");
     if (!u || !catalog) return;
     startImport(u);
-    window.history.replaceState(null, "", "/app");
+    window.history.replaceState(null, "", window.location.pathname);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog]);
 
