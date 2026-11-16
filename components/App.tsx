@@ -1623,16 +1623,16 @@ function Card({
       </div>
 
       <div className="mt-2.5 px-0.5">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="truncate first-letter:uppercase">{b.title}</span>
-          <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
+        <div className="flex items-center justify-between gap-3">
+          <span className="min-w-0 truncate first-letter:uppercase">{b.title}</span>
+          <AgentButton onClick={onAgent} />
         </div>
-        <div className="mt-0.5 flex items-center justify-between gap-3">
+        <div className="mt-0.5 flex items-baseline justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {typeById(typeOf(b)).name}
             {b.description && <span className="text-faint"> · {b.description}</span>}
           </p>
-          <AgentButton onClick={onAgent} />
+          <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
 
         {b.install && (

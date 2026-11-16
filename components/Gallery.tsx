@@ -46,7 +46,7 @@ export function Gallery({
   // ms until the last card lands, so the rest of the page can follow it.
   intro?: boolean;
   onDeal?: (ms: number) => void;
-  // "Copy for agent" under the library name: gets the same text as the drawer's button.
+  // "Copy for agent" beside the card title: gets the same text as the drawer's button.
   onAgent?: (text: string) => void;
 }) {
   const [trigger, setTrigger] = useState<string | null>(null);
@@ -396,15 +396,15 @@ function ComponentCard({
         {starred && tools}
       </div>
       <div className="mt-2.5 px-0.5">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="truncate first-letter:uppercase">{item.title}</span>
-          <span className="shrink-0 text-[12px] text-faint">{site}</span>
+        <div className="flex items-center justify-between gap-3">
+          <span className="min-w-0 truncate first-letter:uppercase">{item.title}</span>
+          {onAgent && <AgentButton onClick={onAgent} />}
         </div>
-        <div className="mt-0.5 flex items-center justify-between gap-3">
+        <div className="mt-0.5 flex items-baseline justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
           </p>
-          {onAgent && <AgentButton onClick={onAgent} />}
+          <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
       </div>
     </article>
@@ -432,7 +432,7 @@ export function OpenDetails({ onClick }: { onClick: () => void }) {
   );
 }
 
-// "Copy for agent" on a card, under the library name. Its click stays off the card.
+// "Copy for agent" on a card, beside the title. Its click stays off the card.
 export function AgentButton({ onClick }: { onClick: () => void }) {
   return (
     <button
