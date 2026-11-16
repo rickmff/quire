@@ -1,0 +1,1 @@
+import{t as e}from"./text-animate-s67-TToS.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{animation:`slideLeft`,by:`character`,children:`Slide left by character`})}export{r as default};

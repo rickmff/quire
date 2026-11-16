@@ -20,6 +20,26 @@
     0,
     1224.2,
     765.1
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "android-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "android-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -46,6 +66,34 @@
     215.2,
     655.4,
     409.6
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "animated-beam-unidirectional",
+       "label": "Unidirectional"
+      },
+      {
+       "value": "animated-beam-bidirectional",
+       "label": "Bidirectional"
+      },
+      {
+       "value": "animated-beam-multiple-inputs",
+       "label": "Multiple inputs"
+      },
+      {
+       "value": "animated-beam-multiple-outputs",
+       "label": "Multiple outputs"
+      }
+     ]
+    }
    ]
   }
  },
@@ -68,10 +116,10 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=animated-circular-progress-bar&theme=dark&live=1",
    "frameDark": [
-    511,
-    264.3,
-    320,
-    200
+    476.2,
+    297.6,
+    327.7,
+    204.8
    ]
   }
  },
@@ -98,6 +146,22 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "animated-gradient-text-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -202,6 +266,46 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "animated-theme-toggler-square-demo",
+       "label": "Square"
+      },
+      {
+       "value": "animated-theme-toggler-diamond-demo",
+       "label": "Diamond"
+      },
+      {
+       "value": "animated-theme-toggler-rectangle-demo",
+       "label": "Rectangle"
+      },
+      {
+       "value": "animated-theme-toggler-hexagon-demo",
+       "label": "Hexagon"
+      },
+      {
+       "value": "animated-theme-toggler-triangle-demo",
+       "label": "Triangle"
+      },
+      {
+       "value": "animated-theme-toggler-star-demo",
+       "label": "Star"
+      },
+      {
+       "value": "animated-theme-toggler-next-themes-demo",
+       "label": "Next themes"
+      }
+     ]
+    }
    ]
   }
  },
@@ -276,6 +380,26 @@
     266.4,
     427.5,
     267.2
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "SVG"
+      },
+      {
+       "value": "backlight-video-demo",
+       "label": "Video"
+      },
+      {
+       "value": "backlight-image-demo",
+       "label": "Image"
+      }
+     ]
+    }
    ]
   }
  },
@@ -328,6 +452,22 @@
     0,
     1280,
     800
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "blur-fade-text-demo",
+       "label": "Text"
+      }
+     ]
+    }
    ]
   }
  },
@@ -354,6 +494,30 @@
     204.2,
     626.7,
     391.7
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "border-beam-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "border-beam-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "border-beam-demo-4",
+       "label": "Demo 4"
+      }
+     ]
+    }
    ]
   }
  },
@@ -456,6 +620,46 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "confetti-basic-cannon",
+       "label": "Basic cannon"
+      },
+      {
+       "value": "confetti-random-direction",
+       "label": "Random direction"
+      },
+      {
+       "value": "confetti-fireworks",
+       "label": "Fireworks"
+      },
+      {
+       "value": "confetti-stars",
+       "label": "Stars"
+      },
+      {
+       "value": "confetti-side-cannons",
+       "label": "Side cannons"
+      },
+      {
+       "value": "confetti-custom-shapes",
+       "label": "Custom shapes"
+      },
+      {
+       "value": "confetti-emoji",
+       "label": "Emoji"
+      }
+     ]
+    }
    ]
   }
  },
@@ -482,6 +686,22 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "cool-mode-custom",
+       "label": "Custom"
+      }
+     ]
+    }
    ]
   }
  },
@@ -508,6 +728,30 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "dia-text-reveal-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "dia-text-reveal-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "dia-text-reveal-demo-4",
+       "label": "Demo 4"
+      }
+     ]
+    }
    ]
   }
  },
@@ -534,6 +778,50 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "dither-field-card-demo",
+       "label": "Card"
+      },
+      {
+       "value": "dither-field-text-demo",
+       "label": "Text"
+      },
+      {
+       "value": "dither-field-image-demo",
+       "label": "Image"
+      },
+      {
+       "value": "dither-field-pointer-demo",
+       "label": "Pointer"
+      },
+      {
+       "value": "dither-field-monochrome-demo",
+       "label": "Monochrome"
+      },
+      {
+       "value": "dither-field-brand-demo",
+       "label": "Brand"
+      },
+      {
+       "value": "dither-field-colors-demo",
+       "label": "Colors"
+      },
+      {
+       "value": "dither-field-patterns-demo",
+       "label": "Patterns"
+      }
+     ]
+    }
    ]
   }
  },
@@ -560,6 +848,26 @@
     261.3,
     465.9,
     291.2
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "dock-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "dock-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -584,6 +892,26 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "dot-pattern-linear-gradient",
+       "label": "Linear gradient"
+      },
+      {
+       "value": "dot-pattern-with-glow-effect",
+       "label": "With glow effect"
+      }
+     ]
+    }
    ]
   }
  },
@@ -608,6 +936,26 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "dotted-map-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "dotted-map-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -619,10 +967,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=file-tree&theme=light&live=1",
    "frame": [
-    25.6,
-    16,
-    1228.8,
-    768
+    332.8,
+    208,
+    614.4,
+    384
    ],
    "view": [
     1280,
@@ -630,10 +978,10 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=file-tree&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16,
-    1228.8,
-    768
+    332.8,
+    208,
+    614.4,
+    384
    ]
   }
  },
@@ -660,6 +1008,22 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "flickering-grid-rounded-demo",
+       "label": "Rounded"
+      }
+     ]
+    }
    ]
   }
  },
@@ -686,6 +1050,22 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "floating-3d-particles-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -712,6 +1092,26 @@
     176,
     716.8,
     448
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "glare-hover-demo-cta",
+       "label": "CTA"
+      },
+      {
+       "value": "glare-hover-demo-alert",
+       "label": "Alert"
+      }
+     ]
+    }
    ]
   }
  },
@@ -723,10 +1123,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=globe&theme=light&live=1",
    "frame": [
-    25.6,
-    16,
-    1228.8,
-    768
+    261.1,
+    163.2,
+    757.8,
+    473.6
    ],
    "view": [
     1280,
@@ -734,10 +1134,10 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=globe&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16,
-    1228.8,
-    768
+    261.1,
+    163.2,
+    757.8,
+    473.6
    ]
   }
  },
@@ -788,6 +1188,26 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "grid-pattern-linear-gradient",
+       "label": "Linear gradient"
+      },
+      {
+       "value": "grid-pattern-dashed",
+       "label": "Dashed"
+      }
+     ]
+    }
    ]
   }
  },
@@ -814,6 +1234,22 @@
     12.5,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "hero-video-dialog-demo-top-in-bottom-out",
+       "label": "Top in bottom out"
+      }
+     ]
+    }
    ]
   }
  },
@@ -838,6 +1274,30 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "hexagon-pattern-linear-gradient",
+       "label": "Linear gradient"
+      },
+      {
+       "value": "hexagon-pattern-dashed",
+       "label": "Dashed"
+      },
+      {
+       "value": "hexagon-pattern-spacing",
+       "label": "Spacing"
+      }
+     ]
+    }
    ]
   }
  },
@@ -901,10 +1361,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=icon-cloud&theme=light&live=1",
    "frame": [
-    384.8,
-    167.5,
-    592.9,
-    370.6
+    246.8,
+    154.2,
+    786.4,
+    491.5
    ],
    "view": [
     1280,
@@ -912,10 +1372,30 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=icon-cloud&theme=dark&live=1",
    "frameDark": [
-    385.6,
-    167.5,
-    592.4,
-    370.2
+    246.8,
+    154.2,
+    786.4,
+    491.5
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "icon-cloud-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "icon-cloud-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -942,6 +1422,22 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "interactive-grid-pattern-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -992,6 +1488,26 @@
     0,
     1280,
     800
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "iphone-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "iphone-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1029,10 +1545,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=lens&theme=light&live=1",
    "frame": [
-    99.8,
-    62.1,
-    1081.3,
-    675.8
+    148.5,
+    92.8,
+    983,
+    614.4
    ],
    "view": [
     1280,
@@ -1040,10 +1556,30 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=lens&theme=dark&live=1",
    "frameDark": [
-    99.8,
-    62.1,
-    1081.3,
-    675.8
+    148.5,
+    92.8,
+    983,
+    614.4
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "lens-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "lens-demo-3",
+       "label": "Demo 3"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1122,6 +1658,22 @@
     200.3,
     639,
     399.4
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "magic-card-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1148,6 +1700,30 @@
     22.5,
     1208,
     755
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "marquee-demo-vertical",
+       "label": "Vertical"
+      },
+      {
+       "value": "marquee-logos",
+       "label": "Logos"
+      },
+      {
+       "value": "marquee-3d",
+       "label": "3D"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1185,10 +1761,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=morphing-text&theme=light&live=1",
    "frame": [
-    336.9,
-    211.8,
-    601.9,
-    376.2
+    361.1,
+    226.5,
+    556.8,
+    348
    ],
    "view": [
     1280,
@@ -1196,10 +1772,10 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=morphing-text&theme=dark&live=1",
    "frameDark": [
-    336.9,
-    211.8,
-    601.9,
-    376.2
+    361.1,
+    226.5,
+    556.8,
+    348
    ]
   }
  },
@@ -1250,6 +1826,30 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "noise-texture-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "noise-texture-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "noise-texture-demo-4",
+       "label": "Demo 4"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1276,6 +1876,26 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "number-ticker-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "number-ticker-decimal-demo",
+       "label": "Decimal"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1432,6 +2052,22 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "pulsating-button-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1444,7 +2080,7 @@
    "src": "/stage/magicui/index.html?c=rainbow-button&theme=light&live=1",
    "frame": [
     480,
-    310.9,
+    300,
     320,
     200
    ],
@@ -1455,9 +2091,25 @@
    "srcDark": "/stage/magicui/index.html?c=rainbow-button&theme=dark&live=1",
    "frameDark": [
     480,
-    311.5,
+    300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "rainbow-button-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1560,6 +2212,30 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "safari-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "safari-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "safari-demo-4",
+       "label": "Demo 4"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1586,6 +2262,22 @@
     26.9,
     1208,
     755
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "scroll-based-velocity-images-demo",
+       "label": "Images"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1624,7 +2316,7 @@
    "src": "/stage/magicui/index.html?c=shimmer-button&theme=light&live=1",
    "frame": [
     480,
-    318.3,
+    300,
     320,
     200
    ],
@@ -1649,10 +2341,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=shine-border&theme=light&w=460&live=1",
    "frame": [
-    320.8,
-    201.4,
-    638.5,
-    399
+    320.5,
+    201.3,
+    639,
+    399.4
    ],
    "view": [
     1280,
@@ -1660,10 +2352,26 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=shine-border&theme=dark&w=460&live=1",
    "frameDark": [
-    322.6,
-    201.6,
-    634.9,
-    396.8
+    320.5,
+    201.3,
+    639,
+    399.4
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "shine-border-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1768,6 +2476,22 @@
     300.1,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "spinning-text-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1792,6 +2516,26 @@
     16,
     1228.8,
     768
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "striped-pattern-dashed",
+       "label": "Dashed"
+      },
+      {
+       "value": "striped-pattern-right",
+       "label": "Right"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1803,10 +2547,10 @@
   "live": {
    "src": "/stage/magicui/index.html?c=terminal&theme=light&live=1",
    "frame": [
-    25.6,
-    16.5,
-    1228.8,
-    768
+    268.3,
+    168.2,
+    743.4,
+    464.6
    ],
    "view": [
     1280,
@@ -1814,10 +2558,26 @@
    ],
    "srcDark": "/stage/magicui/index.html?c=terminal&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16.5,
-    1228.8,
-    768
+    268.3,
+    168.2,
+    743.4,
+    464.6
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "terminal-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1844,6 +2604,22 @@
     180.4,
     716.5,
     447.8
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "text-3d-flip-demo-2",
+       "label": "Demo 2"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1870,6 +2646,50 @@
     300.5,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "text-animate-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "text-animate-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "text-animate-demo-4",
+       "label": "Demo 4"
+      },
+      {
+       "value": "text-animate-demo-5",
+       "label": "Demo 5"
+      },
+      {
+       "value": "text-animate-demo-6",
+       "label": "Demo 6"
+      },
+      {
+       "value": "text-animate-demo-7",
+       "label": "Demo 7"
+      },
+      {
+       "value": "text-animate-demo-8",
+       "label": "Demo 8"
+      },
+      {
+       "value": "text-animate-demo-9",
+       "label": "Demo 9"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1920,6 +2740,26 @@
     0,
     1280,
     800
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "tweet-card-images",
+       "label": "Images"
+      },
+      {
+       "value": "tweet-card-meta-preview",
+       "label": "Meta preview"
+      }
+     ]
+    }
    ]
   }
  },
@@ -1946,6 +2786,46 @@
     299.4,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "v",
+     "label": "Example",
+     "options": [
+      {
+       "value": "",
+       "label": "Default"
+      },
+      {
+       "value": "typing-animation-demo-2",
+       "label": "Demo 2"
+      },
+      {
+       "value": "typing-animation-demo-3",
+       "label": "Demo 3"
+      },
+      {
+       "value": "typing-animation-demo-4",
+       "label": "Demo 4"
+      },
+      {
+       "value": "typing-animation-demo-5",
+       "label": "Demo 5"
+      },
+      {
+       "value": "typing-animation-demo-6",
+       "label": "Demo 6"
+      },
+      {
+       "value": "typing-animation-demo-7",
+       "label": "Demo 7"
+      },
+      {
+       "value": "typing-animation-demo-8",
+       "label": "Demo 8"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2076,6 +2956,38 @@
     161.9,
     761.9,
     476.2
+   ],
+   "variants": [
+    {
+     "key": "writing",
+     "label": "Writing",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "cursor",
+     "label": "Cursor",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2113,10 +3025,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-animate-cursor&theme=light&live=1",
    "frame": [
-    25.6,
-    16,
-    1228.8,
-    768
+    226.3,
+    141.4,
+    827.4,
+    517.1
    ],
    "view": [
     1280,
@@ -2124,10 +3036,99 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-animate-cursor&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16,
-    1228.8,
-    768
+    226.3,
+    141.4,
+    827.4,
+    517.1
+   ],
+   "variants": [
+    {
+     "key": "global",
+     "label": "Global",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "enableCursor",
+     "label": "Enable cursor",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "enableCursorFollow",
+     "label": "Enable cursor follow",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "end",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2154,6 +3155,31 @@
     300.4,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "direction",
+     "label": "Direction",
+     "value": "btt",
+     "options": [
+      {
+       "value": "btt",
+       "label": "Bottom to top"
+      },
+      {
+       "value": "ttb",
+       "label": "Top to bottom"
+      },
+      {
+       "value": "ltr",
+       "label": "Left to right"
+      },
+      {
+       "value": "rtl",
+       "label": "Right to left"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2180,6 +3206,23 @@
     0,
     1280,
     800
+   ],
+   "variants": [
+    {
+     "key": "interactive",
+     "label": "Interactive",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2347,21 +3390,73 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-base-menu&theme=light&zoom=0.52&live=1",
    "frame": [
-    221.7,
-    277.1,
-    836.6,
-    522.9
+    212,
+    265,
+    856.1,
+    535
    ],
    "view": [
     1280,
     800
    ],
-   "srcDark": "/stage/animate-ui/index.html?c=components-base-menu&theme=dark&live=1",
+   "srcDark": "/stage/animate-ui/index.html?c=components-base-menu&theme=dark&zoom=0.52&live=1",
    "frameDark": [
-    217.1,
-    271.4,
-    845.8,
-    528.6
+    212,
+    265,
+    856.1,
+    535
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      },
+      {
+       "value": "inline-start",
+       "label": "Inline start"
+      },
+      {
+       "value": "inline-end",
+       "label": "Inline end"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2373,10 +3468,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-base-preview-card&theme=light&live=1",
    "frame": [
-    305.9,
-    330.3,
-    668.2,
-    417.6
+    299,
+    329.4,
+    682,
+    426.2
    ],
    "view": [
     1280,
@@ -2384,10 +3479,85 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-base-preview-card&theme=dark&live=1",
    "frameDark": [
-    310.3,
-    330.9,
-    659.5,
-    412.2
+    299,
+    329.4,
+    682,
+    426.2
+   ],
+   "variants": [
+    {
+     "key": "followCursor",
+     "label": "Follow cursor",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "x",
+       "label": "X"
+      },
+      {
+       "value": "y",
+       "label": "Y"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      },
+      {
+       "value": "inline-start",
+       "label": "Inline start"
+      },
+      {
+       "value": "inline-end",
+       "label": "Inline end"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2440,6 +3610,74 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "secondary",
+       "label": "Secondary"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      },
+      {
+       "value": "link",
+       "label": "Link"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      },
+      {
+       "value": "icon-sm",
+       "label": "Icon small"
+      },
+      {
+       "value": "icon-lg",
+       "label": "Icon large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2466,6 +3704,66 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "secondary",
+       "label": "Secondary"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      },
+      {
+       "value": "link",
+       "label": "Link"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "xs",
+       "label": "Extra small"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2492,6 +3790,132 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "frontVariant",
+     "label": "Front variant",
+     "value": "accent",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "secondary",
+       "label": "Secondary"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      },
+      {
+       "value": "link",
+       "label": "Link"
+      }
+     ]
+    },
+    {
+     "key": "frontSize",
+     "label": "Front size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      },
+      {
+       "value": "icon-sm",
+       "label": "Icon small"
+      },
+      {
+       "value": "icon-lg",
+       "label": "Icon large"
+      }
+     ]
+    },
+    {
+     "key": "backVariant",
+     "label": "Back variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "secondary",
+       "label": "Secondary"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      },
+      {
+       "value": "link",
+       "label": "Link"
+      }
+     ]
+    },
+    {
+     "key": "backSize",
+     "label": "Back size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2518,6 +3942,50 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2544,6 +4012,50 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2570,6 +4082,58 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      },
+      {
+       "value": "icon-sm",
+       "label": "Icon small"
+      },
+      {
+       "value": "icon-lg",
+       "label": "Icon large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2596,6 +4160,74 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "destructive",
+       "label": "Destructive"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "secondary",
+       "label": "Secondary"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      },
+      {
+       "value": "link",
+       "label": "Link"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      },
+      {
+       "value": "icon-sm",
+       "label": "Icon small"
+      },
+      {
+       "value": "icon-lg",
+       "label": "Icon large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2622,6 +4254,88 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      },
+      {
+       "value": "ghost",
+       "label": "Ghost"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    },
+    {
+     "key": "direction",
+     "label": "Direction",
+     "value": "ltr",
+     "options": [
+      {
+       "value": "btt",
+       "label": "Bottom to top"
+      },
+      {
+       "value": "ttb",
+       "label": "Top to bottom"
+      },
+      {
+       "value": "ltr",
+       "label": "Left to right"
+      },
+      {
+       "value": "rtl",
+       "label": "Right to left"
+      }
+     ]
+    },
+    {
+     "key": "system",
+     "label": "System",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2882,6 +4596,46 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "md",
+       "label": "Medium"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    },
+    {
+     "key": "icon",
+     "label": "Icon",
+     "value": "prefix",
+     "options": [
+      {
+       "value": "prefix",
+       "label": "Prefix"
+      },
+      {
+       "value": "suffix",
+       "label": "Suffix"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2919,10 +4673,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-accordion&theme=light&w=560&live=1",
    "frame": [
-    281.6,
-    176,
-    716.8,
-    448
+    383.1,
+    240.4,
+    510.7,
+    319.2
    ],
    "view": [
     1280,
@@ -2930,10 +4684,72 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-accordion&theme=dark&w=560&live=1",
    "frameDark": [
-    281.6,
-    176,
-    716.8,
-    448
+    383.1,
+    240.4,
+    510.7,
+    319.2
+   ],
+   "variants": [
+    {
+     "key": "multiple",
+     "label": "Multiple",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "collapsible",
+     "label": "Collapsible",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "showArrow",
+     "label": "Show arrow",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "keepRendered",
+     "label": "Keep rendered",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2960,6 +4776,31 @@
     230,
     544,
     340
+   ],
+   "variants": [
+    {
+     "key": "from",
+     "label": "From",
+     "value": "top",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    }
    ]
   }
  },
@@ -2986,6 +4827,61 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "checked",
+     "label": "Checked",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "indeterminate",
+       "label": "Indeterminate"
+      }
+     ]
+    },
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "accent",
+       "label": "Accent"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3012,6 +4908,46 @@
     192.6,
     663.6,
     414.7
+   ],
+   "variants": [
+    {
+     "key": "from",
+     "label": "From",
+     "value": "top",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "showCloseButton",
+     "label": "Show close button",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3023,10 +4959,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-dropdown-menu&theme=light&zoom=0.52&live=1",
    "frame": [
-    314.2,
+    313.1,
     0,
-    838.7,
-    524.2
+    841.7,
+    526.1
    ],
    "view": [
     1280,
@@ -3034,10 +4970,54 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-dropdown-menu&theme=dark&zoom=0.52&live=1",
    "frameDark": [
-    314.7,
+    313.1,
     0,
-    837.6,
-    523.5
+    841.7,
+    526.1
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "start",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3049,10 +5029,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-files&theme=light&live=1",
    "frame": [
-    25.6,
-    16,
-    1228.8,
-    768
+    281.6,
+    176,
+    716.8,
+    448
    ],
    "view": [
     1280,
@@ -3060,10 +5040,10 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-files&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16,
-    1228.8,
-    768
+    281.6,
+    176,
+    716.8,
+    448
    ]
   }
  },
@@ -3075,10 +5055,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-hover-card&theme=light&live=1",
    "frame": [
-    305.9,
-    330.3,
-    668.2,
-    417.6
+    304.1,
+    330.1,
+    671.7,
+    419.8
    ],
    "view": [
     1280,
@@ -3086,10 +5066,77 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-hover-card&theme=dark&live=1",
    "frameDark": [
-    310.3,
-    330.9,
-    659.5,
-    412.2
+    304.1,
+    330.1,
+    671.7,
+    419.8
+   ],
+   "variants": [
+    {
+     "key": "followCursor",
+     "label": "Follow cursor",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "x",
+       "label": "X"
+      },
+      {
+       "value": "y",
+       "label": "Y"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3101,10 +5148,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-popover&theme=light&live=1",
    "frame": [
-    342.8,
-    341.4,
-    594.4,
-    371.5
+    333.8,
+    337.1,
+    612.4,
+    382.7
    ],
    "view": [
     1280,
@@ -3112,10 +5159,54 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-popover&theme=dark&live=1",
    "frameDark": [
-    347.1,
-    342,
-    585.7,
-    366.1
+    333.8,
+    337.1,
+    612.4,
+    382.7
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3127,10 +5218,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-preview-link-card&theme=light&live=1",
    "frame": [
-    353.8,
-    148.7,
-    573.1,
-    358.2
+    325.7,
+    204.2,
+    626.7,
+    391.7
    ],
    "view": [
     1280,
@@ -3138,10 +5229,77 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-preview-link-card&theme=dark&live=1",
    "frameDark": [
-    353.8,
-    148.7,
-    573.1,
-    358.2
+    325.7,
+    204.2,
+    626.7,
+    391.7
+   ],
+   "variants": [
+    {
+     "key": "followCursor",
+     "label": "Follow cursor",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "x",
+       "label": "X"
+      },
+      {
+       "value": "y",
+       "label": "Y"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "top",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3220,6 +5378,31 @@
     0,
     1280,
     800
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "right",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3283,10 +5466,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-tabs&theme=light&live=1",
    "frame": [
-    25.6,
-    16,
-    1228.8,
-    768
+    240.6,
+    150.4,
+    798.7,
+    499.2
    ],
    "view": [
     1280,
@@ -3294,10 +5477,10 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-tabs&theme=dark&live=1",
    "frameDark": [
-    25.6,
-    16,
-    1228.8,
-    768
+    240.6,
+    150.4,
+    798.7,
+    499.2
    ]
   }
  },
@@ -3324,6 +5507,46 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "icon",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3350,6 +5573,61 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "type",
+     "label": "Type",
+     "value": "single",
+     "options": [
+      {
+       "value": "single",
+       "label": "Single"
+      },
+      {
+       "value": "multiple",
+       "label": "Multiple"
+      }
+     ]
+    },
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "outline",
+       "label": "Outline"
+      }
+     ]
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "value": "icon",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "sm",
+       "label": "Small"
+      },
+      {
+       "value": "lg",
+       "label": "Large"
+      },
+      {
+       "value": "icon",
+       "label": "Icon"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3361,8 +5639,8 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-tooltip&theme=light&live=1",
    "frame": [
-    480.3,
-    281.3,
+    480,
+    300.5,
     320,
     200
    ],
@@ -3372,10 +5650,77 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=components-radix-tooltip&theme=dark&live=1",
    "frameDark": [
-    480.3,
-    281,
+    480,
+    300.5,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "followCursor",
+     "label": "Follow cursor",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "x",
+       "label": "X"
+      },
+      {
+       "value": "y",
+       "label": "Y"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "top",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3402,6 +5747,38 @@
     161.9,
     761.9,
     476.2
+   ],
+   "variants": [
+    {
+     "key": "writing",
+     "label": "Writing",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "cursor",
+     "label": "Cursor",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3506,6 +5883,38 @@
     176,
     716.8,
     448
+   ],
+   "variants": [
+    {
+     "key": "global",
+     "label": "Global",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "direction",
+     "label": "Direction",
+     "value": "vertical",
+     "options": [
+      {
+       "value": "horizontal",
+       "label": "Horizontal"
+      },
+      {
+       "value": "vertical",
+       "label": "Vertical"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3569,10 +5978,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-base-menu&theme=light&live=1",
    "frame": [
-    283.9,
-    344.6,
-    712.2,
-    445.1
+    284.7,
+    344.4,
+    710.7,
+    444.2
    ],
    "view": [
     1280,
@@ -3580,10 +5989,62 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-base-menu&theme=dark&live=1",
    "frameDark": [
-    283.9,
-    344.6,
-    712.2,
-    445.1
+    284.7,
+    344.4,
+    710.7,
+    444.2
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      },
+      {
+       "value": "inline-start",
+       "label": "Inline start"
+      },
+      {
+       "value": "inline-end",
+       "label": "Inline end"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3595,10 +6056,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-base-preview-card&theme=light&live=1",
    "frame": [
-    310.3,
-    330.9,
-    659.5,
-    412.2
+    307.2,
+    330.5,
+    665.6,
+    416
    ],
    "view": [
     1280,
@@ -3606,10 +6067,85 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-base-preview-card&theme=dark&live=1",
    "frameDark": [
-    310.3,
-    330.9,
-    659.5,
-    412.2
+    307.2,
+    330.5,
+    665.6,
+    416
+   ],
+   "variants": [
+    {
+     "key": "followCursor",
+     "label": "Follow cursor",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "True"
+      },
+      {
+       "value": false,
+       "label": "False"
+      },
+      {
+       "value": "x",
+       "label": "X"
+      },
+      {
+       "value": "y",
+       "label": "Y"
+      }
+     ]
+    },
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "bottom",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      },
+      {
+       "value": "inline-start",
+       "label": "Inline start"
+      },
+      {
+       "value": "inline-end",
+       "label": "Inline end"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3688,6 +6224,50 @@
     272.4,
     406.7,
     254.2
+   ],
+   "variants": [
+    {
+     "key": "global",
+     "label": "Global",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "variant",
+     "label": "Variant",
+     "value": "ring",
+     "options": [
+      {
+       "value": "ripple",
+       "label": "Ripple"
+      },
+      {
+       "value": "ring",
+       "label": "Ring"
+      },
+      {
+       "value": "crosshair",
+       "label": "Crosshair"
+      },
+      {
+       "value": "burst",
+       "label": "Burst"
+      },
+      {
+       "value": "particles",
+       "label": "Particles"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3714,6 +6294,68 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "blur",
+     "label": "Blur",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "slide",
+     "label": "Slide",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "fade",
+     "label": "Fade",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "zoom",
+     "label": "Zoom",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3766,6 +6408,38 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "mode",
+     "label": "Mode",
+     "value": "children",
+     "options": [
+      {
+       "value": "children",
+       "label": "Children"
+      },
+      {
+       "value": "parent",
+       "label": "Parent"
+      }
+     ]
+    },
+    {
+     "key": "hover",
+     "label": "Hover",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3818,6 +6492,23 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "onlyOnHover",
+     "label": "Only on hover",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3844,6 +6535,50 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "side",
+     "label": "Side",
+     "value": "top",
+     "options": [
+      {
+       "value": "top",
+       "label": "Top"
+      },
+      {
+       "value": "bottom",
+       "label": "Bottom"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    },
+    {
+     "key": "align",
+     "label": "Align",
+     "value": "center",
+     "options": [
+      {
+       "value": "start",
+       "label": "Start"
+      },
+      {
+       "value": "center",
+       "label": "Center"
+      },
+      {
+       "value": "end",
+       "label": "End"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3870,6 +6605,68 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "loop",
+     "label": "Loop",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "enable",
+     "label": "Enable",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "enableOnHover",
+     "label": "Enable on hover",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "enableOnTap",
+     "label": "Enable on tap",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3896,6 +6693,31 @@
     300,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "direction",
+     "label": "Direction",
+     "value": "up",
+     "options": [
+      {
+       "value": "up",
+       "label": "Up"
+      },
+      {
+       "value": "down",
+       "label": "Down"
+      },
+      {
+       "value": "left",
+       "label": "Left"
+      },
+      {
+       "value": "right",
+       "label": "Right"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3907,10 +6729,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-tilt&theme=light&live=1",
    "frame": [
-    0,
-    10.8,
-    1248.6,
-    780.4
+    242.7,
+    152.7,
+    794.6,
+    496.6
    ],
    "view": [
     1280,
@@ -3918,10 +6740,10 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-effects-tilt&theme=dark&live=1",
    "frameDark": [
-    0,
-    10.3,
-    1248,
-    780
+    242.7,
+    152.7,
+    794.6,
+    496.6
    ]
   }
  },
@@ -3959,8 +6781,8 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-headless-disclosure&theme=light&live=1",
    "frame": [
-    405,
-    304.9,
+    370,
+    300.5,
     320,
     200
    ],
@@ -3970,10 +6792,27 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-headless-disclosure&theme=dark&live=1",
    "frameDark": [
-    405,
-    304.9,
+    370,
+    300.5,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "keepRendered",
+     "label": "Keep rendered",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -3985,8 +6824,8 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-radix-collapsible&theme=light&live=1",
    "frame": [
-    480,
-    304.9,
+    445,
+    300.5,
     320,
     200
    ],
@@ -3996,10 +6835,27 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-radix-collapsible&theme=dark&live=1",
    "frameDark": [
-    480,
-    304.9,
+    445,
+    300.5,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "keepRendered",
+     "label": "Keep rendered",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4026,6 +6882,23 @@
     299.3,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "padStart",
+     "label": "Pad start",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4052,6 +6925,23 @@
     299.3,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "neon",
+     "label": "Neon",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4104,6 +6994,23 @@
     256,
     460.8,
     288
+   ],
+   "variants": [
+    {
+     "key": "loop",
+     "label": "Loop",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4182,6 +7089,31 @@
     289.2,
     352.3,
     220.2
+   ],
+   "variants": [
+    {
+     "key": "direction",
+     "label": "Direction",
+     "value": "btt",
+     "options": [
+      {
+       "value": "btt",
+       "label": "Bottom to top"
+      },
+      {
+       "value": "ttb",
+       "label": "Top to bottom"
+      },
+      {
+       "value": "ltr",
+       "label": "Left to right"
+      },
+      {
+       "value": "rtl",
+       "label": "Right to left"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4208,6 +7140,23 @@
     283.7,
     378.2,
     236.4
+   ],
+   "variants": [
+    {
+     "key": "wave",
+     "label": "Wave",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4234,6 +7183,38 @@
     299.3,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "fromNumber",
+     "label": "From number",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "padStart",
+     "label": "Pad start",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4260,6 +7241,46 @@
     301.9,
     320,
     200
+   ],
+   "variants": [
+    {
+     "key": "type",
+     "label": "Type",
+     "value": "chars",
+     "options": [
+      {
+       "value": "chars",
+       "label": "Chars"
+      },
+      {
+       "value": "words",
+       "label": "Words"
+      },
+      {
+       "value": "lines",
+       "label": "Lines"
+      }
+     ]
+    },
+    {
+     "key": "animation",
+     "label": "Animation",
+     "value": "default",
+     "options": [
+      {
+       "value": "default",
+       "label": "Default"
+      },
+      {
+       "value": "vibe",
+       "label": "Vibe"
+      },
+      {
+       "value": "writing",
+       "label": "Writing"
+      }
+     ]
+    }
    ]
   }
  },
@@ -4271,10 +7292,10 @@
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-texts-typing&theme=light&live=1",
    "frame": [
-    42.8,
-    66.1,
-    1074.2,
-    671.4
+    171.5,
+    107.2,
+    937,
+    585.6
    ],
    "view": [
     1280,
@@ -4282,10 +7303,42 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-texts-typing&theme=dark&live=1",
    "frameDark": [
-    42.8,
-    66.1,
-    1074.2,
-    671.4
+    171.5,
+    107.2,
+    937,
+    585.6
+   ],
+   "variants": [
+    {
+     "key": "loop",
+     "label": "Loop",
+     "value": false,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "key": "cursor",
+     "label": "Cursor",
+     "value": true,
+     "options": [
+      {
+       "value": true,
+       "label": "On"
+      },
+      {
+       "value": false,
+       "label": "Off"
+      }
+     ]
+    }
    ]
   }
  }

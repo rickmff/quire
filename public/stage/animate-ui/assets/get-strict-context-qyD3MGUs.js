@@ -1,0 +1,1 @@
+import{a as e,c as t,t as n}from"./index-CUXLBZmm.js";var r=t(e(),1),i=n();function a(e){let t=r.createContext(void 0);return[({value:e,children:n})=>(0,i.jsx)(t.Provider,{value:e,children:n}),()=>{let n=r.useContext(t);if(n===void 0)throw Error(`useContext must be used within ${e??`a Provider`}`);return n}]}export{a as t};

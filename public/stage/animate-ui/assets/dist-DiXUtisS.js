@@ -1,1 +1,0 @@
-import{t as e}from"./dist-7HJlZF7l.js";import{a as t,c as n}from"./index-zOS5uHYh.js";var r=n(t(),1),i=Object.defineProperty,a=(e,t)=>i(e,`name`,{value:t,configurable:!0}),o=r.useInsertionEffect;function s(t){let n=r.useRef(t);return typeof o==`function`?o(()=>{n.current=t}):e(()=>{n.current=t}),r.useMemo(()=>((...e)=>n.current?.(...e)),[])}a(s,`useCallbackRef`);export{s as t};

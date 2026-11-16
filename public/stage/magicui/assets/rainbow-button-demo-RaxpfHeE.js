@@ -1,0 +1,1 @@
+import{t as e}from"./rainbow-button-B9pVcZ4a.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{children:`Get Unlimited Access`})}export{r as default};

@@ -1,0 +1,1 @@
+import{t as e}from"./typing-animation-BoJ5o4Wk.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{showCursor:!1,children:`No cursor shown`})}export{r as default};

@@ -8,6 +8,11 @@ export type ClientCatalog = { generatedAt: string; libraries: CatalogLibrary[]; 
 
 let cache: Promise<ClientCatalog> | null = null;
 
+// Starts the catalog download early, e.g. while the landing hands over to /app.
+export function preloadCatalog() {
+  cache ??= fetch("/api/catalog").then((r) => r.json());
+}
+
 export function useCatalog() {
   const [data, setData] = useState<ClientCatalog | null>(null);
   useEffect(() => {

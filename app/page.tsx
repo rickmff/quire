@@ -3,9 +3,36 @@ import Link from "next/link";
 import Quire3D from "@/components/Quire3D";
 import Wordmark from "@/components/Wordmark";
 import SocialLinks from "@/components/SocialLinks";
+import StartLink from "@/components/StartLink";
 import s from "@/components/Landing.module.css";
+import type { Metadata } from "next";
+import { DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const REPO = "https://github.com/rickmff/quire";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+// Structured data for search engines: the site, and Quire as a free web app.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: SITE_NAME, description: DESCRIPTION },
+    {
+      "@type": "WebApplication",
+      "@id": `${SITE_URL}/#app`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/app`,
+      description: DESCRIPTION,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript",
+      image: `${SITE_URL}/og.png`,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      author: { "@type": "Person", name: "Henrique Matos", url: "https://github.com/rickmff" },
+      sameAs: [REPO],
+    },
+  ],
+};
 
 const LEAD = "Keep every component you find.";
 const TAIL = "Hand them to your agent.";
@@ -24,6 +51,7 @@ function Stream({ text, from }: { text: string; from: number }) {
 export default function Landing() {
   return (
     <div className={s.page}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c") }} />
       <header className={`${s.bar} ${s.enter}`}>
         <Link href="/" aria-label="quire">
           <Wordmark className={s.wordmark} />
@@ -41,9 +69,9 @@ export default function Landing() {
             </span>
           </h1>
           <div className={`${s.cta} ${s.enter}`} style={{ "--d": "620ms" } as CSSProperties}>
-            <Link href="/app" className="btn btn-lg btn-primary">
+            <StartLink className="btn btn-lg btn-primary">
               Start collecting
-            </Link>
+            </StartLink>
             <a href={`${REPO}/tree/main/extension`} className="btn btn-lg btn-secondary">
               Add to Chrome
             </a>

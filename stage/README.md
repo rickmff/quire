@@ -30,6 +30,8 @@ npm install
 (cd app-magicui && PORT=5181 npx vite) &
 node capture.mjs magicui 5181 out/magicui          # stills
 node video.mjs magicui 5181 out/magicui            # clips
+MEASURE=1 node video.mjs magicui 5181 out/magicui  # where each clip paints (see Framing)
+python3 frame.py magicui --write                   # then capture and record those again
 ./build.sh .. magicui animate-ui                   # live demos: public/stage/<library>/
 node publish.mjs .. magicui animate-ui             # copy into public/previews and the catalog
 ```
@@ -57,18 +59,59 @@ the stage:
 - tells the gallery when the demo is ready (`postMessage`),
 - keeps demo links and forms from navigating the frame,
 - passes Escape to the gallery when the demo has no dialog or menu open,
-- with `grid=1`, opens the card on a click outside the demo's controls (for a
-  card that runs it; the gallery does not use this today).
+- with `card=1`, keeps a demo from taking the keyboard focus from the gallery
+  until it is clicked, pressed or typed in.
 
 The detail panel runs the demo with hover, click and keyboard, and has a
-Restart button. Cards do not run it: their clips loop and already show the
-interaction. A card clip plays while the card is on screen or within 200px of
-it, and pauses off screen (one shared `IntersectionObserver`). With reduced
-motion, a clip plays only while the mouse is over it.
+Restart button. A card runs it too, in place of its clip, when the mouse rests
+on the card (140 ms); the clip comes back 250 ms after the mouse leaves. One card
+runs a demo at a time, so a sweep across the grid loads nothing. The star, the
+open icon and the gear stay above the demo. A card clip plays while the card is
+on screen or within 200px of it, and pauses off screen (one shared
+`IntersectionObserver`). With reduced motion, a clip plays only while the mouse
+is over it.
 
 Demos that use shiki get a build with only the grammars and themes they use
 (`template/src/shims/shiki.ts`). Files demos load from the docs site's root
 (`/mug.webp`) are rewritten to the base path at build time.
+
+## Framing
+
+The still and the clip of a component share one frame, so the clip, the still
+and the live demo line up. `capture.mjs` cuts it around what the still shows.
+That misses what the clip shows later (an open menu, a tab panel) and anything
+one theme paints too faintly to see. `MEASURE=1 node video.mjs` plays each clip
+without recording it and samples where the demo paints, in both themes
+(`out/<library>/measure.json`). `frame.py` then builds each frame:
+
+- centered on the demo at rest (its last sample: clips end at rest, so they loop),
+- wide enough on both sides for everything it shows after its first second
+  (entrances that fly in do not count),
+- for a menu, popover or card that opens from a small trigger, centered on all
+  it shows instead, so the trigger does not shrink to a dot.
+
+It prints the components whose frame moves off center or cuts content, and
+`--write` adds their frames to `frames/<library>.json` (`--redo name ...` adds
+others). `capture.mjs` uses those frames over its own; capture and record those
+components again. A demo the stage made wider than its own `max-width` was a
+stage bug: `#subject > *` is now in Tailwind's base layer, under the utilities.
+
+## Variants
+
+`install.mjs` also lists the other versions of each component that its library
+shows, and the gallery's gear menu switches the live demo to them:
+
+- Magic UI: the extra examples in the registry (`confetti-fireworks`,
+  `dock-demo-2`). They are installed with the default demo, as
+  `<name>~<example>` entries of `src/demos.tsx`. The stage takes `v=<example>`.
+- Animate UI: the docs controls of a demo (`meta.demoProps`) that offer a
+  choice, a list of options or on/off. The stage takes them as props, `p=<json>`.
+
+They are the `variants` in `app-<library>/demos.json`; `publish.mjs` copies them to
+`live.variants` in the catalog. The gear sits at the bottom left of a card that
+has variants, and in the detail panel. It opens the choices in a circle around
+it; a second level lists the options. A dot on the gear shows that a variant
+other than the default runs. Clips and stills always show the default.
 
 ## Poses
 
@@ -83,6 +126,9 @@ Demos that use shiki get a build with only the grammars and themes they use
 | `box` | draw a bordered, clipped panel around the stage box (scroll areas) |
 | `zoom` | fixed zoom instead of the automatic fit |
 | `min`, `pad` | smallest frame width (default 320) and padding around the content (default 1.28) |
+| `center` | `"layout"`: center the frame on the stage, not on the demo (a shadow or glow on one side) |
+| `spill` | fit the frame to the demo at rest; its effect (particles, a cursor, a theme change) runs past the edges |
+| `keepframe` | `frame.py` keeps the frame `capture.mjs` cut |
 | `freetheme` | let the demo change the theme (theme togglers); the stage forces the URL's theme otherwise |
 | `video` | options and steps for the clip (see Clips) |
 

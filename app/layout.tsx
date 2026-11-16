@@ -1,11 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DEFAULT_TITLE, DESCRIPTION, SITE_NAME, SITE_URL, social } from "@/lib/seo";
 
+// Routes set their own title, canonical and social cards; see lib/seo.ts.
 export const metadata: Metadata = {
-  title: "quire",
-  description: "Bookmark UI components from every library. Organize them. Hand them to your AI agent.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: DEFAULT_TITLE, template: `%s · ${SITE_NAME}` },
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: "Henrique Matos", url: "https://github.com/rickmff" }],
+  creator: "Henrique Matos",
+  ...social("/", DEFAULT_TITLE, DESCRIPTION),
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b0b" },
+  ],
 };
 
 // Runs from the server-rendered HTML, before any script bundle. A service worker

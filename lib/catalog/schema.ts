@@ -34,6 +34,16 @@ export type LiveDemo = {
   view: number[]; // [width, height]
   srcDark?: string;
   frameDark?: number[];
+  variants?: LiveVariant[]; // what the gear menu can switch the live demo to (stage/variants.mjs)
+};
+
+// One choice of a component's variants: key "v" picks another example of it (value: the
+// example's name, "" for the default); any other key is a prop of the demo, set to the value.
+export type LiveVariant = {
+  key: string;
+  label: string;
+  value?: string | number | boolean;
+  options: { value: string | number | boolean; label: string }[];
 };
 
 export type CatalogLibrary = {

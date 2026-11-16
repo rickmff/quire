@@ -1,0 +1,1 @@
+import{n as e,t}from"./index-BzrXL0dO.js";import{t as n}from"./floating-3d-particles-DocyFBQg.js";var r=t();function i(){let{resolvedTheme:t}=e();return(0,r.jsx)(`div`,{className:`bg-background relative h-[500px] w-full overflow-hidden rounded-lg border`,children:(0,r.jsx)(n,{color:t===`dark`?`#c4b5fd`:`#6d28d9`,depth:.8,opacity:.55,quantity:1e3})})}export{i as default};
