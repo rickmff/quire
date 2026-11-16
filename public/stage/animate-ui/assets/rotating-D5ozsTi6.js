@@ -1,0 +1,1 @@
+import{n as e,t}from"./rotating-BsBwuEEx.js";import{t as n}from"./index-CUXLBZmm.js";var r=n(),i=({delay:n,y:i,duration:a})=>(0,r.jsx)(e,{delay:n,y:i,duration:a,className:`text-4xl font-semibold`,text:[`Rotating`,`Text`,`Demo`],children:(0,r.jsx)(t,{})},n);export{i as RotatingTextDemo};

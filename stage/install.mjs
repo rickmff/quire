@@ -1,6 +1,7 @@
 // Quire stage installer: resolves a library's demo registry items (and everything they
 // depend on) from the libraries' GitHub repos, writes the files into a Vite app, and
-// generates src/demos.tsx mapping each catalog component to its demo.
+// generates src/demos.tsx mapping each catalog component to its demo, and lists the
+// variants of each demo (other examples, docs controls) in demos.json for the gallery.
 //
 //   node install.mjs <library> <appDir>
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
@@ -85,6 +86,29 @@ function dest(reg, f) {
   return `components/ui/${base}`;
 }
 
+// Variants the gallery's gear menu offers (live.variants in the catalog).
+// Animate UI: the docs controls of a demo (meta.demoProps) that offer a choice, a list of
+// options or on/off. The stage page takes the picked values as props (p=<json>).
+const NAMES = { btt: "Bottom to top", ttb: "Top to bottom", ltr: "Left to right", rtl: "Right to left", xs: "Extra small", sm: "Small", md: "Medium", lg: "Large", "icon-sm": "Icon small", "icon-lg": "Icon large", svg: "SVG", cta: "CTA", "3d": "3D" };
+const words = (k) => NAMES[String(k).toLowerCase()] ?? String(k).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/-/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+function variantsOf(item) {
+  const groups = [];
+  for (const props of Object.values(item.meta?.demoProps ?? {}))
+    for (const [k, v] of Object.entries(props)) {
+      if (v?.options && Object.keys(v.options).length > 1) groups.push({ key: k, label: words(k), value: v.value, options: Object.entries(v.options).map(([l, val]) => ({ value: val, label: words(l) })) });
+      else if (typeof v?.value === "boolean") groups.push({ key: k, label: words(k), value: v.value, options: [{ value: true, label: "On" }, { value: false, label: "Off" }] });
+    }
+  return groups.length ? { variants: groups } : {};
+}
+// "confetti-fireworks" -> "Fireworks", "dock-demo-2" -> "Demo 2", "x-demo" -> "Default",
+// "glare-hover-demo-cta" -> "CTA".
+function exampleLabel(name, example) {
+  let s = example.slice(name.length).replace(/^-/, "");
+  if (!s || s === "demo") return "Default";
+  s = s.replace(/-demo$/, "").replace(/^demo-(?!\d)/, "");
+  return words(s);
+}
+
 const vars = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k.startsWith("--") ? k : `--${k}`, v]));
 function cssText(obj, indent = "") {
   let out = "";
@@ -150,7 +174,31 @@ export async function install(lib, app, names) {
     // Animate UI demos take their docs controls as props: use the defaults.
     const props = {};
     for (const group of Object.values(item.meta?.demoProps ?? {})) for (const [k, v] of Object.entries(group)) props[k] = v?.value;
-    demos.push({ name, demo: found, file: dest(lib, main), props });
+    demos.push({ name, demo: found, file: dest(lib, main), props, ...variantsOf(item) });
+  }
+
+  // Magic UI: the other examples of a component in the registry (confetti-fireworks,
+  // dock-demo-2), so the gallery's gear menu can switch the live demo to them (v=<example>).
+  if (lib === "magicui") {
+    const index = await (await fetch(`${RAW}/${REG.magicui.repo}/HEAD/${REG.magicui.dir}/registry.json`)).json();
+    const examples = index.items.filter((i) => i.type === "registry:example").map((i) => i.name);
+    for (const d of demos) {
+      if (!d.demo || d.file.startsWith("custom/")) continue;
+      // An example belongs to the longest component name it starts with.
+      const mine = examples.filter((e) => (e === d.name || e.startsWith(d.name + "-")) && !names.some((m) => m.length > d.name.length && (e === m || e.startsWith(m + "-"))));
+      if (mine.length < 2 || !mine.includes(d.demo)) continue;
+      const options = [{ value: "", label: exampleLabel(d.name, d.demo) }];
+      d.examples = {};
+      for (const e of mine.filter((x) => x !== d.demo)) {
+        const item = await add(lib, e);
+        const f = item && item.files?.find((f) => f.content && /\.(t|j)sx$/.test(f.path));
+        if (!f) continue;
+        d.examples[e] = dest(lib, f);
+        options.push({ value: e, label: exampleLabel(d.name, e) });
+      }
+      if (options.length > 1) d.variants = [{ key: "v", label: "Example", options }];
+      else delete d.examples;
+    }
   }
 
   // Close over imports the registry metadata forgot: shadcn ui/hooks and npm packages.
@@ -185,7 +233,10 @@ export async function install(lib, app, names) {
 
   // demos.tsx: one lazy import per component, picking the default or first function export.
   let src = `import { lazy } from "react";\nconst pick = (m: any) => ({ default: m.default ?? Object.values(m).find((v) => typeof v === "function") });\nexport const demos: Record<string, any> = {\n`;
-  for (const d of demos) if (d.demo) src += `  ${JSON.stringify(d.name)}: lazy(() => import(${JSON.stringify("@/" + d.file.replace(/\.(t|j)sx?$/, ""))}).then(pick)),\n`;
+  const entry = (key, file) => `  ${JSON.stringify(key)}: lazy(() => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}).then(pick)),\n`;
+  for (const d of demos) if (d.demo) src += entry(d.name, d.file);
+  // Other examples, as <name>~<example> (the stage page takes v=<example>).
+  for (const d of demos) for (const [e, file] of Object.entries(d.examples ?? {})) src += entry(`${d.name}~${e}`, file);
   src += "};\n";
   src += `export const props: Record<string, any> = ${JSON.stringify(Object.fromEntries(demos.filter((d) => d.demo && Object.keys(d.props).length).map((d) => [d.name, d.props])), null, 1)};\n`;
   writeFileSync(join(app, "src/demos.tsx"), src);

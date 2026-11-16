@@ -44,14 +44,14 @@ if (live) {
   // Window capture runs before the demo's own handlers, so the overlay is still in the DOM here.
   const overlay = ["[role=dialog]", "[role=alertdialog]", "[role=menu]", "[role=listbox]"].map((s) => `${s}:not([data-state=closed])`).join(",");
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.querySelector(overlay)) tell("escape"); }, true);
-  // grid=1: a card in the grid. A click on the demo's controls works; a click anywhere else opens the card.
-  if (q.has("grid")) {
-    const control = "a,button,input,select,textarea,label,summary,[role=button],[role=switch],[role=checkbox],[role=tab],[role=menuitem],[role=slider],[contenteditable],[tabindex]:not([tabindex='-1'])";
-    addEventListener("click", (e) => {
-      const t = e.target as Element;
-      if (t.closest?.(control) || getComputedStyle(t).cursor === "pointer") return;
-      e.preventDefault(); e.stopPropagation(); tell("open");
-    }, true);
+  // card=1: a gallery card, where the demo mounts when the mouse rests on it. A demo cannot
+  // take the keyboard focus from the gallery until it is clicked, pressed or typed in.
+  if (q.has("card")) {
+    const focus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function () {};
+    const used = () => { HTMLElement.prototype.focus = focus; removeEventListener("pointerdown", used, true); removeEventListener("keydown", used, true); };
+    addEventListener("pointerdown", used, true);
+    addEventListener("keydown", used, true);
   }
 }
 
@@ -73,9 +73,14 @@ if (q.get("cursor")) {
 function Stage() {
   const [run, setRun] = useState(0);
   useEffect(() => { w.__remount = () => { w.__ready = false; setRun((n) => n + 1); }; }, []);
-  const Demo = demos[q.get("c") || ""];
+  // v=<example>: another example of the component (variants.mjs); p=<json>: props picked in the
+  // gallery's variants menu, over the demo's own defaults.
+  const c = q.get("c") || "", v = q.get("v");
+  const Demo = demos[v ? `${c}~${v}` : c] ?? demos[c];
+  let picked = {};
+  try { picked = JSON.parse(q.get("p") || "{}"); } catch {}
   return (
-    <Boundary key={run}><Suspense fallback={null}>{Demo ? <><Demo {...(props[q.get("c") || ""] ?? {})} /><Ready /></> : <p>unknown component</p>}</Suspense></Boundary>
+    <Boundary key={run}><Suspense fallback={null}>{Demo ? <><Demo {...(props[c] ?? {})} {...picked} /><Ready /></> : <p>unknown component</p>}</Suspense></Boundary>
   );
 }
 

@@ -1,1 +1,0 @@
-import{a as e,c as t}from"./index-zOS5uHYh.js";var n=t(e(),1);function r(e){return n.useSyncExternalStore(t=>e.on(`change`,t),()=>e.get(),()=>e.get())}export{r as t};

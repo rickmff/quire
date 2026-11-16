@@ -20,6 +20,8 @@ for (const lib of libs) {
   mkdirSync(dir, { recursive: true });
   const report = existsSync(join(out, "report.json")) ? JSON.parse(readFileSync(join(out, "report.json"), "utf8")) : {};
   const built = existsSync(join(root, "public/stage", lib, "index.html"));
+  // Variants the live demo can switch to (variants.mjs): other examples (v=) or props (p=).
+  const variants = Object.fromEntries((existsSync(join(`app-${lib}`, "demos.json")) ? JSON.parse(readFileSync(join(`app-${lib}`, "demos.json"), "utf8")) : []).filter((d) => d.variants).map((d) => [d.name, d.variants]));
   if (!built) console.log(`no live demos for ${lib}: run ./build.sh ${root} ${lib} first`);
   for (const c of data.components.filter((c) => c.library === lib)) {
     const s = {};
@@ -55,6 +57,7 @@ for (const lib of libs) {
     if (light) {
       s.live = { src: light.src, frame: light.frame, view: VIEW };
       if (dark) { s.live.srcDark = dark.src; s.live.frameDark = dark.frame; }
+      if (variants[c.name]) s.live.variants = variants[c.name];
     }
     if (s.image) shots[c.id] = s; else { delete shots[c.id]; console.log("no preview:", c.id); }
   }
