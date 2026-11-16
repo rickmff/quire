@@ -829,7 +829,9 @@ export default function App() {
                   />
                 ) : null;
               }}
-              intro={intro === "deal"}
+              // Starred cards exist before the catalog arrives; deal only once
+              // every card of the view is there, not just those.
+              intro={intro === "deal" && Boolean(catalog)}
               onDeal={onDeal}
               onAgent={(text) => copy(text, "Copied for your agent")}
               empty={
