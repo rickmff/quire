@@ -2,7 +2,7 @@
 
 import { Command } from "cmdk";
 import SocialLinks from "@/components/SocialLinks";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   type Bookmark,
   type Library,
@@ -72,6 +72,28 @@ export default function App() {
     const t = setTimeout(() => !dealing.current && setIntro("show"), 1600);
     return () => clearTimeout(t);
   }, [intro]);
+  // Switching views from the sidebar: the new title and the cards in view
+  // settle in with a short stagger, a quick echo of the first-load deal.
+  const mainRef = useRef<HTMLElement>(null);
+  const shownView = useRef(view);
+  useLayoutEffect(() => {
+    if (shownView.current === view) return;
+    shownView.current = view;
+    const main = mainRef.current;
+    if (!main || intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const vh = window.innerHeight;
+    const els = [...main.querySelectorAll<HTMLElement>("h1, section > button[data-chrome], [data-grid] > *")].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.top < vh && r.bottom > 0;
+    });
+    els.forEach((el, i) =>
+      el.animate(
+        [{ opacity: 0, transform: "translateY(8px) scale(.985)", filter: "blur(2px)" }, { opacity: 1, transform: "none", filter: "none" }],
+        { duration: 360, delay: Math.min(i, 10) * 28, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" },
+      ),
+    );
+  }, [view, intro]);
+
   // The onboarding has no cards to deal.
   const onboarding = isGallery(view) && ready && catalog && !lib.mode && lib.bookmarks.length === 0;
   useEffect(() => {
@@ -565,7 +587,7 @@ export default function App() {
         openId={open?.id}
       />
 
-      <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
+      <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
         <header data-chrome style={{ "--d": "60ms" } as React.CSSProperties} className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
             className="flex h-14 items-center gap-4"
@@ -680,7 +702,7 @@ export default function App() {
         ) : ready && visible.length === 0 ? (
           <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
         ) : (
-          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
             {visible.map((b) => (
               <Card
                 key={b.id}
