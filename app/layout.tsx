@@ -1,30 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DEFAULT_TITLE, DESCRIPTION, SITE_NAME, SITE_URL, social } from "@/lib/seo";
 
-const DESCRIPTION = "Keep every component you find. Hand them to your agent.";
-// public/og.png is a static asset, served by the Workers assets binding.
-const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "quire: Keep every component you find. Hand them to your agent." };
-
+// Routes set their own title, canonical and social cards; see lib/seo.ts.
 export const metadata: Metadata = {
-  metadataBase: new URL("https://quire.fyi"),
-  title: "quire",
+  metadataBase: new URL(SITE_URL),
+  title: { default: DEFAULT_TITLE, template: `%s · ${SITE_NAME}` },
   description: DESCRIPTION,
-  openGraph: {
-    type: "website",
-    url: "/",
-    siteName: "quire",
-    title: "quire",
-    description: DESCRIPTION,
-    images: [OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "quire",
-    description: DESCRIPTION,
-    images: [OG_IMAGE],
-  },
+  applicationName: SITE_NAME,
+  authors: [{ name: "Henrique Matos", url: "https://github.com/rickmff" }],
+  creator: "Henrique Matos",
+  ...social("/", DEFAULT_TITLE, DESCRIPTION),
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b0b" },
+  ],
 };
 
 // Runs from the server-rendered HTML, before any script bundle. A service worker
