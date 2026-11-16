@@ -979,12 +979,12 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
               data-row
               aria-expanded={expanded}
               onClick={() => toggle(g.key)}
-              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[11px] whitespace-nowrap text-faint transition hover:text-muted"
             >
               <span className="flex w-[26px] shrink-0 items-center">
                 <svg
                   viewBox="0 0 8 8"
-                  className={`size-2 text-faint transition-transform duration-200 group-hover:text-muted ${expanded ? "rotate-90" : ""}`}
+                  className={`size-2 transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
                   aria-hidden
                 >
                   <path d="M2.5 1.5 5.5 4l-3 2.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -1000,10 +1000,10 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
                   data-row
                   aria-current={openId === i.id ? "page" : undefined}
                   onClick={() => openItem(i)}
-                  className="group flex h-6 shrink-0 items-center gap-2 pl-6 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+                  className="group flex h-7 shrink-0 items-center gap-2 pl-6 text-left text-[13px] whitespace-nowrap text-fg transition"
                 >
                   <span className="w-[26px] shrink-0">
-                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
+                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-faint group-hover:bg-muted"}`} />
                   </span>
                   <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
                     {i.title}
