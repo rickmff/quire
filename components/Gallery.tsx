@@ -400,7 +400,7 @@ function ComponentCard({
           <span className="truncate first-letter:uppercase">{item.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
-        <div className="mt-0.5 flex items-start justify-between gap-3">
+        <div className="mt-0.5 flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
           </p>
@@ -444,7 +444,7 @@ export function AgentButton({ onClick }: { onClick: () => void }) {
       }}
       onPointerDown={(e) => e.stopPropagation()}
       title="Copy an agent-ready description"
-      className="btn btn-secondary btn-sm -mr-0.5 mt-1 shrink-0 !h-[22px] !px-2 text-[11px]"
+      className="btn btn-secondary btn-sm -my-[3px] -mr-0.5 shrink-0 !h-[22px] !px-2 text-[11px]"
     >
       Copy for agent
     </button>

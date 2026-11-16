@@ -1627,7 +1627,7 @@ function Card({
           <span className="truncate first-letter:uppercase">{b.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
-        <div className="mt-0.5 flex items-start justify-between gap-3">
+        <div className="mt-0.5 flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {typeById(typeOf(b)).name}
             {b.description && <span className="text-faint"> · {b.description}</span>}
