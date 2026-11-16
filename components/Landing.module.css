@@ -92,7 +92,7 @@
   .bar .x:hover { transform: none; }
   .gh:hover .star, .gh:focus-visible .star { animation: none; }
 }
-.wordmark { display: block; height: 22px; width: auto; color: var(--fg); }
+.wordmark { display: block; height: 26px; width: auto; color: var(--fg); }
 
 .main {
   display: grid; justify-items: center; align-content: center; min-height: 0;
@@ -147,5 +147,6 @@
 
 @media (max-width: 520px) {
   .page { padding: 20px; }
+  .wordmark { height: 24px; }
   .main { gap: 40px; }
 }
