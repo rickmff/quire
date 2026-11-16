@@ -1022,10 +1022,10 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
                   data-row
                   aria-current={openId === i.id ? "page" : undefined}
                   onClick={() => openItem(i)}
-                  className="group flex h-7 shrink-0 items-center gap-2 pl-6 text-left text-[13px] whitespace-nowrap text-fg transition"
+                  className="group flex h-7 shrink-0 items-center gap-2 rounded-md pr-2 pl-6 text-left text-[13px] whitespace-nowrap text-fg transition hover:bg-hover aria-[current=page]:hover:bg-transparent"
                 >
                   <span className="w-[26px] shrink-0">
-                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-faint group-hover:bg-muted"}`} />
+                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-faint group-hover:bg-fg"}`} />
                   </span>
                   <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
                     {i.title}
