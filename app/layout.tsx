@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: "quire",
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: DROP_SW }} />
       </head>
-      <body className="font-sans min-h-dvh">{children}</body>
+      <body className="font-sans min-h-dvh">
+        <TooltipProvider>{children}</TooltipProvider>
+      </body>
     </html>
   );
 }

@@ -7,6 +7,7 @@ import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
+import { Tip } from "@/components/ui/tooltip";
 import { deal } from "@/lib/deal";
 import { agentText } from "@/lib/agentText";
 import { Maximize2 } from "lucide-react";
@@ -371,6 +372,7 @@ function ComponentCard({
         </div>
         <OpenDetails onClick={onOpen} />
         {onStar && (
+          <Tip label={starred ? "Remove from Starred" : "Star"}>
           <button
             type="button"
             data-star
@@ -384,7 +386,6 @@ function ComponentCard({
             onPointerDown={(e) => e.stopPropagation()}
             aria-pressed={starred}
             aria-label={starred ? `Remove ${item.title} from Saved` : `Save ${item.title}`}
-            title={starred ? "Remove from Saved" : "Save"}
             onAnimationEnd={() => setPop(false)}
             className={`absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
               starred ? "opacity-100" : "text-muted opacity-0 group-hover:opacity-100 hover:text-[#F59F00]"
@@ -392,6 +393,7 @@ function ComponentCard({
           >
             <StarIcon filled={starred} />
           </button>
+          </Tip>
         )}
         {starred && tools}
       </div>
@@ -414,6 +416,7 @@ function ComponentCard({
 // The open-details icon in a card preview's bottom-right corner, styled like the star.
 export function OpenDetails({ onClick }: { onClick: () => void }) {
   return (
+    <Tip label="Open details">
     <button
       type="button"
       data-open
@@ -424,17 +427,18 @@ export function OpenDetails({ onClick }: { onClick: () => void }) {
       }}
       onPointerDown={(e) => e.stopPropagation()}
       aria-label="Open details"
-      title="Open details"
       className="absolute right-2 bottom-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 text-muted opacity-0 shadow-sm ring-1 ring-line backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
     >
       <Maximize2 size={14} strokeWidth={1.75} aria-hidden />
     </button>
+    </Tip>
   );
 }
 
 // "Copy for agent" on a card, beside the title. Its click stays off the card.
 export function AgentButton({ onClick }: { onClick: () => void }) {
   return (
+    <Tip label="Copy an agent-ready description">
     <button
       type="button"
       onClick={(e) => {
@@ -443,11 +447,11 @@ export function AgentButton({ onClick }: { onClick: () => void }) {
         onClick();
       }}
       onPointerDown={(e) => e.stopPropagation()}
-      title="Copy an agent-ready description"
       className="btn btn-secondary btn-sm -my-[3px] -mr-0.5 shrink-0 !h-[22px] !px-2 text-[11px]"
     >
       Copy for agent
     </button>
+    </Tip>
   );
 }
 
@@ -561,17 +565,19 @@ export function Detail({
           </dl>
 
           {item.install && (
+            <Tip label="Copy install command">
             <button
               onClick={() => copy(item.install!, "Command copied")}
-              title="Copy"
               className="mt-5 flex w-full items-center justify-between gap-3 rounded-md bg-field px-3 py-2 text-left font-mono text-[11px] text-muted transition hover:bg-field-focus"
             >
               <span className="truncate">{item.install}</span>
               <span className="shrink-0 font-sans text-faint">Copy</span>
             </button>
+            </Tip>
           )}
 
           <div className="mt-3 flex flex-wrap gap-1.5">
+            <Tip label={saved ? "Remove from Starred" : "Add to Starred"}>
             <button
               type="button"
               data-star
@@ -580,7 +586,6 @@ export function Detail({
                 onStar();
               }}
               aria-pressed={saved}
-              title={saved ? "Remove from Saved" : "Save"}
               className={`group btn ${saved ? "btn-secondary" : "btn-primary"}`}
             >
               <span className={`flex ${pop ? "star-pop" : ""}`} onAnimationEnd={() => setPop(false)}>
@@ -588,6 +593,7 @@ export function Detail({
               </span>
               {saved ? "Starred" : "Star"}
             </button>
+            </Tip>
             <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
             </button>

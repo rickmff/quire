@@ -2,6 +2,7 @@
 
 import { Command } from "cmdk";
 import SocialLinks from "@/components/SocialLinks";
+import { Tip } from "@/components/ui/tooltip";
 import StarIcon from "@/components/StarIcon";
 import { PlusIcon as Plus, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -659,13 +660,12 @@ export default function App() {
                   ["add", "Add a component or library", "+", Plus],
                 ] as const
               ).map(([m, label, key, Icon]) => (
+                <Tip key={m} label={label} shortcut={key}>
                 <button
-                  key={m}
                   type="button"
                   role="radio"
                   aria-checked={barMode === m}
                   aria-label={label}
-                  title={`${label}  ${key}`}
                   onClick={() => {
                     setBarMode(m);
                     inputRef.current?.focus();
@@ -676,6 +676,7 @@ export default function App() {
                 >
                   <Icon className="size-3.5" strokeWidth={1.75} aria-hidden />
                 </button>
+                </Tip>
               ))}
             </div>
             <input
@@ -698,24 +699,26 @@ export default function App() {
             />
             {input.trim() && (barMode === "add" || normalizeUrl(input)) && (
               <>
+                <Tip label="Add this link as a component">
                 <button
                   type="submit"
-                  title="Add this link as a component"
                   className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
                 >
                   Add component <span className="text-faint">↵</span>
                 </button>
+                </Tip>
+                <Tip label="Find every component in this library and sort them by type">
                 <button
                   type="button"
                   onClick={() => {
                     startImport(input);
                     setInput("");
                   }}
-                  title="Find every component on this library and sort them by type"
                   className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
                 >
                   Import library
                 </button>
+                </Tip>
               </>
             )}
             {barMode === "search" && input && !normalizeUrl(input) && (
@@ -825,9 +828,11 @@ export default function App() {
             <span className="text-faint tabular-nums">{visible.length || ""}</span>
           </h1>
           {libFilter && (
-            <button onClick={() => setLibFilter(null)} className="text-[12px] text-muted transition hover:text-fg" title="Clear filter">
+            <Tip label="Clear filter">
+            <button onClick={() => setLibFilter(null)} className="text-[12px] text-muted transition hover:text-fg">
               {libFilter} <span className="text-faint">×</span>
             </button>
+            </Tip>
           )}
         </div>
 
@@ -1494,6 +1499,7 @@ function NavItem({
   const active = view === id;
   const droppable = !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
   return (
+    <Tip label={onRename ? "Double-click to rename" : undefined} side="right">
     <button
       onClick={() => setView(id)}
       onDoubleClick={onRename}
@@ -1508,7 +1514,6 @@ function NavItem({
         const bid = e.dataTransfer.getData("text/bookmark-id");
         if (bid && droppable) moveTo(bid, id);
       }}
-      title={onRename ? "Double-click to rename" : undefined}
       data-row
       aria-current={active ? "page" : undefined}
       className={`group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap transition md:rounded-none md:px-0 ${
@@ -1524,11 +1529,11 @@ function NavItem({
       </span>
       {onDelete && (
         // A span, not a button: it sits inside the row's button.
+        <Tip label="Remove collection">
         <span
           role="button"
           tabIndex={0}
           aria-label={`Remove collection “${name}”`}
-          title="Remove collection"
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
@@ -1544,8 +1549,10 @@ function NavItem({
         >
           <TrashIcon />
         </span>
+        </Tip>
       )}
     </button>
+    </Tip>
   );
 }
 
@@ -1608,17 +1615,18 @@ function Card({
         <OpenDetails onClick={onOpen} />
 
         {/* Every saved card is starred; un-starring is how it is removed. */}
+        <Tip label="Remove from Starred">
         <button
           type="button"
           data-star
           onClick={onUnstar}
           aria-pressed
           aria-label={`Remove ${b.title} from Starred`}
-          title="Remove from Starred"
           className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg"
         >
           <StarIcon filled />
         </button>
+        </Tip>
         <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
       </div>
 
@@ -1636,13 +1644,14 @@ function Card({
         </div>
 
         {b.install && (
+          <Tip label="Copy install command">
           <button
             onClick={onCopy}
-            title="Copy"
             className="mt-1 block max-w-full truncate text-left font-mono text-[11px] text-faint transition hover:text-muted"
           >
             {b.install}
           </button>
+          </Tip>
         )}
 
         {editing ? (
@@ -1700,7 +1709,8 @@ function CardTools({
       <IconBtn label="Note for your agent" onClick={onNote}>
         <NoteIcon />
       </IconBtn>
-      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
+      <Tip label="Move to collection">
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
         <FolderIcon />
         <select
           value={b.collectionId ?? ""}
@@ -1716,7 +1726,9 @@ function CardTools({
           ))}
         </select>
       </label>
-      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
+      </Tip>
+      <Tip label="Change type">
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
         <TagIcon />
         <select
           value={typeOf(b)}
@@ -1731,6 +1743,7 @@ function CardTools({
           ))}
         </select>
       </label>
+      </Tip>
     </div>
   );
 }
@@ -1779,15 +1792,16 @@ function StarredTools({
 
 function IconBtn({ label, onClick, children, data }: { label: string; onClick: () => void; children: React.ReactNode; data?: string }) {
   return (
+    <Tip label={label}>
     <button
       onClick={onClick}
       {...(data ? { [`data-${data}`]: "" } : {})}
       aria-label={label}
-      title={label}
       className="grid size-6 place-items-center rounded text-muted transition hover:bg-hover hover:text-fg"
     >
       {children}
     </button>
+    </Tip>
   );
 }
 
