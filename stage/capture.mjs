@@ -10,6 +10,9 @@ mkdirSync(OUT, { recursive: true });
 const demos = JSON.parse(readFileSync(`app-${lib}/demos.json`, "utf8")).filter((d) => d.demo && (!only.length || only.includes(d.name)));
 const POSES = existsSync("poses.json") ? JSON.parse(readFileSync("poses.json", "utf8")) : {};
 const D = 4, VW = 1280, VH = 800;
+// Frames from frame.py (frames/<library>.json): centered on the demo at rest and fitted to
+// everything it shows over its clip, in both themes. They replace the frame cut around the still.
+const FRAMES = existsSync(`frames/${lib}.json`) ? JSON.parse(readFileSync(`frames/${lib}.json`, "utf8")) : {};
 const MIRROR = existsSync("mirror/manifest.json") ? JSON.parse(readFileSync("mirror/manifest.json", "utf8")) : null;
 
 async function pose(p, steps = []) {
@@ -75,7 +78,8 @@ async function worker() {
     const { d, theme } = queue.shift();
     const cfg = POSES[`${lib}/${d.name}`] ?? {};
     const ctx = await browser.newContext({ viewport: { width: VW, height: VH }, deviceScaleFactor: D, colorScheme: theme, reducedMotion: "no-preference" });
-    let zoom = cfg.zoom ?? 1, errs = [], blocked = [];
+    const fixed = FRAMES[d.name];
+    let zoom = fixed?.zoom ?? cfg.zoom ?? 1, errs = [], blocked = [];
     try {
       let shot;
       for (let attempt = 0; ; attempt++) {
@@ -85,10 +89,10 @@ async function worker() {
         // Too big for the stage: shrink the subject and shoot again (not for full-bleed backgrounds).
         const t = shot.t, tw = t.info.width / D, th = t.info.height / D, top = -t.info.trimOffsetTop / D, left = -t.info.trimOffsetLeft / D;
         const touches = top < 2 || top + th > VH - 2 || left < 2 || left + tw > VW - 2;
-        if (cfg.fullFrame || cfg.fill || cfg.zoom || !touches || tw >= VW * 0.97 || attempt >= 2) break;
+        if (fixed || cfg.fullFrame || cfg.fill || cfg.zoom || !touches || tw >= VW * 0.97 || attempt >= 2) break;
         zoom = +(zoom * 0.72).toFixed(2);
       }
-      const f = cfg.fullFrame || cfg.fill ? { x: 0, y: 0, width: VW, height: VH } : frameOf(shot.t, cfg);
+      const f = cfg.fullFrame || cfg.fill ? { x: 0, y: 0, width: VW, height: VH } : fixed ? { x: fixed.x, y: fixed.y, width: fixed.width, height: fixed.height, content: fixed.content } : frameOf(shot.t, cfg);
       const L = Math.round(f.x * D), T = Math.round(f.y * D);
       const png = await sharp(shot.full).extract({ left: L, top: T, width: Math.min(VW * D - L, Math.round(f.width * D)), height: Math.min(VH * D - T, Math.round(f.height * D)) }).toBuffer();
       const base = `${OUT}/${d.name}-${theme}`;

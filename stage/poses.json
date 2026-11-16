@@ -1261,7 +1261,8 @@
     }
    ],
    "seconds": 5.1
-  }
+  },
+  "spill": true
  },
  "magicui/magic-card": {
   "w": 460,
@@ -1415,7 +1416,9 @@
    ],
    "seconds": 5.9,
    "cursor": false
-  }
+  },
+  "spill": true,
+  "keepframe": true
  },
  "magicui/pointer": {
   "steps": [
@@ -1830,7 +1833,8 @@
    ],
    "seconds": 5.5
   },
-  "freetheme": true
+  "freetheme": true,
+  "spill": true
  },
  "animate-ui/components-community-flip-card": {
   "video": {
@@ -2395,7 +2399,8 @@
    ],
    "seconds": 5.7
   },
-  "freetheme": true
+  "freetheme": true,
+  "spill": true
  },
  "magicui/bento-grid": {
   "video": {
@@ -2864,5 +2869,14 @@
    ],
    "seconds": 4.9
   }
+ },
+ "magicui/shimmer-button": {
+  "center": "layout"
+ },
+ "magicui/icon-cloud": {
+  "center": "layout"
+ },
+ "magicui/rainbow-button": {
+  "center": "layout"
  }
 }

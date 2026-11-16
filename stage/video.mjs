@@ -17,8 +17,12 @@ const MIRROR = existsSync("mirror/manifest.json") ? JSON.parse(readFileSync("mir
 const report = JSON.parse(readFileSync(`${OUT}/report.json`, "utf8"));
 const POSES = existsSync("poses.json") ? JSON.parse(readFileSync("poses.json", "utf8")) : {};
 const demos = JSON.parse(readFileSync(`app-${lib}/demos.json`, "utf8")).filter((d) => d.demo && (!only.length || only.includes(d.name)));
-const vreport = existsSync(`${OUT}/video.json`) ? JSON.parse(readFileSync(`${OUT}/video.json`, "utf8")) : {};
+const VREPORT = `${OUT}/${process.env.MEASURE ? "measure" : "video"}.json`;
+const vreport = existsSync(VREPORT) ? JSON.parse(readFileSync(VREPORT, "utf8")) : {};
 const POINTER = new Set(["hover", "to", "path", "click", "rightclick", "drag", "down", "leave", "dblclick"]);
+// MEASURE=1: no clip. Run the same steps and note where the demo paints over time (both
+// themes), so frame.mjs can center the frame on the demo at rest and fit everything it shows.
+const MEASURE = Boolean(process.env.MEASURE);
 
 // Turn a still's pose into timed video steps when poses.json gives no video.steps:
 // waits become gaps (capped), actions keep their order, and the pointer leaves at the end.
@@ -59,8 +63,8 @@ async function record(browser, d, theme, slow) {
   const steps = timeline(cfg);
   const pointer = v.cursor ?? steps.some((s) => Object.keys(s).some((x) => POINTER.has(x)));
   // Pointer size in CSS px, so it shows at about the same size in every clip.
-  const cursor = pointer ? Math.round(Math.max(12, (20 * f.width) / 640)) : 0;
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2, colorScheme: theme, reducedMotion: "no-preference" });
+  const cursor = pointer && !MEASURE ? Math.round(Math.max(12, (20 * f.width) / 640)) : 0;
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: MEASURE ? 1 : 2, colorScheme: theme, reducedMotion: "no-preference" });
   if (k !== 1) await ctx.addInitScript(slowClock(k));
   const p = await ctx.newPage();
   const cdp = await ctx.newCDPSession(p);
@@ -160,6 +164,19 @@ async function record(browser, d, theme, slow) {
     // A screenshot clip is in page coordinates, so when a step may scroll the page, grab the
     // whole viewport (what is on screen) and cut the frame out of it afterwards.
     const pageScroll = steps.some((s) => s.scroll || s.eval);
+    if (MEASURE) {
+      const samples = [];
+      while (Date.now() - t0 < seconds * 1000 * k) {
+        const t = Math.round((Date.now() - t0) / k);
+        const png = Buffer.from((await cdp.send("Page.captureScreenshot", { format: "png" })).data, "base64");
+        const r = await sharp(png).trim({ threshold: 4 }).toBuffer({ resolveWithObject: true }).catch(() => null);
+        if (r) { const x = -r.info.trimOffsetLeft, y = -r.info.trimOffsetTop; samples.push([t, x, y, x + r.info.width, y + r.info.height]); }
+        await p.waitForTimeout(60 * k);
+      }
+      await actions;
+      const first = steps.find((s) => Object.keys(s).some((x) => POINTER.has(x) || ["type", "press", "scroll", "eval"].includes(x)));
+      return { samples, first: first ? first.at ?? 0 : null, frame: f, pageScroll };
+    }
     const clip = { x: f.x, y: f.y, width: f.width, height: f.height, scale: W / f.width / 2 };
     while (Date.now() - t0 < seconds * 1000 * k) {
       const shot = await cdp.send("Page.captureScreenshot", { format: "jpeg", quality: 92, optimizeForSpeed: true, ...(pageScroll ? {} : { clip }) });
@@ -218,6 +235,7 @@ await Promise.all(Array.from({ length: Number(process.env.JOBS || 3) }, async ()
     const { d, theme } = queue.shift();
     try {
       let r = await record(browser, d, theme);
+      if (MEASURE) { vreport[`${d.name}|${theme}`] = r; console.log(d.name, theme, r.samples?.length ?? JSON.stringify(r)); continue; }
       // Too slow to paint here: record again in slow motion, fast enough for 24+ fps.
       if (r.skip === "slow") r = await record(browser, d, theme, Math.min(12, Math.ceil(22 / Math.max(r.fps, 1))));
       vreport[`${d.name}|${theme}`] = r;
@@ -225,5 +243,5 @@ await Promise.all(Array.from({ length: Number(process.env.JOBS || 3) }, async ()
     } catch (e) { vreport[`${d.name}|${theme}`] = { error: String(e.message).slice(0, 200) }; console.log(d.name, theme, "FAILED", String(e.message).split("\n")[0]); }
   }
 }));
-writeFileSync(`${OUT}/video.json`, JSON.stringify(vreport, null, 1));
+writeFileSync(`${OUT}/${MEASURE ? "measure" : "video"}.json`, JSON.stringify(vreport, null, 1));
 await browser.close();
