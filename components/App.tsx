@@ -964,23 +964,19 @@ function groupItems(items: GalleryItem[]) {
 
 function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openItem: (item: GalleryItem) => void; openId?: string }) {
   const groups = useMemo(() => groupItems(items), [items]);
-  const [open, setOpen] = useState<Set<string>>(() => new Set());
+  // One group open at a time, like an accordion.
+  const [open, setOpen] = useState<string | null>(null);
   // The group that holds the open component opens with it.
   useEffect(() => {
     const g = groups.find((g) => g.items.some((i) => i.id === openId));
-    if (g) setOpen((s) => (s.has(g.key) ? s : new Set(s).add(g.key)));
+    if (g) setOpen(g.key);
   }, [groups, openId]);
-  const toggle = (k: string) =>
-    setOpen((s) => {
-      const n = new Set(s);
-      if (!n.delete(k)) n.add(k);
-      return n;
-    });
+  const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
 
   return (
     <div className="hidden md:contents">
       {groups.map((g) => {
-        const expanded = open.has(g.key);
+        const expanded = open === g.key;
         return (
           <div key={g.key} className="contents">
             <button
