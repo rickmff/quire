@@ -39,7 +39,9 @@ const TAIL = "Hand them to your agent.";
 function Stream({ text, from }: { text: string; from: number }) {
   return text.split(" ").map((w, i) => (
     <Fragment key={i}>
-      <span className={s.word} style={{ "--w": from + i } as CSSProperties}>{w}</span>{" "}
+      <span className={s.word} style={{ "--w": from + i } as CSSProperties}>
+        {w}
+      </span>{" "}
     </Fragment>
   ));
 }
@@ -47,7 +49,10 @@ function Stream({ text, from }: { text: string; from: number }) {
 export default function Landing() {
   return (
     <div className={s.page}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c") }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c") }}
+      />
       <header className={`${s.bar} ${s.enter}`}>
         <Link href="/" aria-label="quire">
           <Wordmark className={s.wordmark} />
@@ -61,13 +66,13 @@ export default function Landing() {
           <h1 className={s.title} aria-label={`${LEAD} ${TAIL}`}>
             <span aria-hidden="true">
               <Stream text={LEAD} from={0} />
-              <span className={s.muted}><Stream text={TAIL} from={LEAD.split(" ").length} /></span>
+              <span className={s.muted}>
+                <Stream text={TAIL} from={LEAD.split(" ").length} />
+              </span>
             </span>
           </h1>
           <div className={`${s.cta} ${s.enter}`} style={{ "--d": "620ms" } as CSSProperties}>
-            <StartLink className="btn btn-lg btn-primary">
-              Start collecting
-            </StartLink>
+            <StartLink className="btn btn-lg btn-primary">Start collecting</StartLink>
             <a href={`${REPO}/tree/main/extension`} className="btn btn-lg btn-secondary">
               Add to Chrome
             </a>

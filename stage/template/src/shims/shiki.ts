@@ -5,7 +5,12 @@ let hl: Promise<HighlighterCore> | undefined;
 const highlighter = () =>
   (hl ??= createHighlighterCore({
     themes: [import("@shikijs/themes/github-light"), import("@shikijs/themes/github-dark")],
-    langs: [import("@shikijs/langs/tsx"), import("@shikijs/langs/typescript"), import("@shikijs/langs/json"), import("@shikijs/langs/bash")],
+    langs: [
+      import("@shikijs/langs/tsx"),
+      import("@shikijs/langs/typescript"),
+      import("@shikijs/langs/json"),
+      import("@shikijs/langs/bash"),
+    ],
     engine: createOnigurumaEngine(import("shiki/wasm")),
   }));
 

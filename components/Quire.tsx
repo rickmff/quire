@@ -12,7 +12,13 @@ export default function Quire() {
     const scene = ref.current;
     if (!scene) return;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let tx = 0, ty = 0, x = 0, y = 0, near = 0, o = 0, raf = 0;
+    let tx = 0,
+      ty = 0,
+      x = 0,
+      y = 0,
+      near = 0,
+      o = 0,
+      raf = 0;
     const t0 = performance.now();
 
     const move = (e: PointerEvent) => {
@@ -23,7 +29,9 @@ export default function Quire() {
       const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
       near = Math.max(0, 1 - Math.hypot(dx, dy) / 1.1);
     };
-    const leave = () => { tx = ty = near = 0; };
+    const leave = () => {
+      tx = ty = near = 0;
+    };
 
     const frame = (now: number) => {
       const t = (now - t0) / 1000;

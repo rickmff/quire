@@ -50,7 +50,10 @@ export function Gallery({
   const libName = useMemo(() => new Map(libraries.map((l) => [l.id, l.name])), [libraries]);
   const nameOf = (i: GalleryItem) => i.site ?? libName.get(i.library) ?? i.library;
 
-  const filtered = useMemo(() => (trigger ? items.filter((i) => i.triggers.includes(trigger)) : items), [items, trigger]);
+  const filtered = useMemo(
+    () => (trigger ? items.filter((i) => i.triggers.includes(trigger)) : items),
+    [items, trigger],
+  );
 
   const triggerCounts = useMemo(() => {
     const m = new Map<string, number>();
@@ -60,12 +63,16 @@ export function Gallery({
 
   const root = useRef<HTMLElement>(null);
   const before = useRef<Map<string, DOMRect> | null>(null);
-  const star = onStar && ((i: GalleryItem) => {
-    const m = new Map<string, DOMRect>();
-    root.current?.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
-    before.current = m;
-    onStar(i);
-  });
+  const star =
+    onStar &&
+    ((i: GalleryItem) => {
+      const m = new Map<string, DOMRect>();
+      root.current
+        ?.querySelectorAll<HTMLElement>("[data-card]")
+        .forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
+      before.current = m;
+      onStar(i);
+    });
   useLayoutEffect(() => {
     const prev = before.current;
     before.current = null;
@@ -74,7 +81,13 @@ export function Gallery({
     root.current.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => {
       const was = prev.get(el.dataset.card!);
       if (!was) {
-        el.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 320, easing });
+        el.animate(
+          [
+            { opacity: 0, transform: "scale(.96)" },
+            { opacity: 1, transform: "none" },
+          ],
+          { duration: 320, easing },
+        );
         return;
       }
       const now = el.getBoundingClientRect();
@@ -84,10 +97,11 @@ export function Gallery({
       const duration = Math.min(700, 380 + Math.hypot(dx, dy) * 0.25);
       el.style.position = "relative";
       el.style.zIndex = "2";
-      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration, easing }).onfinish = () => {
-        el.style.position = "";
-        el.style.zIndex = "";
-      };
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration, easing }).onfinish =
+        () => {
+          el.style.position = "";
+          el.style.zIndex = "";
+        };
     });
   }, [items]);
 
@@ -102,43 +116,54 @@ export function Gallery({
   useEffect(() => {
     const el = more.current;
     if (!el) return;
-    const io = new IntersectionObserver((e) => e[0].isIntersecting && setShown((n) => n + PAGE), { rootMargin: "800px" });
+    const io = new IntersectionObserver((e) => e[0].isIntersecting && setShown((n) => n + PAGE), {
+      rootMargin: "800px",
+    });
     io.observe(el);
     return () => io.disconnect();
   }, [filtered.length]);
 
   return (
     <section ref={root}>
-      <div data-chrome style={{ "--d": "120ms" } as React.CSSProperties} className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
-      <div className="flex h-12 items-center">
-        <h1 className="flex items-baseline gap-2">
-          <span className="font-medium">{title}</span>
-          <span className="text-faint tabular-nums">{filtered.length || ""}</span>
-        </h1>
-      </div>
-
-      {triggerCounts.size > 1 && (
-        <div className="-mx-1 flex gap-0.5 overflow-x-auto pb-2">
-          {TRIGGERS.filter((t) => triggerCounts.has(t.id)).map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTrigger(trigger === t.id ? null : t.id)}
-              className={`h-7 shrink-0 rounded-md px-2 text-[12px] whitespace-nowrap transition ${
-                trigger === t.id ? "bg-hover text-fg" : "text-faint hover:text-muted"
-              }`}
-            >
-              {t.name} <span className="tabular-nums opacity-60">{triggerCounts.get(t.id)}</span>
-            </button>
-          ))}
+      <div
+        data-chrome
+        style={{ "--d": "120ms" } as React.CSSProperties}
+        className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0"
+      >
+        <div className="flex h-12 items-center">
+          <h1 className="flex items-baseline gap-2">
+            <span className="font-medium">{title}</span>
+            <span className="text-faint tabular-nums">{filtered.length || ""}</span>
+          </h1>
         </div>
-      )}
+
+        {triggerCounts.size > 1 && (
+          <div className="-mx-1 flex gap-0.5 overflow-x-auto pb-2">
+            {TRIGGERS.filter((t) => triggerCounts.has(t.id)).map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTrigger(trigger === t.id ? null : t.id)}
+                className={`h-7 shrink-0 rounded-md px-2 text-[12px] whitespace-nowrap transition ${
+                  trigger === t.id ? "bg-hover text-fg" : "text-faint hover:text-muted"
+                }`}
+              >
+                {t.name} <span className="tabular-nums opacity-60">{triggerCounts.get(t.id)}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {sections && !trigger ? (
         <div className="flex flex-col gap-12">
           {sections.map((sec) => (
             <section key={sec.key}>
-              <button data-chrome style={{ "--d": "160ms" } as React.CSSProperties} onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
+              <button
+                data-chrome
+                style={{ "--d": "160ms" } as React.CSSProperties}
+                onClick={() => onSite?.(sec.key)}
+                className="group mb-3 flex items-baseline gap-2 text-left"
+              >
                 <span className="font-medium">{sec.name}</span>
                 <span className="text-faint tabular-nums">{sec.items.length}</span>
                 <span className="text-[12px] text-faint opacity-0 transition group-hover:opacity-100">View all</span>
@@ -146,7 +171,14 @@ export function Gallery({
               <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
                 {sec.items.slice(0, 4).map((i, n) => (
                   <div key={i.id} className={n === 3 ? "xl:hidden" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
+                    <ComponentCard
+                      item={i}
+                      site={nameOf(i)}
+                      onOpen={() => onOpen(i)}
+                      onStar={star && (() => star(i))}
+                      tools={tools?.(i)}
+                      onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))}
+                    />
                   </div>
                 ))}
               </div>
@@ -154,11 +186,19 @@ export function Gallery({
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        empty ?? <p className="pt-16 text-center text-muted">Nothing here yet.</p>
+        (empty ?? <p className="pt-16 text-center text-muted">Nothing here yet.</p>)
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
+            <ComponentCard
+              key={i.id}
+              item={i}
+              site={nameOf(i)}
+              onOpen={() => onOpen(i)}
+              onStar={star && (() => star(i))}
+              tools={tools?.(i)}
+              onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))}
+            />
           ))}
         </div>
       )}
@@ -191,7 +231,17 @@ function useReducedMotion() {
   return reduce;
 }
 
-export function Preview({ item, site, large, still }: { item: GalleryItem; site: string; large?: boolean; still?: boolean }) {
+export function Preview({
+  item,
+  site,
+  large,
+  still,
+}: {
+  item: GalleryItem;
+  site: string;
+  large?: boolean;
+  still?: boolean;
+}) {
   const dark = useDark();
   const image = (dark && item.previewDark) || item.preview;
   const video = still ? undefined : (dark && item.videoDark) || item.video;
@@ -201,7 +251,10 @@ export function Preview({ item, site, large, still }: { item: GalleryItem; site:
 const onScreen = new Map<Element, (visible: boolean) => void>();
 let screenObserver: IntersectionObserver | undefined;
 function watchOnScreen(el: Element, cb: (visible: boolean) => void) {
-  screenObserver ??= new IntersectionObserver((entries) => entries.forEach((e) => onScreen.get(e.target)?.(e.isIntersecting)), { rootMargin: "200px 0px" });
+  screenObserver ??= new IntersectionObserver(
+    (entries) => entries.forEach((e) => onScreen.get(e.target)?.(e.isIntersecting)),
+    { rootMargin: "200px 0px" },
+  );
   onScreen.set(el, cb);
   screenObserver.observe(el);
   return () => {
@@ -210,7 +263,19 @@ function watchOnScreen(el: Element, cb: (visible: boolean) => void) {
   };
 }
 
-function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; site: string; large?: boolean; image?: string; video?: string }) {
+function PreviewMedia({
+  item,
+  site,
+  large,
+  image,
+  video,
+}: {
+  item: GalleryItem;
+  site: string;
+  large?: boolean;
+  image?: string;
+  video?: string;
+}) {
   const [img, setImg] = useState(Boolean(image));
   const [vid, setVid] = useState(Boolean(video));
   const ref = useRef<HTMLVideoElement>(null);
@@ -262,7 +327,9 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
   return (
     <div className="flex size-full flex-col justify-between p-4">
       <span className="text-[11px] text-faint">{typeById(item.type).name}</span>
-      <span className={`font-medium tracking-tight text-muted ${large ? "text-[28px]" : "text-[19px]"} leading-[1.1] line-clamp-3`}>
+      <span
+        className={`font-medium tracking-tight text-muted ${large ? "text-[28px]" : "text-[19px]"} leading-[1.1] line-clamp-3`}
+      >
         {item.title}
       </span>
       <span className={`text-[11px] text-faint ${capture ? "animate-pulse" : ""}`}>
@@ -272,11 +339,35 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
   );
 }
 
-function LiveDemo({ live, title, onEscape, onReady, card, picked }: { live: Live; title: string; onEscape?: () => void; onReady?: () => void; card?: boolean; picked?: Picked }) {
+function LiveDemo({
+  live,
+  title,
+  onEscape,
+  onReady,
+  card,
+  picked,
+}: {
+  live: Live;
+  title: string;
+  onEscape?: () => void;
+  onReady?: () => void;
+  card?: boolean;
+  picked?: Picked;
+}) {
   const dark = useDark();
   const base = (dark && live.srcDark) || live.src;
   const src = `${base}${card ? "&card=1" : ""}${variantQuery(live.variants, picked)}`;
-  return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} onReady={onReady} />;
+  return (
+    <LiveFrame
+      key={src}
+      src={src}
+      frame={(dark && live.frameDark) || live.frame}
+      view={live.view}
+      title={title}
+      onEscape={onEscape}
+      onReady={onReady}
+    />
+  );
 }
 
 type Picked = Record<string, unknown>;
@@ -301,7 +392,19 @@ function pillSizes(labels: string[]) {
   if (ruler) ruler.font = `11px ${getComputedStyle(document.body).fontFamily}`;
   return labels.map((l) => ({ w: Math.ceil((ruler ? ruler.measureText(l).width : l.length * 6.2) + 22), h: 24 }));
 }
-export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: { groups: LiveVariant[]; picked: Picked; onPick: (p: Picked) => void; onOpenChange?: (open: boolean, at?: { x: number; y: number }) => void; always?: boolean }) {
+export function VariantsMenu({
+  groups,
+  picked,
+  onPick,
+  onOpenChange,
+  always,
+}: {
+  groups: LiveVariant[];
+  picked: Picked;
+  onPick: (p: Picked) => void;
+  onOpenChange?: (open: boolean, at?: { x: number; y: number }) => void;
+  always?: boolean;
+}) {
   const btn = useRef<HTMLButtonElement>(null);
   const [menu, setMenu] = useState<Menu>({ kind: "closed" });
   const one = groups.length === 1;
@@ -312,7 +415,16 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   const isOpen = menu.kind === "open";
   const open = (o: boolean) => {
     const r = btn.current?.getBoundingClientRect();
-    setMenu(o && r ? { kind: "open", at: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, group: one ? 0 : null, grown: false } : { kind: "closed" });
+    setMenu(
+      o && r
+        ? {
+            kind: "open",
+            at: { x: r.left + r.width / 2, y: r.top + r.height / 2 },
+            group: one ? 0 : null,
+            grown: false,
+          }
+        : { kind: "closed" },
+    );
     events.current.onOpenChange?.(o, mouse.current);
   };
   const choose = (group: number | null) => setMenu((m) => (m.kind === "open" ? { ...m, group, grown: false } : m));
@@ -336,18 +448,29 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   const growing = menu.kind === "open" && !menu.grown;
   useEffect(() => {
     if (!growing) return;
-    const f = requestAnimationFrame(() => requestAnimationFrame(() => setMenu((m) => (m.kind === "open" ? { ...m, grown: true } : m))));
+    const f = requestAnimationFrame(() =>
+      requestAnimationFrame(() => setMenu((m) => (m.kind === "open" ? { ...m, grown: true } : m))),
+    );
     return () => cancelAnimationFrame(f);
   }, [growing]);
 
   const g = menu.kind === "open" && menu.group !== null ? groups[menu.group] : null;
   const items = g
-    ? g.options.map((o) => ({ label: o.label, active: current(g, picked) === o.value, pick: () => (onPick({ ...picked, [g.key]: o.value }), open(false)) }))
-    : groups.map((x, i) => ({ label: x.label, active: x.key in picked && picked[x.key] !== (x.value ?? ""), pick: () => choose(i) }));
+    ? g.options.map((o) => ({
+        label: o.label,
+        active: current(g, picked) === o.value,
+        pick: () => (onPick({ ...picked, [g.key]: o.value }), open(false)),
+      }))
+    : groups.map((x, i) => ({
+        label: x.label,
+        active: x.key in picked && picked[x.key] !== (x.value ?? ""),
+        pick: () => choose(i),
+      }));
   const labels = items.map((it) => it.label).join("\n");
   const ring = useMemo(() => (isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null), [isOpen, labels]);
   const shown = menu.kind === "open" && menu.grown;
-  let cx = 0, cy = 0;
+  let cx = 0,
+    cy = 0;
   if (menu.kind === "open" && ring) {
     const m = 8;
     cx = Math.min(window.innerWidth - m - ring.box.right, Math.max(m - ring.box.left, menu.at.x));
@@ -373,10 +496,19 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
           }}
           onPointerDown={(e) => e.stopPropagation()}
           className={`absolute bottom-2 left-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
-            isOpen || changed ? "text-fg opacity-100" : always ? "text-muted" : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+            isOpen || changed
+              ? "text-fg opacity-100"
+              : always
+                ? "text-muted"
+                : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
           }`}
         >
-          <Settings size={14} strokeWidth={1.75} aria-hidden className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
+          <Settings
+            size={14}
+            strokeWidth={1.75}
+            aria-hidden
+            className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
+          />
           {changed && <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#F59F00] ring-2 ring-bg" />}
         </button>
       </Tip>
@@ -393,12 +525,19 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
           >
             <div
               aria-hidden
-              style={{ left: cx, top: cy, width: 2 * ring.reach + 24, height: 2 * ring.reach + 24, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
+              style={{
+                left: cx,
+                top: cy,
+                width: 2 * ring.reach + 24,
+                height: 2 * ring.reach + 24,
+                transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})`,
+              }}
               className={`pointer-events-none absolute rounded-full bg-bg/70 ring-1 ring-line backdrop-blur-[3px] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"}`}
             />
             {items.map((it, i) => {
               const p = ring.at[i] ?? { x: 0, y: 0 };
-              const x = shown ? p.x : 0, y = shown ? p.y : 0;
+              const x = shown ? p.x : 0,
+                y = shown ? p.y : 0;
               return (
                 <button
                   key={`${menu.group}-${it.label}`}
@@ -406,7 +545,12 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
                   role="menuitemradio"
                   aria-checked={it.active}
                   onClick={(e) => (stop(e), it.pick())}
-                  style={{ left: cx, top: cy, transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${shown ? 1 : 0.4})`, transitionDelay: shown ? `${i * 14}ms` : "0ms" }}
+                  style={{
+                    left: cx,
+                    top: cy,
+                    transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${shown ? 1 : 0.4})`,
+                    transitionDelay: shown ? `${i * 14}ms` : "0ms",
+                  }}
                   className={`absolute rounded-full px-2.5 py-1 text-[11px] leading-4 whitespace-nowrap shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] ring-1 transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"} ${
                     it.active ? "bg-fg text-bg ring-fg" : "bg-bg text-fg ring-line hover:bg-hover"
                   }`}
@@ -437,12 +581,18 @@ const pointer = { x: 0, y: 0, t: 0, v: Infinity, on: false };
 function trackPointer() {
   if (pointer.on) return;
   pointer.on = true;
-  document.addEventListener("pointermove", (e) => {
-    const dt = e.timeStamp - pointer.t;
-    const d = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
-    pointer.v = dt > 100 ? d / 16 : dt > 0 ? pointer.v * 0.5 + (d / dt) * 0.5 : pointer.v;
-    pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = e.timeStamp;
-  }, { passive: true, capture: true });
+  document.addEventListener(
+    "pointermove",
+    (e) => {
+      const dt = e.timeStamp - pointer.t;
+      const d = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
+      pointer.v = dt > 100 ? d / 16 : dt > 0 ? pointer.v * 0.5 + (d / dt) * 0.5 : pointer.v;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      pointer.t = e.timeStamp;
+    },
+    { passive: true, capture: true },
+  );
 }
 const SLOW = 0.35;
 const REST = 50;
@@ -451,10 +601,17 @@ type Demo = "off" | "loading" | "shown";
 function useCardLive(enabled: boolean) {
   const [demo, setDemo] = useState<Demo>("off");
   const ref = useRef<HTMLDivElement>(null);
-  const timers = useRef<{ rest?: ReturnType<typeof setTimeout>; dwell?: ReturnType<typeof setTimeout>; grace?: ReturnType<typeof setTimeout> }>({});
+  const timers = useRef<{
+    rest?: ReturnType<typeof setTimeout>;
+    dwell?: ReturnType<typeof setTimeout>;
+    grace?: ReturnType<typeof setTimeout>;
+  }>({});
   const state = useRef<{ inside: boolean; held: boolean; demo: Demo }>({ inside: false, held: false, demo: "off" });
   const [fns] = useState(() => {
-    const to = (d: Demo) => { state.current.demo = d; setDemo(d); };
+    const to = (d: Demo) => {
+      state.current.demo = d;
+      setDemo(d);
+    };
     const clear = (...names: ("rest" | "dwell" | "grace")[]) => names.forEach((n) => clearTimeout(timers.current[n]));
     const stop = () => to("off");
     const start = () => {
@@ -473,7 +630,9 @@ function useCardLive(enabled: boolean) {
       if (state.current.demo !== "shown") return off();
       timers.current.grace = setTimeout(off, 250);
     };
-    const ready = () => { if (state.current.demo === "loading") to("shown"); };
+    const ready = () => {
+      if (state.current.demo === "loading") to("shown");
+    };
     const near = (at: Point, m = 150) => {
       const r = ref.current?.getBoundingClientRect();
       return Boolean(r && at.x >= r.left - m && at.x <= r.right + m && at.y >= r.top - m && at.y <= r.bottom + m);
@@ -538,7 +697,21 @@ function useCardLive(enabled: boolean) {
   };
 }
 
-function LiveFrame({ src, frame, view, title, onEscape, onReady }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void; onReady?: () => void }) {
+function LiveFrame({
+  src,
+  frame,
+  view,
+  title,
+  onEscape,
+  onReady,
+}: {
+  src: string;
+  frame: number[];
+  view: number[];
+  title: string;
+  onEscape?: () => void;
+  onReady?: () => void;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const win = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(0);
@@ -557,8 +730,12 @@ function LiveFrame({ src, frame, view, title, onEscape, onReady }: { src: string
   }, [w]);
   useEffect(() => {
     const on = (e: MessageEvent) => {
-      if (e.origin !== location.origin || e.source !== win.current?.contentWindow || e.data?.source !== "quire-stage") return;
-      if (e.data.event === "ready") { setReady(true); events.current.onReady?.(); }
+      if (e.origin !== location.origin || e.source !== win.current?.contentWindow || e.data?.source !== "quire-stage")
+        return;
+      if (e.data.event === "ready") {
+        setReady(true);
+        events.current.onReady?.();
+      }
       if (e.data.event === "escape") events.current.onEscape?.();
     };
     window.addEventListener("message", on);
@@ -566,7 +743,10 @@ function LiveFrame({ src, frame, view, title, onEscape, onReady }: { src: string
   }, []);
 
   return (
-    <div ref={box} className={`absolute inset-0 overflow-hidden transition-opacity duration-150 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+    <div
+      ref={box}
+      className={`absolute inset-0 overflow-hidden transition-opacity duration-150 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}
+    >
       {scale > 0 && (
         <iframe
           ref={win}
@@ -605,31 +785,35 @@ function ComponentCard({
       <div ref={live.ref} className="relative">
         <div className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
-          {live.on && item.live && <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={live.ready} />}
+          {live.on && item.live && (
+            <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={live.ready} />
+          )}
         </div>
-        {item.live?.variants && <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} onOpenChange={live.hold} />}
+        {item.live?.variants && (
+          <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} onOpenChange={live.hold} />
+        )}
         <OpenDetails onClick={onOpen} />
         {onStar && (
           <Tip label={starred ? "Remove from Starred" : "Star"}>
-          <button
-            type="button"
-            data-star
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setPop(!starred);
-              onStar();
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            aria-pressed={starred}
-            aria-label={starred ? `Remove ${item.title} from Saved` : `Save ${item.title}`}
-            onAnimationEnd={() => setPop(false)}
-            className={`absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
-              starred ? "opacity-100" : "text-muted opacity-0 group-hover:opacity-100 hover:text-[#F59F00]"
-            } ${pop ? "star-pop" : ""}`}
-          >
-            <StarIcon filled={starred} />
-          </button>
+            <button
+              type="button"
+              data-star
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setPop(!starred);
+                onStar();
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              aria-pressed={starred}
+              aria-label={starred ? `Remove ${item.title} from Saved` : `Save ${item.title}`}
+              onAnimationEnd={() => setPop(false)}
+              className={`absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
+                starred ? "opacity-100" : "text-muted opacity-0 group-hover:opacity-100 hover:text-[#F59F00]"
+              } ${pop ? "star-pop" : ""}`}
+            >
+              <StarIcon filled={starred} />
+            </button>
           </Tip>
         )}
         {starred && tools}
@@ -641,7 +825,9 @@ function ComponentCard({
         </div>
         <div className="mt-2 flex items-baseline justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
-            {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
+            {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(
+              " · ",
+            )}
           </p>
           <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
@@ -653,20 +839,20 @@ function ComponentCard({
 export function OpenDetails({ onClick }: { onClick: () => void }) {
   return (
     <Tip label="Open details">
-    <button
-      type="button"
-      data-open
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick();
-      }}
-      onPointerDown={(e) => e.stopPropagation()}
-      aria-label="Open details"
-      className="absolute right-2 bottom-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 text-muted opacity-0 shadow-sm ring-1 ring-line backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
-    >
-      <Maximize2 size={14} strokeWidth={1.75} aria-hidden />
-    </button>
+      <button
+        type="button"
+        data-open
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClick();
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        aria-label="Open details"
+        className="absolute right-2 bottom-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 text-muted opacity-0 shadow-sm ring-1 ring-line backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+      >
+        <Maximize2 size={14} strokeWidth={1.75} aria-hidden />
+      </button>
     </Tip>
   );
 }
@@ -674,18 +860,18 @@ export function OpenDetails({ onClick }: { onClick: () => void }) {
 export function AgentButton({ onClick }: { onClick: () => void }) {
   return (
     <Tip label="Copy an agent-ready description">
-    <button
-      type="button"
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick();
-      }}
-      onPointerDown={(e) => e.stopPropagation()}
-      className="btn btn-secondary btn-sm -my-[3px] -mr-0.5 shrink-0 !h-[22px] !px-2 text-[11px]"
-    >
-      Copy for agent
-    </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClick();
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="btn btn-secondary btn-sm -my-[3px] -mr-0.5 shrink-0 !h-[22px] !px-2 text-[11px]"
+      >
+        Copy for agent
+      </button>
     </Tip>
   );
 }
@@ -707,7 +893,9 @@ export function Detail({
   onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
-  const [src, setSrc] = useState<{ state: "idle" | "loading" | "none" } | { state: "done"; files: SourceFile[]; from?: string }>({ state: "idle" });
+  const [src, setSrc] = useState<
+    { state: "idle" | "loading" | "none" } | { state: "done"; files: SourceFile[]; from?: string }
+  >({ state: "idle" });
   const [tab, setTab] = useState(0);
   const [run, setRun] = useState(0);
   const [picked, setPicked] = useState<Picked>({});
@@ -749,9 +937,19 @@ export function Detail({
         <div className="px-5 pb-10">
           <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-hover">
             <Preview item={item} site={site} large still={Boolean(item.live)} />
-            {item.live && <LiveDemo key={`${item.id}|${run}`} live={item.live} title={item.title} onEscape={onClose} picked={picked} />}
+            {item.live && (
+              <LiveDemo
+                key={`${item.id}|${run}`}
+                live={item.live}
+                title={item.title}
+                onEscape={onClose}
+                picked={picked}
+              />
+            )}
             <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-line ring-inset" />
-            {item.live?.variants && <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} always />}
+            {item.live?.variants && (
+              <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} always />
+            )}
           </div>
           {item.live && (
             <div className="mt-1.5 flex items-center justify-between text-[12px] text-faint">
@@ -764,7 +962,12 @@ export function Detail({
 
           <div className="mt-5 flex items-baseline justify-between gap-4">
             <h2 className="text-[17px] font-medium tracking-tight first-letter:uppercase">{item.title}</h2>
-            <a href={item.docs} target="_blank" rel="noreferrer" className="shrink-0 text-[12px] text-muted transition hover:text-fg">
+            <a
+              href={item.docs}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 text-[12px] text-muted transition hover:text-fg"
+            >
               {site} ↗
             </a>
           </div>
@@ -802,33 +1005,33 @@ export function Detail({
 
           {item.install && (
             <Tip label="Copy install command">
-            <button
-              onClick={() => copy(item.install!, "Command copied")}
-              className="mt-5 flex w-full items-center justify-between gap-3 rounded-md bg-field px-3 py-2 text-left font-mono text-[11px] text-muted transition hover:bg-field-focus"
-            >
-              <span className="truncate">{item.install}</span>
-              <span className="shrink-0 font-sans text-faint">Copy</span>
-            </button>
+              <button
+                onClick={() => copy(item.install!, "Command copied")}
+                className="mt-5 flex w-full items-center justify-between gap-3 rounded-md bg-field px-3 py-2 text-left font-mono text-[11px] text-muted transition hover:bg-field-focus"
+              >
+                <span className="truncate">{item.install}</span>
+                <span className="shrink-0 font-sans text-faint">Copy</span>
+              </button>
             </Tip>
           )}
 
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Tip label={saved ? "Remove from Starred" : "Add to Starred"}>
-            <button
-              type="button"
-              data-star
-              onClick={() => {
-                setPop(!saved);
-                onStar();
-              }}
-              aria-pressed={saved}
-              className={`group btn ${saved ? "btn-secondary" : "btn-primary"}`}
-            >
-              <span className={`flex ${pop ? "star-pop" : ""}`} onAnimationEnd={() => setPop(false)}>
-                <StarIcon filled={saved} />
-              </span>
-              {saved ? "Starred" : "Star"}
-            </button>
+              <button
+                type="button"
+                data-star
+                onClick={() => {
+                  setPop(!saved);
+                  onStar();
+                }}
+                aria-pressed={saved}
+                className={`group btn ${saved ? "btn-secondary" : "btn-primary"}`}
+              >
+                <span className={`flex ${pop ? "star-pop" : ""}`} onAnimationEnd={() => setPop(false)}>
+                  <StarIcon filled={saved} />
+                </span>
+                {saved ? "Starred" : "Star"}
+              </button>
             </Tip>
             <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
@@ -846,7 +1049,9 @@ export function Detail({
                 </button>
               )}
               {src.state === "loading" && <p className="text-[12px] text-faint">Reading source…</p>}
-              {src.state === "none" && <p className="text-[12px] text-faint">The source is not readable right now. Open the docs.</p>}
+              {src.state === "none" && (
+                <p className="text-[12px] text-faint">The source is not readable right now. Open the docs.</p>
+              )}
               {src.state === "done" && src.files.length > 0 && (
                 <div>
                   <div className="flex items-center gap-0.5 overflow-x-auto">
@@ -859,7 +1064,10 @@ export function Detail({
                         {f.path.split("/").pop()}
                       </button>
                     ))}
-                    <button onClick={() => copy(src.files[tab].content, "Code copied")} className="ml-auto h-7 shrink-0 px-2 text-[12px] text-faint transition hover:text-muted">
+                    <button
+                      onClick={() => copy(src.files[tab].content, "Code copied")}
+                      className="ml-auto h-7 shrink-0 px-2 text-[12px] text-faint transition hover:text-muted"
+                    >
                       Copy
                     </button>
                   </div>
@@ -918,7 +1126,9 @@ export function Sources({
                 onClick={() => onToggle(l.id)}
                 className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${on ? "bg-fg" : "bg-hover ring-1 ring-line ring-inset"}`}
               >
-                <span className={`absolute top-0.5 left-0.5 size-3 rounded-full bg-bg transition-transform duration-200 ${on ? "translate-x-3" : ""}`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 size-3 rounded-full bg-bg transition-transform duration-200 ${on ? "translate-x-3" : ""}`}
+                />
               </button>
               <div className="min-w-0 flex-1">
                 <a href={l.url} target="_blank" rel="noreferrer" className={on ? "" : "text-muted"}>
@@ -948,7 +1158,9 @@ export function Sources({
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-muted">Paste the link of any component library. Quire reads it and adds each component by type.</p>
+        <p className="mt-2 text-muted">
+          Paste the link of any component library. Quire reads it and adds each component by type.
+        </p>
       )}
     </section>
   );
@@ -983,7 +1195,8 @@ export function Agents({
         <h1 className="font-medium">Agents</h1>
       </div>
       <p className="text-muted">
-        Add Quire as an MCP server. Your agent can then search components by type and motion, and read their real source code before it writes UI.
+        Add Quire as an MCP server. Your agent can then search components by type and motion, and read their real source
+        code before it writes UI.
       </p>
 
       <div className="mt-6 rounded-lg p-4 ring-1 ring-line ring-inset">
@@ -1001,12 +1214,16 @@ export function Agents({
         ) : available === false ? (
           <>
             <p>The curated library is ready for agents.</p>
-            <p className="mt-1 text-[12px] text-muted">This server has no storage set up yet, so your own library stays in this browser for now.</p>
+            <p className="mt-1 text-[12px] text-muted">
+              This server has no storage set up yet, so your own library stays in this browser for now.
+            </p>
           </>
         ) : (
           <>
             <p>Agents read the curated library.</p>
-            <p className="mt-1 text-[12px] text-muted">Connect your library so they read your sites, saved components and notes instead.</p>
+            <p className="mt-1 text-[12px] text-muted">
+              Connect your library so they read your sites, saved components and notes instead.
+            </p>
             <button onClick={onEnable} disabled={available === null} className="btn btn-primary mt-3">
               Connect my library
             </button>
@@ -1019,21 +1236,38 @@ export function Agents({
           <div key={r.name}>
             <div className="flex items-baseline justify-between">
               <span className="text-[12px] text-faint">{r.name}</span>
-              <button onClick={() => copy(r.text, "Copied")} className="text-[12px] text-faint transition hover:text-muted">
+              <button
+                onClick={() => copy(r.text, "Copied")}
+                className="text-[12px] text-faint transition hover:text-muted"
+              >
                 Copy
               </button>
             </div>
-            <pre className="mt-1 overflow-x-auto rounded-md bg-field px-3 py-2 font-mono text-[11px] text-muted">{r.text}</pre>
+            <pre className="mt-1 overflow-x-auto rounded-md bg-field px-3 py-2 font-mono text-[11px] text-muted">
+              {r.text}
+            </pre>
           </div>
         ))}
       </div>
 
       <h2 className="mt-10 font-medium">Tools</h2>
       <ul className="mt-2 flex flex-col gap-1.5 text-[12px] text-muted">
-        <li><code className="text-fg">recommend(brief)</code> picks component types from a plain brief and returns references for each.</li>
-        <li><code className="text-fg">search_components</code> by words, type, motion trigger, tech or site.</li>
-        <li><code className="text-fg">get_component_source(id)</code> returns the real code from the site&apos;s registry or repo.</li>
-        <li><code className="text-fg">get_component</code>, <code className="text-fg">get_filters</code>, <code className="text-fg">list_libraries</code>.</li>
+        <li>
+          <code className="text-fg">recommend(brief)</code> picks component types from a plain brief and returns
+          references for each.
+        </li>
+        <li>
+          <code className="text-fg">search_components</code> by words, type, motion trigger, tech or site.
+        </li>
+        <li>
+          <code className="text-fg">get_component_source(id)</code> returns the real code from the site&apos;s registry
+          or repo.
+        </li>
+        <li>
+          <code className="text-fg">get_component</code>, <code className="text-fg">get_filters</code>
+          {", "}
+          <code className="text-fg">list_libraries</code>.
+        </li>
       </ul>
     </section>
   );

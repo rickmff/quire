@@ -58,8 +58,7 @@ export async function GET(req: Request) {
         } catch {}
       }
     }
-  } catch {
-  }
+  } catch {}
 
   if (!title) title = titleFromUrl(u.href);
 

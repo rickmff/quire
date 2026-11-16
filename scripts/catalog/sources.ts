@@ -44,7 +44,8 @@ export const SOURCES: Source[] = [
     repo: "imskyleen/animate-ui",
     kind: "registry",
     path: "apps/v1/apps/www/public/r/registry.json",
-    docs: (n) => `https://animate-ui.com/docs/${n.replace(/^(components|primitives)-/, "$1/").replace(/^(components|primitives)\/(animate|radix|base|headless|buttons|backgrounds|community|effects|texts)-/, "$1/$2/")}`,
+    docs: (n) =>
+      `https://animate-ui.com/docs/${n.replace(/^(components|primitives)-/, "$1/").replace(/^(components|primitives)\/(animate|radix|base|headless|buttons|backgrounds|community|effects|texts)-/, "$1/$2/")}`,
     item: (n) => `https://animate-ui.com/r/${n}.json`,
     install: (n) => shadcnAdd(`@animate-ui/${n}`),
     skip: /^(demo|icons)-/,

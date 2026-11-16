@@ -35,7 +35,12 @@ export const TYPES: ComponentType[] = [
   { id: "modal", name: "Modal", family: "Overlay", re: /modal|dialog|lightbox/i },
   { id: "popover", name: "Popover & menu", family: "Overlay", re: /popover|context ?menu|dropdown ?menu/i },
 
-  { id: "ai", name: "AI interface", family: "AI", re: /\bai\b|\bchat|prompt|assistant|\bagent|\bllm\b|web ?search|thinking/i },
+  {
+    id: "ai",
+    name: "AI interface",
+    family: "AI",
+    re: /\bai\b|\bchat|prompt|assistant|\bagent|\bllm\b|web ?search|thinking/i,
+  },
 
   { id: "hero", name: "Hero", family: "Section", re: /\bhero/i },
   { id: "pricing", name: "Pricing", family: "Section", re: /pricing/i },
@@ -55,15 +60,35 @@ export const TYPES: ComponentType[] = [
   { id: "card", name: "Card", family: "Data", re: /\bcards?\b/i },
 
   { id: "player", name: "Media player", family: "Media", re: /player|audio|voice|video|music|waveform/i },
-  { id: "carousel", name: "Carousel & marquee", family: "Media", re: /carousel|marquee|gallery|slideshow|image slider/i },
+  {
+    id: "carousel",
+    name: "Carousel & marquee",
+    family: "Media",
+    re: /carousel|marquee|gallery|slideshow|image slider/i,
+  },
   { id: "device", name: "Device mockup", family: "Media", re: /mockup|iphone|android|safari|browser frame/i },
 
-  { id: "text-effect", name: "Text effect", family: "Effect", re: /\btext|headline|letters?|typewriter|typing|heading|\bwords?\b|font|glyph/i },
+  {
+    id: "text-effect",
+    name: "Text effect",
+    family: "Effect",
+    re: /\btext|headline|letters?|typewriter|typing|heading|\bwords?\b|font|glyph/i,
+  },
   { id: "orb", name: "Orb & shader", family: "Effect", re: /\borb\b|blob|sphere|shader|webgl|fluid/i },
-  { id: "background", name: "Background", family: "Effect", re: /background|gradient|\bgrid\b|beams?|particles|aurora|noise|dots|stars|meteor/i },
+  {
+    id: "background",
+    name: "Background",
+    family: "Effect",
+    re: /background|gradient|\bgrid\b|beams?|particles|aurora|noise|dots|stars|meteor/i,
+  },
   { id: "3d", name: "3D", family: "Effect", re: /\b3d\b|three|globe/i },
   { id: "cursor", name: "Cursor", family: "Effect", re: /cursor|pointer|magnetic/i },
-  { id: "motion", name: "Motion", family: "Effect", re: /animat|motion|hover|scroll|parallax|spring|reveal|transition/i },
+  {
+    id: "motion",
+    name: "Motion",
+    family: "Effect",
+    re: /animat|motion|hover|scroll|parallax|spring|reveal|transition/i,
+  },
 ];
 
 export const OTHER: ComponentType = { id: "other", name: "Other", family: "Other", re: /$^/ };

@@ -2,7 +2,12 @@ import { fetchText } from "./net";
 import type { CatalogComponent } from "./catalog/schema";
 
 export type SourceFile = { path: string; content: string; truncated?: boolean };
-export type SourceResult = { from: string; files: SourceFile[]; dependencies?: string[]; registryDependencies?: string[] };
+export type SourceResult = {
+  from: string;
+  files: SourceFile[];
+  dependencies?: string[];
+  registryDependencies?: string[];
+};
 
 const MAX_FILE = 40_000;
 const MAX_TOTAL = 120_000;
@@ -29,7 +34,12 @@ async function fromRegistry(url: string): Promise<SourceResult | null> {
       .filter((f: any) => typeof f?.content === "string")
       .map((f: any) => ({ path: f.target || f.path, content: f.content }));
     if (!files.length) return null;
-    return { from: url, files: clip(files), dependencies: item.dependencies, registryDependencies: item.registryDependencies };
+    return {
+      from: url,
+      files: clip(files),
+      dependencies: item.dependencies,
+      registryDependencies: item.registryDependencies,
+    };
   } catch {
     return null;
   }

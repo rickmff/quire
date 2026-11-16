@@ -8,7 +8,15 @@ export default function StarIcon({ filled, className = "size-4" }: { filled: boo
   const id = useId().replace(/:/g, "");
   if (!filled)
     return (
-      <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinejoin="round" aria-hidden>
+      <svg
+        viewBox="0 0 24 24"
+        className={className}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        strokeLinejoin="round"
+        aria-hidden
+      >
         <path d={STAR} />
       </svg>
     );

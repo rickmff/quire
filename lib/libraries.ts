@@ -12,22 +12,18 @@ const RULES: Rule[] = [
   {
     host: /(^|\.)ui\.shadcn\.com$/,
     library: "shadcn/ui",
-    install: (p) =>
-      p.includes("components") ? `npx shadcn@latest add ${last(p)}` : undefined,
+    install: (p) => (p.includes("components") ? `npx shadcn@latest add ${last(p)}` : undefined),
   },
   {
     host: /(^|\.)magicui\.design$/,
     library: "Magic UI",
-    install: (p) =>
-      p.includes("components") ? `npx shadcn@latest add @magicui/${last(p)}` : undefined,
+    install: (p) => (p.includes("components") ? `npx shadcn@latest add @magicui/${last(p)}` : undefined),
   },
   {
     host: /(^|\.)ui\.aceternity\.com$/,
     library: "Aceternity UI",
     install: (p) =>
-      p[0] === "components" && p.length > 1
-        ? `npx shadcn@latest add @aceternity/${last(p)}`
-        : undefined,
+      p[0] === "components" && p.length > 1 ? `npx shadcn@latest add @aceternity/${last(p)}` : undefined,
   },
   { host: /(^|\.)21st\.dev$/, library: "21st.dev" },
   { host: /(^|\.)kokonutui\.com$/, library: "Kokonut UI" },
@@ -87,7 +83,9 @@ const TAGS: [string, RegExp][] = [
 
 export function autoTags(...texts: (string | undefined)[]): string[] {
   const s = texts.filter(Boolean).join(" ").replace(/[-_/]/g, " ");
-  return TAGS.filter(([, re]) => re.test(s)).map(([t]) => t).slice(0, 4);
+  return TAGS.filter(([, re]) => re.test(s))
+    .map(([t]) => t)
+    .slice(0, 4);
 }
 
 const SKIP = new Set(["default", "docs", "components", "component", "r", "community", "preview", "demo"]);
@@ -95,7 +93,10 @@ const SKIP = new Set(["default", "docs", "components", "component", "r", "commun
 export function titleFromUrl(rawUrl: string): string {
   try {
     const u = new URL(rawUrl);
-    const seg = u.pathname.split("/").filter((s) => s && !SKIP.has(s.toLowerCase())).at(-1);
+    const seg = u.pathname
+      .split("/")
+      .filter((s) => s && !SKIP.has(s.toLowerCase()))
+      .at(-1);
     const t = (seg ?? u.hostname.replace(/^www\./, "")).replace(/[-_]+/g, " ");
     return t.charAt(0).toUpperCase() + t.slice(1);
   } catch {
