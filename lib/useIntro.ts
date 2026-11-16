@@ -42,7 +42,7 @@ export function useIntro() {
     phase: state.phase,
     // The gallery dealt its cards; ms until the last one lands.
     dealt: useCallback((ms: number) => move("wait", "deal", ms), [move]),
-    // Nothing to deal (the onboarding, an empty Starred): show the page now.
+    // Nothing to deal (another view, an empty Starred): show the page now.
     skip: useCallback(() => move("wait", "show"), [move]),
   };
 }

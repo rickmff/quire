@@ -962,36 +962,6 @@ export function Detail({
   );
 }
 
-export function Onboarding({
-  libraries,
-  total,
-  onChoose,
-}: {
-  libraries: CatalogLibrary[];
-  total: number;
-  onChoose: (mode: "curated" | "scratch") => void;
-}) {
-  return (
-    <div className="mx-auto max-w-lg pt-20 pb-24">
-      <p className="text-fg">How do you want to start?</p>
-      <p className="mt-1 text-muted">Either way, your agent reads this library through the Quire MCP.</p>
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <button onClick={() => onChoose("curated")} className="rounded-lg p-4 text-left ring-1 ring-line ring-inset transition hover:bg-hover">
-          <span className="block font-medium">Curated library</span>
-          <span className="mt-1 block text-[12px] text-muted">
-            {total.toLocaleString("en")} components from {libraries.length} sites, sorted by type. Turn sites off any time.
-          </span>
-        </button>
-        <button onClick={() => onChoose("scratch")} className="rounded-lg p-4 text-left ring-1 ring-line ring-inset transition hover:bg-hover">
-          <span className="block font-medium">From scratch</span>
-          <span className="mt-1 block text-[12px] text-muted">Start empty. Paste the link of each component library you want as reference.</span>
-        </button>
-      </div>
-      <p className="mt-8 text-[12px] leading-relaxed text-faint">{libraries.map((l) => l.name).join(" · ")}</p>
-    </div>
-  );
-}
-
 export function Sources({
   libraries,
   followed,

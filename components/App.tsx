@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
-import { AgentButton, Agents, Detail, Gallery, OpenDetails, Onboarding, Sources } from "@/components/Gallery";
+import { AgentButton, Agents, Detail, Gallery, OpenDetails, Sources } from "@/components/Gallery";
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 import { agentText } from "@/lib/agentText";
@@ -254,11 +254,22 @@ export default function App() {
     };
   }, [add]);
 
+  // A new visitor (nothing chosen, nothing saved) starts with the curated
+  // catalog: there is no question to answer first. Libraries that already
+  // chose, or that hold their own links, stay as they are.
+  const fresh = !lib.mode && lib.bookmarks.length === 0;
+
   // Sites the user follows from the curated catalog.
   const followed = useMemo(() => {
     if (lib.sources) return new Set(lib.sources);
-    return new Set(lib.mode === "curated" && catalog ? catalog.libraries.map((l) => l.id) : []);
-  }, [lib.sources, lib.mode, catalog]);
+    return new Set((lib.mode === "curated" || fresh) && catalog ? catalog.libraries.map((l) => l.id) : []);
+  }, [lib.sources, lib.mode, fresh, catalog]);
+
+  // Keep that start, so a first star does not turn the curated sites off.
+  useEffect(() => {
+    if (ready && catalog && fresh)
+      update((l) => (l.mode ? l : { ...l, mode: "curated", sources: l.sources ?? catalog.libraries.map((x) => x.id) }));
+  }, [ready, catalog, fresh, update]);
 
   const byDocs = useMemo(() => new Map((catalog?.components ?? []).map((c) => [c.docs.replace(/\/$/, ""), c])), [catalog]);
 
@@ -310,9 +321,8 @@ export default function App() {
     });
   }, [galleryItems, view, words]);
 
-  // Nothing to deal (the onboarding, an empty Starred): show the page now.
-  const nothingToDeal =
-    Boolean(ready && catalog) && (!isGallery(view) || (!lib.mode && lib.bookmarks.length === 0) || galleryView.length === 0);
+  // Nothing to deal (another view, an empty Starred): show the page now.
+  const nothingToDeal = Boolean(ready && catalog) && (!isGallery(view) || galleryView.length === 0);
   useEffect(() => {
     if (nothingToDeal) intro.skip();
   }, [nothingToDeal, intro.skip]);
@@ -398,8 +408,6 @@ export default function App() {
   const startImport = (raw: string) => {
     if (!followCurated(raw)) setDialog({ kind: "import", url: raw });
   };
-  const choose = (mode: "curated" | "scratch") =>
-    update((l) => ({ ...l, mode, sources: mode === "curated" ? (catalog?.libraries ?? []).map((x) => x.id) : [] }));
 
   const enableSync = async () => {
     const key = newSyncKey();
@@ -780,10 +788,7 @@ export default function App() {
         </header>
 
         {isGallery(view) ? (
-          ready && catalog && !lib.mode && lib.bookmarks.length === 0 ? (
-            <Onboarding libraries={catalog.libraries} total={catalog.components.length} onChoose={choose} />
-          ) : (
-            <Gallery
+          <Gallery
               items={galleryView}
               title={viewName}
               sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
@@ -830,7 +835,6 @@ export default function App() {
                 )
               }
             />
-          )
         ) : view === "sites" ? (
           <Sources
             libraries={catalog?.libraries ?? []}
