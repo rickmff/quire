@@ -914,10 +914,9 @@ function Sidebar(props: {
               New collection
             </button>
           )}
-          <div className="hidden h-3 md:block" />
           <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
           <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
-          <div className="hidden h-6 md:block" />
+          {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
           {lib.collections.map((c) =>
             props.renaming === c.id ? (
               <input
@@ -937,7 +936,7 @@ function Sidebar(props: {
           )}
           {sites.length > 0 && (
             <>
-              <div className="hidden h-6 md:block" />
+              <div className="hidden h-4 md:block" />
               <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
               {sites.map((x) => (
                 <div key={x.key} className="contents">
