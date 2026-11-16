@@ -2,6 +2,7 @@
 
 import { Command } from "cmdk";
 import SocialLinks from "@/components/SocialLinks";
+import StarIcon from "@/components/StarIcon";
 import { PlusIcon as Plus, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -132,12 +133,12 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), undo ? 4000 : 1600);
   }, []);
 
-  const removeBookmark = (id: string, msg = "Deleted") => {
+  const removeBookmark = (id: string) => {
     const idx = lib.bookmarks.findIndex((x) => x.id === id);
     const gone = lib.bookmarks[idx];
     if (!gone) return;
     update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== id) }));
-    flash(msg, () => {
+    flash("Removed from Starred", () => {
       update((l) => {
         if (l.bookmarks.some((x) => x.id === gone.id)) return l;
         const next = [...l.bookmarks];
@@ -334,7 +335,7 @@ export default function App() {
   // the open drawer holds a snapshot of the item.
   const toggleStar = (c: GalleryItem) => {
     const id = lib.bookmarks.find((b) => b.id === c.saved || b.ref === c.id || b.url === c.docs)?.id;
-    if (id) removeBookmark(id, "Removed from Starred");
+    if (id) removeBookmark(id);
     else saveFromCatalog(c);
   };
 
@@ -407,7 +408,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog]);
 
-  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to delete.
+  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to un-star.
   const navRef = useRef<{ visible: Bookmark[]; sel: number }>({ visible: [], sel: -1 });
   navRef.current = { visible: isGallery(view) || PAGES.has(view ?? "") ? [] : visible, sel };
   useEffect(() => {
@@ -431,7 +432,7 @@ export default function App() {
       else if (e.key === "Escape") setSel(-1);
       else if (cur && e.key === "Enter") window.open(cur.url, "_blank", "noopener");
       else if (cur && e.key === "c") document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-copy]`)?.click();
-      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-delete]`)?.click();
+      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-star]`)?.click();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -748,7 +749,6 @@ export default function App() {
                       moveTo(b.id, cid);
                       flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
                     }}
-                    onDelete={() => removeBookmark(b.id)}
                     onType={(t) => setType(b.id, t)}
                     onNote={(note) => update((l) => ({ ...l, bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)) }))}
                     onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
@@ -829,7 +829,7 @@ export default function App() {
                   moveTo(b.id, cid);
                   flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
                 }}
-                onDelete={() => removeBookmark(b.id)}
+                onUnstar={() => removeBookmark(b.id)}
                 onType={(t) => setType(b.id, t)}
                 onNote={(note) =>
                   update((l) => ({
@@ -1534,7 +1534,7 @@ function Card({
   lib,
   selected,
   onMove,
-  onDelete,
+  onUnstar,
   onType,
   onNote,
   onCopy,
@@ -1543,7 +1543,7 @@ function Card({
   lib: Library;
   selected: boolean;
   onMove: (cid: string | null) => void;
-  onDelete: () => void;
+  onUnstar: () => void;
   onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
@@ -1587,7 +1587,19 @@ function Card({
           )}
         </a>
 
-        <CardTools b={b} lib={lib} onMove={onMove} onDelete={onDelete} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-2" />
+        {/* Every saved card is starred; un-starring is how it is removed. */}
+        <button
+          type="button"
+          data-star
+          onClick={onUnstar}
+          aria-pressed
+          aria-label={`Remove ${b.title} from Starred`}
+          title="Remove from Starred"
+          className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg"
+        >
+          <StarIcon filled />
+        </button>
+        <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
       </div>
 
       <div className="mt-2.5 px-0.5">
@@ -1640,12 +1652,12 @@ function Card({
   );
 }
 
-// The hover toolbar of a saved card: copy, note, collection, type, delete.
+// The hover toolbar of a saved card: copy, note, collection, type. The star
+// beside it removes the card.
 function CardTools({
   b,
   lib,
   onMove,
-  onDelete,
   onType,
   onNote,
   onCopy,
@@ -1654,7 +1666,6 @@ function CardTools({
   b: Bookmark;
   lib: Library;
   onMove: (cid: string | null) => void;
-  onDelete: () => void;
   onType: (type: string) => void;
   onNote: () => void;
   onCopy: () => void;
@@ -1699,9 +1710,6 @@ function CardTools({
           ))}
         </select>
       </label>
-      <IconBtn label="Delete" onClick={onDelete} data="delete">
-        <TrashIcon />
-      </IconBtn>
     </div>
   );
 }
@@ -1712,7 +1720,6 @@ function StarredTools({
   b,
   lib,
   onMove,
-  onDelete,
   onType,
   onNote,
   onCopy,
@@ -1720,7 +1727,6 @@ function StarredTools({
   b: Bookmark;
   lib: Library;
   onMove: (cid: string | null) => void;
-  onDelete: () => void;
   onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
@@ -1728,7 +1734,7 @@ function StarredTools({
   const [editing, setEditing] = useState(false);
   return (
     <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} className="contents">
-      <CardTools b={b} lib={lib} onMove={onMove} onDelete={onDelete} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
+      <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
       {editing && (
         <textarea
           autoFocus
