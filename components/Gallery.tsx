@@ -7,6 +7,7 @@ import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
+import { deal } from "@/lib/deal";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
@@ -22,6 +23,8 @@ export function Gallery({
   sections,
   onSite,
   onStar,
+  intro,
+  onDeal,
 }: {
   items: GalleryItem[];
   title: string;
@@ -33,6 +36,10 @@ export function Gallery({
   onSite?: (key: string) => void;
   // Star on each card: saves the component to Saved, or removes it.
   onStar?: (item: GalleryItem) => void;
+  // First load: deal the visible cards from a pile. onDeal gets the time in
+  // ms until the last card lands, so the rest of the page can follow it.
+  intro?: boolean;
+  onDeal?: (ms: number) => void;
 }) {
   const [q, setQ] = useState("");
   const [trigger, setTrigger] = useState<string | null>(null);
@@ -110,6 +117,15 @@ export function Gallery({
     });
   }, [items]);
 
+  // Runs once, as soon as the first cards are in the page.
+  const dealtRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!intro || dealtRef.current || !root.current?.querySelector("[data-card]")) return;
+    dealtRef.current = true;
+    onDeal?.(deal(root.current));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intro, items, sections]);
+
   useEffect(() => setShown(PAGE), [items, q, trigger, library, type]);
   useEffect(() => setType(null), [items]);
   useEffect(() => {
@@ -123,7 +139,7 @@ export function Gallery({
   return (
     <section ref={root}>
       {/* Title, filters and interaction chips stay pinned under the top bar. */}
-      <div className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
+      <div data-chrome style={{ "--d": "120ms" } as React.CSSProperties} className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
       <div className="flex h-12 items-center justify-between gap-4">
         <h1 className="flex items-baseline gap-2">
           <span className="font-medium">{title}</span>
@@ -201,7 +217,7 @@ export function Gallery({
         <div className="flex flex-col gap-12">
           {sections.map((sec) => (
             <section key={sec.key}>
-              <button onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
+              <button data-chrome style={{ "--d": "160ms" } as React.CSSProperties} onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
                 <span className="font-medium">{sec.name}</span>
                 <span className="text-faint tabular-nums">{sec.items.length}</span>
                 <span className="text-[12px] text-faint opacity-0 transition group-hover:opacity-100">View all</span>

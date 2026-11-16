@@ -43,12 +43,43 @@ const EXAMPLES = [
   "ui.shadcn.com/docs/components/command",
 ];
 
+// The first-load deal plays once per page load, not on later visits to /app
+// within the same tab.
+let dealtOnce = false;
+
 export default function App() {
   const { lib, ready, update } = useLibrary();
   const [view, setView] = useState<View>("library");
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
+
+  // First load: "deal" hides the chrome while the gallery deals its cards,
+  // "show" brings the sidebar and headers in, then the attribute is dropped
+  // so later views mount without an entrance.
+  const [intro, setIntro] = useState<"deal" | "show" | null>(() => (dealtOnce ? null : "deal"));
+  const dealing = useRef(false);
+  useEffect(() => {
+    dealtOnce = true;
+    if (intro === "show") {
+      const t = setTimeout(() => setIntro(null), 900);
+      return () => clearTimeout(t);
+    }
+    if (intro !== "deal") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setIntro(null);
+    // Nothing to deal (another view, onboarding, slow catalog): show the page.
+    const t = setTimeout(() => !dealing.current && setIntro("show"), 1600);
+    return () => clearTimeout(t);
+  }, [intro]);
+  // The onboarding has no cards to deal.
+  const onboarding = isGallery(view) && ready && catalog && !lib.mode && lib.bookmarks.length === 0;
+  useEffect(() => {
+    if (onboarding && intro === "deal") setIntro("show");
+  }, [onboarding, intro]);
+  const onDeal = useCallback((ms: number) => {
+    dealing.current = true;
+    setTimeout(() => setIntro("show"), ms);
+  }, []);
 
   // Quire registers no service worker. One left on this origin by another app
   // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
@@ -511,7 +542,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col md:flex-row">
+    <div data-intro={intro ?? undefined} className="flex min-h-dvh flex-col md:flex-row">
       <Sidebar
         lib={lib}
         view={view}
@@ -532,7 +563,7 @@ export default function App() {
       />
 
       <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
-        <header className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
+        <header data-chrome style={{ "--d": "60ms" } as React.CSSProperties} className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
             className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
@@ -591,6 +622,8 @@ export default function App() {
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
               onStar={toggleStar}
+              intro={intro === "deal"}
+              onDeal={onDeal}
               empty={
                 <div className="mx-auto max-w-sm pt-20 text-center">
                   <p>Your library is empty.</p>
@@ -872,7 +905,7 @@ function Sidebar(props: {
   }, [view]);
 
   return (
-    <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
+    <aside data-chrome className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
         <div className="flex h-10 items-center px-2 md:h-6 md:pl-[34px]">
           <Wordmark className="h-[15px] w-auto text-fg" />
