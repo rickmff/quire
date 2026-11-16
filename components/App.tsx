@@ -886,26 +886,6 @@ function Sidebar(props: {
           onMouseLeave={settle}
           className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
         >
-          <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
-          <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
-          <div className="hidden h-6 md:block" />
-          {lib.collections.map((c) =>
-            props.renaming === c.id ? (
-              <input
-                key={c.id}
-                autoFocus
-                defaultValue={c.name}
-                onBlur={(e) => props.renameCollection(c.id, e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                  if (e.key === "Escape") props.setRenaming(null);
-                }}
-                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
-              />
-            ) : (
-              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} onDelete={() => props.deleteCollection(c.id)} {...props} />
-            ),
-          )}
           {newCol !== null ? (
             <input
               autoFocus
@@ -926,6 +906,27 @@ function Sidebar(props: {
             >
               New collection
             </button>
+          )}
+          <div className="hidden h-3 md:block" />
+          <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
+          <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
+          <div className="hidden h-6 md:block" />
+          {lib.collections.map((c) =>
+            props.renaming === c.id ? (
+              <input
+                key={c.id}
+                autoFocus
+                defaultValue={c.name}
+                onBlur={(e) => props.renameCollection(c.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  if (e.key === "Escape") props.setRenaming(null);
+                }}
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
+              />
+            ) : (
+              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} onDelete={() => props.deleteCollection(c.id)} {...props} />
+            ),
           )}
           {sites.length > 0 && (
             <>
