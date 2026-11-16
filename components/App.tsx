@@ -9,13 +9,32 @@ import {
   exportJSON,
   fetchMeta,
   normalizeUrl,
+  selectView,
+  typeOf,
   uid,
   useLibrary,
 } from "@/lib/store";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
+import { OTHER, TYPES, typeById } from "@/lib/types";
 import Wordmark from "@/components/Wordmark";
+import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
+import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
+import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
+import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 
-type View = "all" | null | string; // null = Inbox
+// "library" = the whole reference gallery, "all" = saved cards, null = Inbox,
+// "type:<id>" = one component type across the library, "sites", "agents",
+// else a collection id.
+type View = "library" | "all" | null | string;
+
+const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
+// "site:<key>" = one library and its own components.
+const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5) : null);
+const PAGES = new Set(["library", "sites", "agents"]);
+const isGallery = (v: View) => v === "library" || typeView(v) !== null || siteView(v) !== null;
+// Curated components group by library id; your own links by the site they came from.
+const siteKey = (i: { library: string; site?: string }) =>
+  i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
 const EXAMPLES = [
   "magicui.design/docs/components/marquee",
@@ -25,7 +44,19 @@ const EXAMPLES = [
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
-  const [view, setView] = useState<View>("all");
+  const [view, setView] = useState<View>("library");
+  const catalog = useCatalog();
+  const syncOk = useSyncAvailable();
+  const [open, setOpen] = useState<GalleryItem | null>(null);
+
+  // Quire registers no service worker. One left on this origin by another app
+  // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
+  useEffect(() => {
+    navigator.serviceWorker
+      ?.getRegistrations()
+      .then((rs) => rs.forEach((r) => r.unregister()))
+      .catch(() => {});
+  }, []);
   const [input, setInput] = useState("");
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
@@ -33,6 +64,7 @@ export default function App() {
   const [renaming, setRenaming] = useState<string | null>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
+  const [importing, setImporting] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -66,6 +98,13 @@ export default function App() {
       if (lib.bookmarks.some((b) => b.url === url)) return flash("Already saved");
       const id = uid();
       const m = matchLibrary(url);
+      const t = typeView(view);
+      const known = byDocs.get(url.replace(/\/$/, ""));
+      if (known) {
+        saveFromCatalog(known);
+        return;
+      }
+      if (followCurated(url)) return;
       const draft: Bookmark = {
         id,
         url,
@@ -73,7 +112,8 @@ export default function App() {
         library: m.library,
         install: m.install,
         tags: [],
-        collectionId: view === "all" ? null : view,
+        ...(t ? { type: t } : {}),
+        collectionId: view === "all" || t ? null : view,
         createdAt: Date.now(),
       };
       update((l) => ({ ...l, bookmarks: [draft, ...l.bookmarks] }));
@@ -86,11 +126,13 @@ export default function App() {
             b.id === id ? { ...b, ...meta, install: b.install ?? meta.install, url } : b,
           ),
         }));
+        if (!meta.image) capturePreviews([url]);
       } catch {
-        /* keep the URL-only card */
+        capturePreviews([url]);
       }
     },
-    [lib.bookmarks, update, view, flash],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lib.bookmarks, update, view, flash, catalog],
   );
 
   useEffect(() => {
@@ -122,10 +164,132 @@ export default function App() {
     };
   }, [add]);
 
+  // Sites the user follows from the curated catalog.
+  const followed = useMemo(() => {
+    if (lib.sources) return new Set(lib.sources);
+    return new Set(lib.mode === "curated" && catalog ? catalog.libraries.map((l) => l.id) : []);
+  }, [lib.sources, lib.mode, catalog]);
+
+  const byDocs = useMemo(() => new Map((catalog?.components ?? []).map((c) => [c.docs.replace(/\/$/, ""), c])), [catalog]);
+
+  const galleryItems = useMemo<GalleryItem[]>(() => {
+    const saved = lib.bookmarks.map((b) => {
+      const c = toComponent(b);
+      const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
+      return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
+    });
+    // One card per component: a saved copy of a curated component (same id or
+    // same page) replaces the curated card, and a page saved twice shows once.
+    const page = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase();
+    const ids = new Set<string>();
+    const pages = new Set<string>();
+    const unique = saved.filter((s) => {
+      const p = page(s.docs);
+      if (ids.has(s.id) || pages.has(p)) return false;
+      ids.add(s.id);
+      pages.add(p);
+      return true;
+    });
+    // Every card shows a preview. Curated components without one stay out of
+    // the gallery (the MCP still serves them); saved ones wait for a capture.
+    const curated = (catalog?.components ?? []).filter(
+      (c) => c.preview && followed.has(c.library) && !ids.has(c.id) && !pages.has(page(c.docs)),
+    );
+    return [...unique, ...mix(curated)];
+  }, [lib.bookmarks, catalog, followed]);
+
+  const galleryView = useMemo(() => {
+    const t = typeView(view);
+    const s = siteView(view);
+    if (s) return galleryItems.filter((i) => siteKey(i) === s);
+    return t ? galleryItems.filter((i) => i.type === t) : galleryItems;
+  }, [galleryItems, view]);
+
+  // Library first: every site in the library, with its own components.
+  const sites = useMemo(() => {
+    const m = new Map<string, { key: string; name: string; items: GalleryItem[] }>();
+    for (const i of galleryItems) {
+      const key = siteKey(i);
+      if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
+      m.get(key)!.items.push(i);
+    }
+    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [galleryItems, catalog]);
+
+  const saveFromCatalog = (c: GalleryItem) => {
+    if (lib.bookmarks.some((b) => b.ref === c.id || b.url === c.docs)) return flash("Already saved");
+    update((l) => ({
+      ...l,
+      bookmarks: [
+        {
+          id: uid(),
+          url: c.docs,
+          title: c.title,
+          description: c.description,
+          image: c.preview,
+          library: catalog?.libraries.find((x) => x.id === c.library)?.name ?? c.library,
+          install: c.install,
+          registry: c.item,
+          category: c.category,
+          type: c.type,
+          ref: c.id,
+          tags: [],
+          collectionId: null,
+          createdAt: Date.now(),
+        },
+        ...l.bookmarks,
+      ],
+    }));
+    flash("Saved");
+  };
+
+  const setFollowed = (next: Set<string>) => update((l) => ({ ...l, sources: [...next] }));
+
+  // A link to the home or index page of a curated site turns that site on,
+  // instead of scraping it again.
+  const followCurated = (raw: string) => {
+    const url = normalizeUrl(raw);
+    if (!url || !catalog) return false;
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
+    const site = catalog.libraries.find((l) => {
+      const lu = new URL(l.url);
+      return lu.hostname.replace(/^www\./, "") === host && (u.pathname.replace(/\/$/, "") === lu.pathname.replace(/\/$/, "") || /^\/(docs\/?)?(components\/?)?$/.test(u.pathname));
+    });
+    if (!site) return false;
+    if (!followed.has(site.id)) {
+      setFollowed(new Set([...followed, site.id]));
+      update((l) => ({ ...l, mode: l.mode ?? "scratch" }));
+    }
+    setView("library");
+    flash(`${site.name}: ${site.count} components in your library`);
+    return true;
+  };
+  const startImport = (raw: string) => {
+    if (!followCurated(raw)) setImporting(raw);
+  };
+  const choose = (mode: "curated" | "scratch") =>
+    update((l) => ({ ...l, mode, sources: mode === "curated" ? (catalog?.libraries ?? []).map((x) => x.id) : [] }));
+
+  const enableSync = async () => {
+    const key = newSyncKey();
+    const next = { ...lib, syncKey: key, sources: [...followed], mode: lib.mode ?? "curated" };
+    const ok = await pushLibrary(next);
+    if (!ok) return flash("Could not connect. Try again later.");
+    update((l) => ({ ...l, syncKey: key, sources: next.sources, mode: next.mode, syncedAt: Date.now() }));
+    flash("Library connected");
+  };
+
   const visible = useMemo(() => {
-    const inView = view === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === view);
+    const inView = selectView(lib, view).items;
     return libFilter ? inView.filter((b) => b.library === libFilter) : inView;
-  }, [lib.bookmarks, view, libFilter]);
+  }, [lib, view, libFilter]);
+
+  const importedSites = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const b of lib.bookmarks) if (!b.ref) m.set(b.library, (m.get(b.library) ?? 0) + 1);
+    return [...m].filter(([, n]) => n > 1).map(([name, count]) => ({ name, count }));
+  }, [lib.bookmarks]);
 
   const libraries = useMemo(() => {
     const m = new Map<string, number>();
@@ -135,9 +299,18 @@ export default function App() {
 
   useEffect(() => setSel(-1), [view, libFilter]);
 
+  // The extension opens /app?import=<url> to add a whole site.
+  useEffect(() => {
+    const u = new URLSearchParams(window.location.search).get("import");
+    if (!u || !catalog) return;
+    startImport(u);
+    window.history.replaceState(null, "", "/app");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog]);
+
   // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to delete.
   const navRef = useRef<{ visible: Bookmark[]; sel: number }>({ visible: [], sel: -1 });
-  navRef.current = { visible, sel };
+  navRef.current = { visible: isGallery(view) || PAGES.has(view ?? "") ? [] : visible, sel };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (palette || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -171,12 +344,91 @@ export default function App() {
       const k = b.collectionId ?? "inbox";
       c[k] = (c[k] ?? 0) + 1;
     }
+    for (const i of galleryItems) {
+      const t = `type:${i.type}`;
+      c[t] = (c[t] ?? 0) + 1;
+    }
+    c.library = galleryItems.length;
     return c;
-  }, [lib.bookmarks]);
+  }, [lib.bookmarks, galleryItems]);
 
   const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
-  const viewName = view === "all" ? "All" : view === null ? "Inbox" : (current?.name ?? "All");
-  const exportView = view === "all" ? "all" : view;
+  const viewType = typeView(view);
+  const viewName =
+    view === "library"
+      ? "Library"
+      : view === "all"
+        ? "Saved"
+        : view === null
+          ? "Inbox"
+          : viewType
+            ? typeById(viewType).name
+            : siteView(view)
+              ? (sites.find((x) => x.key === siteView(view))?.name ?? "Library")
+              : (current?.name ?? "Saved");
+  const exportView = view;
+
+  const setType = (bookmarkId: string, type: string) =>
+    update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.id === bookmarkId ? { ...b, type } : b)) }));
+
+  const dropTo = (bookmarkId: string, target: View) => {
+    const t = typeView(target);
+    if (t) {
+      setType(bookmarkId, t);
+      flash(`Marked as ${typeById(t).name}`);
+    } else moveTo(bookmarkId, target);
+  };
+
+  const importSite = ({ result, items, collection }: ImportChoice) => {
+    let colId: string | null = null;
+    update((l) => {
+      let collections = l.collections;
+      if (collection) {
+        const existing = l.collections.find((c) => c.name === collection);
+        colId = existing?.id ?? uid();
+        if (!existing) collections = [...collections, { id: colId, name: collection, createdAt: Date.now() }];
+      }
+      const have = new Set(l.bookmarks.map((b) => b.url));
+      const now = Date.now();
+      const fresh: Bookmark[] = items
+        .filter((i) => !have.has(i.url))
+        .map((i, n) => ({
+          id: uid(),
+          ...(byDocs.get(i.url.replace(/\/$/, "")) ? { ref: byDocs.get(i.url.replace(/\/$/, ""))!.id } : {}),
+          url: i.url,
+          title: i.title,
+          description: i.description,
+          library: result.library,
+          install: i.install,
+          registry: i.registry,
+          dependencies: i.dependencies,
+          category: i.category,
+          type: i.type,
+          tags: [],
+          collectionId: colId,
+          createdAt: now - n,
+        }));
+      return { ...l, collections, bookmarks: [...fresh, ...l.bookmarks] };
+    });
+    setImporting(null);
+    setView("library");
+    flash(`Imported ${items.length} from ${result.site}`);
+    capturePreviews(items.map((i) => i.url));
+  };
+
+  // Record a preview for each new card, one at a time, when the server has a
+  // capture service. Cards update as each capture lands.
+  const capturePreviews = async (urls: string[]) => {
+    if (!(await getStatus()).capture) return;
+    for (const url of urls) {
+      try {
+        const r = await fetch("/api/capture", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+        if (!r.ok) continue;
+        const { image, video } = await r.json();
+        update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.url === url && !b.image ? { ...b, image, video } : b)) }));
+      } catch {}
+    }
+  };
 
   const createCollection = (name: string) => {
     const n = name.trim();
@@ -243,8 +495,11 @@ export default function App() {
         renaming={renaming}
         setRenaming={setRenaming}
         renameCollection={renameCollection}
-        moveTo={moveTo}
+        moveTo={dropTo}
         openPalette={() => setPalette(true)}
+        sites={sites}
+        openItem={setOpen}
+        openId={open?.id}
       />
 
       <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
@@ -269,6 +524,19 @@ export default function App() {
               autoComplete="off"
               spellCheck={false}
             />
+            {input.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  startImport(input);
+                  setInput("");
+                }}
+                title="Find every component on this site and sort them by type"
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+              >
+                Import site
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setPalette(true)}
@@ -281,6 +549,53 @@ export default function App() {
           </form>
         </header>
 
+        {isGallery(view) ? (
+          ready && catalog && !lib.mode && lib.bookmarks.length === 0 ? (
+            <Onboarding libraries={catalog.libraries} total={catalog.components.length} onChoose={choose} />
+          ) : (
+            <Gallery
+              items={galleryView}
+              title={viewName}
+              sections={view === "library" && sites.length > 1 ? sites : undefined}
+              onSite={(key) => setView(`site:${key}`)}
+              libraries={catalog?.libraries ?? []}
+              onOpen={setOpen}
+              empty={
+                <div className="mx-auto max-w-sm pt-20 text-center">
+                  <p>Your library is empty.</p>
+                  <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
+                  <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
+                    Choose sites
+                  </button>
+                </div>
+              }
+            />
+          )
+        ) : view === "sites" ? (
+          <Sources
+            libraries={catalog?.libraries ?? []}
+            followed={followed}
+            onToggle={(id) => {
+              const next = new Set(followed);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              setFollowed(next);
+            }}
+            onAll={(on) => setFollowed(new Set(on ? (catalog?.libraries ?? []).map((l) => l.id) : []))}
+            onAddSite={() => setImporting("")}
+            imported={importedSites}
+          />
+        ) : view === "agents" ? (
+          <Agents
+            syncKey={lib.syncKey}
+            syncedAt={lib.syncedAt}
+            available={syncOk}
+            onEnable={enableSync}
+            onSyncNow={async () => flash((await pushLibrary(lib)) ? "Synced" : "Sync failed")}
+            copy={copy}
+          />
+        ) : (
+        <>
         <div className="flex h-12 items-center justify-between">
           <h1 className="flex items-baseline gap-2">
             <span className="font-medium">{viewName}</span>
@@ -310,6 +625,7 @@ export default function App() {
                   flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
                 }}
                 onDelete={() => removeBookmark(b.id)}
+                onType={(t) => setType(b.id, t)}
                 onNote={(note) =>
                   update((l) => ({
                     ...l,
@@ -321,7 +637,20 @@ export default function App() {
             ))}
           </div>
         )}
+        </>
+        )}
       </main>
+
+      {open && (
+        <Detail
+          item={open}
+          site={open.site ?? catalog?.libraries.find((l) => l.id === open.library)?.name ?? open.library}
+          saved={Boolean(open.saved) || lib.bookmarks.some((b) => b.ref === open.id)}
+          onClose={() => setOpen(null)}
+          onSave={() => saveFromCatalog(open)}
+          copy={copy}
+        />
+      )}
 
       <input
         ref={fileRef}
@@ -371,7 +700,12 @@ export default function App() {
             </Command.Group>
           )}
           <Command.Group heading="Go to">
-            {[{ id: "all", name: "All" }, { id: "inbox", name: "Inbox" }, ...lib.collections].map((c) => (
+            {[
+              { id: "all", name: "All" },
+              { id: "inbox", name: "Inbox" },
+              ...lib.collections,
+              ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
+            ].map((c) => (
               <Command.Item
                 key={c.id}
                 value={`go ${c.name} ${c.id}`}
@@ -404,6 +738,9 @@ export default function App() {
             </Command.Item>
           </Command.Group>
           <Command.Group heading="Library">
+            <Command.Item onSelect={run(() => setImporting(""))} className={itemCls}>
+              Import every component from a site
+            </Command.Item>
             <Command.Item onSelect={run(() => setNewCol(""))} className={itemCls}>
               New collection
             </Command.Item>
@@ -426,6 +763,15 @@ export default function App() {
           </Command.Group>
         </Command.List>
       </Command.Dialog>
+
+      {importing !== null && (
+        <ImportDialog
+          initialUrl={importing}
+          savedUrls={new Set(lib.bookmarks.map((b) => b.url))}
+          onClose={() => setImporting(null)}
+          onImport={importSite}
+        />
+      )}
 
       {toast && (
         <div
@@ -457,12 +803,31 @@ function Sidebar(props: {
   renaming: string | null;
   setRenaming: (id: string | null) => void;
   renameCollection: (id: string, name: string) => void;
-  moveTo: (bookmarkId: string, collectionId: string | null) => void;
+  moveTo: (bookmarkId: string, target: View) => void;
   openPalette: () => void;
+  sites: { key: string; name: string; items: GalleryItem[] }[];
+  openItem: (item: GalleryItem) => void;
+  openId?: string;
 }) {
-  const { lib, view, setView, counts, newCol, setNewCol } = props;
+  const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
+  const activeSite = siteView(view);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
+
+
+  // Ticks within ~3 rows of the pointer grow, nearest the most.
+  const ruler = useRef<HTMLElement>(null);
+  const grow = (e: React.MouseEvent) => {
+    for (const el of ruler.current?.querySelectorAll<HTMLElement>("[data-row]") ?? []) {
+      const r = el.getBoundingClientRect();
+      const d = Math.abs(e.clientY - (r.top + r.height / 2)) / r.height;
+      el.style.setProperty("--grow", String(Math.max(0, 1 - d / 3).toFixed(2)));
+    }
+  };
+  const settle = () => ruler.current?.querySelectorAll<HTMLElement>("[data-row]").forEach((el) => el.style.removeProperty("--grow"));
+  useEffect(() => {
+    ruler.current?.querySelector("[aria-current=page]")?.scrollIntoView({ block: "nearest" });
+  }, [view]);
 
   const bookmarklet = origin
     ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
@@ -471,12 +836,18 @@ function Sidebar(props: {
   return (
     <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
-        <div className="flex h-10 items-center px-2 md:h-6">
+        <div className="flex h-10 items-center px-2 md:h-6 md:pl-[34px]">
           <Wordmark className="h-[15px] w-auto text-fg" />
         </div>
 
-        <nav className="-mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-6 md:flex-col md:overflow-visible md:pb-0">
-          <NavItem id="all" name="All" count={lib.bookmarks.length} {...props} />
+        <nav
+          ref={ruler}
+          onMouseMove={grow}
+          onMouseLeave={settle}
+          className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
+        >
+          <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
+          <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
           <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
           <div className="hidden h-6 md:block" />
           {lib.collections.map((c) =>
@@ -490,7 +861,7 @@ function Sidebar(props: {
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   if (e.key === "Escape") props.setRenaming(null);
                 }}
-                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus"
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
               />
             ) : (
               <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
@@ -507,31 +878,67 @@ function Sidebar(props: {
                 if (e.key === "Escape") setNewCol(null);
               }}
               placeholder="Name"
-              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint"
+              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint md:ml-[34px]"
             />
           ) : (
             <button
               onClick={() => setNewCol("")}
-              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted"
+              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:pl-[34px]"
             >
               New collection
             </button>
           )}
+          {sites.length > 0 && (
+            <>
+              <div className="hidden h-6 md:block" />
+              <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
+              {sites.map((x) => (
+                <div key={x.key} className="contents">
+                  <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
+                  {activeSite === x.key && (
+                    <div className="hidden md:contents">
+                      {x.items.map((i) => (
+                        <button
+                          key={i.id}
+                          data-row
+                          aria-current={openId === i.id ? "page" : undefined}
+                          onClick={() => openItem(i)}
+                          className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+                        >
+                          <span className="w-[26px] shrink-0">
+                            <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
+                          </span>
+                          <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
+                            {i.title}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
         </nav>
 
-        <div className="mt-auto hidden flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
+        <div className="-mx-1 flex shrink-0 gap-0.5 pb-2 md:mx-0 md:flex-col md:border-t md:border-line md:pt-3 md:pb-3">
+          <NavItem id="sites" name="Sites" count={0} {...props} />
+          <NavItem id="agents" name="Agents" count={0} {...props} />
+        </div>
+
+        <div className="hidden shrink-0 flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
           <a
             href={bookmarklet}
             onClick={(e) => e.preventDefault()}
             title="Drag to your bookmarks bar, then click it on any page to save it"
-            className="rounded-md px-2 py-1 text-faint transition hover:text-muted"
+            className="rounded-md px-2 py-1 text-faint transition hover:text-muted md:pl-[34px]"
           >
             Save button <span className="text-faint">· drag to bar</span>
           </a>
-          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted">
+          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted md:pl-[34px]">
             Commands <span>⌘K</span>
           </button>
-          <span className="px-2 py-1 text-faint">Open source · MIT</span>
+          <span className="px-2 py-1 text-faint md:pl-[34px]">Open source · MIT</span>
         </div>
       </div>
     </aside>
@@ -552,12 +959,12 @@ function NavItem({
   count: number;
   view: View;
   setView: (v: View) => void;
-  moveTo: (bookmarkId: string, collectionId: string | null) => void;
+  moveTo: (bookmarkId: string, target: View) => void;
   onRename?: () => void;
 }) {
   const [over, setOver] = useState(false);
   const active = view === id;
-  const droppable = id !== "all";
+  const droppable = id !== "all" && !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
   return (
     <button
       onClick={() => setView(id)}
@@ -574,11 +981,16 @@ function NavItem({
         if (bid && droppable) moveTo(bid, id);
       }}
       title={onRename ? "Double-click to rename" : undefined}
-      className={`group flex h-7 shrink-0 items-center justify-between gap-4 rounded-md px-2 text-left whitespace-nowrap transition ${
-        active ? "bg-hover text-fg" : "text-muted hover:text-fg"
+      data-row
+      aria-current={active ? "page" : undefined}
+      className={`group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap transition md:rounded-none md:px-0 ${
+        active ? "bg-hover text-fg md:bg-transparent" : "text-muted hover:text-fg"
       } ${over ? "bg-hover text-fg" : ""}`}
     >
-      <span className="truncate">{name}</span>
+      <span className="hidden w-[26px] shrink-0 md:block">
+        <span data-tick className={`block h-px ${active ? "" : "bg-faint group-hover:bg-muted"}`} />
+      </span>
+      <span data-label className="min-w-0 flex-1 truncate">{name}</span>
       <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
         {count || ""}
       </span>
@@ -592,6 +1004,7 @@ function Card({
   selected,
   onMove,
   onDelete,
+  onType,
   onNote,
   onCopy,
 }: {
@@ -600,6 +1013,7 @@ function Card({
   selected: boolean;
   onMove: (cid: string | null) => void;
   onDelete: () => void;
+  onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
 }) {
@@ -665,6 +1079,21 @@ function Card({
               ))}
             </select>
           </label>
+          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
+            <TagIcon />
+            <select
+              value={typeOf(b)}
+              onChange={(e) => onType(e.target.value)}
+              aria-label="Component type"
+              className="absolute inset-0 cursor-pointer opacity-0"
+            >
+              {[...TYPES, OTHER].map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <IconBtn label="Delete" onClick={onDelete} data="delete">
             <TrashIcon />
           </IconBtn>
@@ -678,6 +1107,10 @@ function Card({
           </a>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
+        <p className="mt-0.5 truncate text-[12px] text-faint">
+          {typeById(typeOf(b)).name}
+          {b.description && <span className="text-faint"> · {b.description}</span>}
+        </p>
 
         {b.install && (
           <button
@@ -791,6 +1224,14 @@ function FolderIcon() {
     </svg>
   );
 }
+function TagIcon() {
+  return (
+    <svg {...svg} aria-hidden>
+      <path d="M2.75 8.25V3.5c0-.4.35-.75.75-.75h4.75l5 5-5.5 5.5z" />
+      <circle cx="5.5" cy="5.5" r=".9" />
+    </svg>
+  );
+}
 function TrashIcon() {
   return (
     <svg {...svg} aria-hidden>
@@ -828,4 +1269,18 @@ function Favicon({ url }: { url: string }) {
   if (!src || !ok) return null;
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={src} alt="" width={20} height={20} onError={() => setOk(false)} className="size-5 rounded opacity-70 grayscale" />;
+}
+
+// Gallery order: components with a preview first, then the rest, each part
+// interleaved across sites so no single library fills the first screen.
+function mix<T extends { library: string; preview?: string }>(items: T[]): T[] {
+  const deal = (list: T[]) => {
+    const by = new Map<string, T[]>();
+    for (const i of list) by.set(i.library, [...(by.get(i.library) ?? []), i]);
+    const queues = [...by.values()];
+    const out: T[] = [];
+    for (let n = 0; out.length < list.length; n++) for (const q of queues) if (q[n]) out.push(q[n]);
+    return out;
+  };
+  return [...deal(items.filter((i) => i.preview)), ...deal(items.filter((i) => !i.preview))];
 }

@@ -1,0 +1,868 @@
+{
+ "magicui/android": {
+  "image": "/previews/magicui/android.webp",
+  "imageDark": "/previews/magicui/android-dark.webp"
+ },
+ "magicui/animated-beam": {
+  "image": "/previews/magicui/animated-beam.webp",
+  "imageDark": "/previews/magicui/animated-beam-dark.webp",
+  "video": "/previews/magicui/animated-beam.mp4",
+  "videoDark": "/previews/magicui/animated-beam-dark.mp4"
+ },
+ "magicui/animated-circular-progress-bar": {
+  "image": "/previews/magicui/animated-circular-progress-bar.webp",
+  "imageDark": "/previews/magicui/animated-circular-progress-bar-dark.webp",
+  "video": "/previews/magicui/animated-circular-progress-bar.mp4",
+  "videoDark": "/previews/magicui/animated-circular-progress-bar-dark.mp4"
+ },
+ "magicui/animated-gradient-text": {
+  "image": "/previews/magicui/animated-gradient-text.webp",
+  "imageDark": "/previews/magicui/animated-gradient-text-dark.webp",
+  "video": "/previews/magicui/animated-gradient-text.mp4",
+  "videoDark": "/previews/magicui/animated-gradient-text-dark.mp4"
+ },
+ "magicui/animated-grid-pattern": {
+  "image": "/previews/magicui/animated-grid-pattern.webp",
+  "imageDark": "/previews/magicui/animated-grid-pattern-dark.webp",
+  "video": "/previews/magicui/animated-grid-pattern.mp4",
+  "videoDark": "/previews/magicui/animated-grid-pattern-dark.mp4"
+ },
+ "magicui/animated-list": {
+  "image": "/previews/magicui/animated-list.webp",
+  "imageDark": "/previews/magicui/animated-list-dark.webp",
+  "video": "/previews/magicui/animated-list.mp4",
+  "videoDark": "/previews/magicui/animated-list-dark.mp4"
+ },
+ "magicui/animated-shiny-text": {
+  "image": "/previews/magicui/animated-shiny-text.webp",
+  "imageDark": "/previews/magicui/animated-shiny-text-dark.webp",
+  "video": "/previews/magicui/animated-shiny-text.mp4",
+  "videoDark": "/previews/magicui/animated-shiny-text-dark.mp4"
+ },
+ "magicui/animated-theme-toggler": {
+  "image": "/previews/magicui/animated-theme-toggler.webp",
+  "imageDark": "/previews/magicui/animated-theme-toggler-dark.webp"
+ },
+ "magicui/aurora-text": {
+  "image": "/previews/magicui/aurora-text.webp",
+  "imageDark": "/previews/magicui/aurora-text-dark.webp",
+  "video": "/previews/magicui/aurora-text.mp4",
+  "videoDark": "/previews/magicui/aurora-text-dark.mp4"
+ },
+ "magicui/avatar-circles": {
+  "image": "/previews/magicui/avatar-circles.webp",
+  "imageDark": "/previews/magicui/avatar-circles-dark.webp"
+ },
+ "magicui/backlight": {
+  "image": "/previews/magicui/backlight.webp",
+  "imageDark": "/previews/magicui/backlight-dark.webp"
+ },
+ "magicui/bento-grid": {
+  "image": "/previews/magicui/bento-grid.webp",
+  "imageDark": "/previews/magicui/bento-grid-dark.webp",
+  "video": "/previews/magicui/bento-grid.mp4",
+  "videoDark": "/previews/magicui/bento-grid-dark.mp4"
+ },
+ "magicui/blur-fade": {
+  "image": "/previews/magicui/blur-fade.webp",
+  "imageDark": "/previews/magicui/blur-fade-dark.webp",
+  "video": "/previews/magicui/blur-fade.mp4",
+  "videoDark": "/previews/magicui/blur-fade-dark.mp4"
+ },
+ "magicui/border-beam": {
+  "image": "/previews/magicui/border-beam.webp",
+  "imageDark": "/previews/magicui/border-beam-dark.webp",
+  "video": "/previews/magicui/border-beam.mp4",
+  "videoDark": "/previews/magicui/border-beam-dark.mp4"
+ },
+ "magicui/client-tweet-card": {
+  "image": "/previews/magicui/client-tweet-card.webp",
+  "imageDark": "/previews/magicui/client-tweet-card-dark.webp"
+ },
+ "magicui/code-comparison": {
+  "image": "/previews/magicui/code-comparison.webp",
+  "imageDark": "/previews/magicui/code-comparison-dark.webp"
+ },
+ "magicui/comic-text": {
+  "image": "/previews/magicui/comic-text.webp",
+  "imageDark": "/previews/magicui/comic-text-dark.webp",
+  "video": "/previews/magicui/comic-text.mp4",
+  "videoDark": "/previews/magicui/comic-text-dark.mp4"
+ },
+ "magicui/confetti": {
+  "image": "/previews/magicui/confetti.webp",
+  "imageDark": "/previews/magicui/confetti-dark.webp",
+  "video": "/previews/magicui/confetti.mp4",
+  "videoDark": "/previews/magicui/confetti-dark.mp4"
+ },
+ "magicui/cool-mode": {
+  "image": "/previews/magicui/cool-mode.webp",
+  "imageDark": "/previews/magicui/cool-mode-dark.webp",
+  "video": "/previews/magicui/cool-mode.mp4",
+  "videoDark": "/previews/magicui/cool-mode-dark.mp4"
+ },
+ "magicui/dia-text-reveal": {
+  "image": "/previews/magicui/dia-text-reveal.webp",
+  "imageDark": "/previews/magicui/dia-text-reveal-dark.webp",
+  "video": "/previews/magicui/dia-text-reveal.mp4",
+  "videoDark": "/previews/magicui/dia-text-reveal-dark.mp4"
+ },
+ "magicui/dither-field": {
+  "image": "/previews/magicui/dither-field.webp",
+  "imageDark": "/previews/magicui/dither-field-dark.webp"
+ },
+ "magicui/dock": {
+  "image": "/previews/magicui/dock.webp",
+  "imageDark": "/previews/magicui/dock-dark.webp",
+  "video": "/previews/magicui/dock.mp4",
+  "videoDark": "/previews/magicui/dock-dark.mp4"
+ },
+ "magicui/dot-pattern": {
+  "image": "/previews/magicui/dot-pattern.webp",
+  "imageDark": "/previews/magicui/dot-pattern-dark.webp"
+ },
+ "magicui/dotted-map": {
+  "image": "/previews/magicui/dotted-map.webp",
+  "imageDark": "/previews/magicui/dotted-map-dark.webp"
+ },
+ "magicui/file-tree": {
+  "image": "/previews/magicui/file-tree.webp",
+  "imageDark": "/previews/magicui/file-tree-dark.webp"
+ },
+ "magicui/flickering-grid": {
+  "image": "/previews/magicui/flickering-grid.webp",
+  "imageDark": "/previews/magicui/flickering-grid-dark.webp",
+  "video": "/previews/magicui/flickering-grid.mp4",
+  "videoDark": "/previews/magicui/flickering-grid-dark.mp4"
+ },
+ "magicui/floating-3d-particles": {
+  "image": "/previews/magicui/floating-3d-particles.webp",
+  "imageDark": "/previews/magicui/floating-3d-particles-dark.webp",
+  "video": "/previews/magicui/floating-3d-particles.mp4",
+  "videoDark": "/previews/magicui/floating-3d-particles-dark.mp4"
+ },
+ "magicui/glare-hover": {
+  "image": "/previews/magicui/glare-hover.webp",
+  "imageDark": "/previews/magicui/glare-hover-dark.webp"
+ },
+ "magicui/globe": {
+  "image": "/previews/magicui/globe.webp",
+  "imageDark": "/previews/magicui/globe-dark.webp",
+  "video": "/previews/magicui/globe.mp4",
+  "videoDark": "/previews/magicui/globe-dark.mp4"
+ },
+ "magicui/glyph-matrix": {
+  "image": "/previews/magicui/glyph-matrix.webp",
+  "imageDark": "/previews/magicui/glyph-matrix-dark.webp",
+  "video": "/previews/magicui/glyph-matrix.mp4",
+  "videoDark": "/previews/magicui/glyph-matrix-dark.mp4"
+ },
+ "magicui/grid-pattern": {
+  "image": "/previews/magicui/grid-pattern.webp",
+  "imageDark": "/previews/magicui/grid-pattern-dark.webp"
+ },
+ "magicui/hero-video-dialog": {
+  "image": "/previews/magicui/hero-video-dialog.webp",
+  "imageDark": "/previews/magicui/hero-video-dialog-dark.webp"
+ },
+ "magicui/hexagon-pattern": {
+  "image": "/previews/magicui/hexagon-pattern.webp",
+  "imageDark": "/previews/magicui/hexagon-pattern-dark.webp"
+ },
+ "magicui/highlighter": {
+  "image": "/previews/magicui/highlighter.webp",
+  "imageDark": "/previews/magicui/highlighter-dark.webp"
+ },
+ "magicui/hyper-text": {
+  "image": "/previews/magicui/hyper-text.webp",
+  "imageDark": "/previews/magicui/hyper-text-dark.webp",
+  "video": "/previews/magicui/hyper-text.mp4",
+  "videoDark": "/previews/magicui/hyper-text-dark.mp4"
+ },
+ "magicui/icon-cloud": {
+  "image": "/previews/magicui/icon-cloud.webp",
+  "imageDark": "/previews/magicui/icon-cloud-dark.webp",
+  "video": "/previews/magicui/icon-cloud.mp4",
+  "videoDark": "/previews/magicui/icon-cloud-dark.mp4"
+ },
+ "magicui/interactive-grid-pattern": {
+  "image": "/previews/magicui/interactive-grid-pattern.webp",
+  "imageDark": "/previews/magicui/interactive-grid-pattern-dark.webp"
+ },
+ "magicui/interactive-hover-button": {
+  "image": "/previews/magicui/interactive-hover-button.webp",
+  "imageDark": "/previews/magicui/interactive-hover-button-dark.webp",
+  "video": "/previews/magicui/interactive-hover-button.mp4",
+  "videoDark": "/previews/magicui/interactive-hover-button-dark.mp4"
+ },
+ "magicui/iphone": {
+  "image": "/previews/magicui/iphone.webp",
+  "imageDark": "/previews/magicui/iphone-dark.webp"
+ },
+ "magicui/kinetic-text": {
+  "image": "/previews/magicui/kinetic-text.webp",
+  "imageDark": "/previews/magicui/kinetic-text-dark.webp"
+ },
+ "magicui/lens": {
+  "image": "/previews/magicui/lens.webp",
+  "imageDark": "/previews/magicui/lens-dark.webp"
+ },
+ "magicui/light-rays": {
+  "image": "/previews/magicui/light-rays.webp",
+  "imageDark": "/previews/magicui/light-rays-dark.webp"
+ },
+ "magicui/line-shadow-text": {
+  "image": "/previews/magicui/line-shadow-text.webp",
+  "imageDark": "/previews/magicui/line-shadow-text-dark.webp",
+  "video": "/previews/magicui/line-shadow-text.mp4",
+  "videoDark": "/previews/magicui/line-shadow-text-dark.mp4"
+ },
+ "magicui/magic-card": {
+  "image": "/previews/magicui/magic-card.webp",
+  "imageDark": "/previews/magicui/magic-card-dark.webp",
+  "video": "/previews/magicui/magic-card.mp4",
+  "videoDark": "/previews/magicui/magic-card-dark.mp4"
+ },
+ "magicui/marquee": {
+  "image": "/previews/magicui/marquee.webp",
+  "imageDark": "/previews/magicui/marquee-dark.webp",
+  "video": "/previews/magicui/marquee.mp4",
+  "videoDark": "/previews/magicui/marquee-dark.mp4"
+ },
+ "magicui/meteors": {
+  "image": "/previews/magicui/meteors.webp",
+  "imageDark": "/previews/magicui/meteors-dark.webp",
+  "video": "/previews/magicui/meteors.mp4",
+  "videoDark": "/previews/magicui/meteors-dark.mp4"
+ },
+ "magicui/morphing-text": {
+  "image": "/previews/magicui/morphing-text.webp",
+  "imageDark": "/previews/magicui/morphing-text-dark.webp",
+  "video": "/previews/magicui/morphing-text.mp4",
+  "videoDark": "/previews/magicui/morphing-text-dark.mp4"
+ },
+ "magicui/neon-gradient-card": {
+  "image": "/previews/magicui/neon-gradient-card.webp",
+  "imageDark": "/previews/magicui/neon-gradient-card-dark.webp",
+  "video": "/previews/magicui/neon-gradient-card.mp4",
+  "videoDark": "/previews/magicui/neon-gradient-card-dark.mp4"
+ },
+ "magicui/noise-texture": {
+  "image": "/previews/magicui/noise-texture.webp",
+  "imageDark": "/previews/magicui/noise-texture-dark.webp"
+ },
+ "magicui/number-ticker": {
+  "image": "/previews/magicui/number-ticker.webp",
+  "imageDark": "/previews/magicui/number-ticker-dark.webp",
+  "video": "/previews/magicui/number-ticker.mp4",
+  "videoDark": "/previews/magicui/number-ticker-dark.mp4"
+ },
+ "magicui/orbiting-circles": {
+  "image": "/previews/magicui/orbiting-circles.webp",
+  "imageDark": "/previews/magicui/orbiting-circles-dark.webp",
+  "video": "/previews/magicui/orbiting-circles.mp4",
+  "videoDark": "/previews/magicui/orbiting-circles-dark.mp4"
+ },
+ "magicui/particles": {
+  "image": "/previews/magicui/particles.webp",
+  "imageDark": "/previews/magicui/particles-dark.webp",
+  "video": "/previews/magicui/particles.mp4",
+  "videoDark": "/previews/magicui/particles-dark.mp4"
+ },
+ "magicui/pixel-image": {
+  "image": "/previews/magicui/pixel-image.webp",
+  "imageDark": "/previews/magicui/pixel-image-dark.webp",
+  "video": "/previews/magicui/pixel-image.mp4",
+  "videoDark": "/previews/magicui/pixel-image-dark.mp4"
+ },
+ "magicui/pointer": {
+  "image": "/previews/magicui/pointer.webp",
+  "imageDark": "/previews/magicui/pointer-dark.webp",
+  "video": "/previews/magicui/pointer.mp4",
+  "videoDark": "/previews/magicui/pointer-dark.mp4"
+ },
+ "magicui/progressive-blur": {
+  "image": "/previews/magicui/progressive-blur.webp",
+  "imageDark": "/previews/magicui/progressive-blur-dark.webp"
+ },
+ "magicui/pulsating-button": {
+  "image": "/previews/magicui/pulsating-button.webp",
+  "imageDark": "/previews/magicui/pulsating-button-dark.webp"
+ },
+ "magicui/rainbow-button": {
+  "image": "/previews/magicui/rainbow-button.webp",
+  "imageDark": "/previews/magicui/rainbow-button-dark.webp",
+  "video": "/previews/magicui/rainbow-button.mp4",
+  "videoDark": "/previews/magicui/rainbow-button-dark.mp4"
+ },
+ "magicui/retro-grid": {
+  "image": "/previews/magicui/retro-grid.webp",
+  "imageDark": "/previews/magicui/retro-grid-dark.webp"
+ },
+ "magicui/ripple": {
+  "image": "/previews/magicui/ripple.webp",
+  "imageDark": "/previews/magicui/ripple-dark.webp",
+  "video": "/previews/magicui/ripple.mp4",
+  "videoDark": "/previews/magicui/ripple-dark.mp4"
+ },
+ "magicui/ripple-button": {
+  "image": "/previews/magicui/ripple-button.webp",
+  "imageDark": "/previews/magicui/ripple-button-dark.webp"
+ },
+ "magicui/safari": {
+  "image": "/previews/magicui/safari.webp",
+  "imageDark": "/previews/magicui/safari-dark.webp"
+ },
+ "magicui/scroll-based-velocity": {
+  "image": "/previews/magicui/scroll-based-velocity.webp",
+  "imageDark": "/previews/magicui/scroll-based-velocity-dark.webp",
+  "video": "/previews/magicui/scroll-based-velocity.mp4",
+  "videoDark": "/previews/magicui/scroll-based-velocity-dark.mp4"
+ },
+ "magicui/scroll-progress": {
+  "image": "/previews/magicui/scroll-progress.webp",
+  "imageDark": "/previews/magicui/scroll-progress-dark.webp"
+ },
+ "magicui/shimmer-button": {
+  "image": "/previews/magicui/shimmer-button.webp",
+  "imageDark": "/previews/magicui/shimmer-button-dark.webp",
+  "video": "/previews/magicui/shimmer-button.mp4",
+  "videoDark": "/previews/magicui/shimmer-button-dark.mp4"
+ },
+ "magicui/shine-border": {
+  "image": "/previews/magicui/shine-border.webp",
+  "imageDark": "/previews/magicui/shine-border-dark.webp",
+  "video": "/previews/magicui/shine-border.mp4",
+  "videoDark": "/previews/magicui/shine-border-dark.mp4"
+ },
+ "magicui/shiny-button": {
+  "image": "/previews/magicui/shiny-button.webp",
+  "imageDark": "/previews/magicui/shiny-button-dark.webp",
+  "video": "/previews/magicui/shiny-button.mp4",
+  "videoDark": "/previews/magicui/shiny-button-dark.mp4"
+ },
+ "magicui/smooth-cursor": {
+  "image": "/previews/magicui/smooth-cursor.webp",
+  "imageDark": "/previews/magicui/smooth-cursor-dark.webp",
+  "video": "/previews/magicui/smooth-cursor.mp4",
+  "videoDark": "/previews/magicui/smooth-cursor-dark.mp4"
+ },
+ "magicui/sparkles-text": {
+  "image": "/previews/magicui/sparkles-text.webp",
+  "imageDark": "/previews/magicui/sparkles-text-dark.webp",
+  "video": "/previews/magicui/sparkles-text.mp4",
+  "videoDark": "/previews/magicui/sparkles-text-dark.mp4"
+ },
+ "magicui/spinning-text": {
+  "image": "/previews/magicui/spinning-text.webp",
+  "imageDark": "/previews/magicui/spinning-text-dark.webp",
+  "video": "/previews/magicui/spinning-text.mp4",
+  "videoDark": "/previews/magicui/spinning-text-dark.mp4"
+ },
+ "magicui/striped-pattern": {
+  "image": "/previews/magicui/striped-pattern.webp",
+  "imageDark": "/previews/magicui/striped-pattern-dark.webp"
+ },
+ "magicui/terminal": {
+  "image": "/previews/magicui/terminal.webp",
+  "imageDark": "/previews/magicui/terminal-dark.webp",
+  "video": "/previews/magicui/terminal.mp4",
+  "videoDark": "/previews/magicui/terminal-dark.mp4"
+ },
+ "magicui/text-3d-flip": {
+  "image": "/previews/magicui/text-3d-flip.webp",
+  "imageDark": "/previews/magicui/text-3d-flip-dark.webp"
+ },
+ "magicui/text-animate": {
+  "image": "/previews/magicui/text-animate.webp",
+  "imageDark": "/previews/magicui/text-animate-dark.webp",
+  "video": "/previews/magicui/text-animate.mp4",
+  "videoDark": "/previews/magicui/text-animate-dark.mp4"
+ },
+ "magicui/text-reveal": {
+  "image": "/previews/magicui/text-reveal.webp",
+  "imageDark": "/previews/magicui/text-reveal-dark.webp"
+ },
+ "magicui/tweet-card": {
+  "image": "/previews/magicui/tweet-card.webp",
+  "imageDark": "/previews/magicui/tweet-card-dark.webp"
+ },
+ "magicui/typing-animation": {
+  "image": "/previews/magicui/typing-animation.webp",
+  "imageDark": "/previews/magicui/typing-animation-dark.webp",
+  "video": "/previews/magicui/typing-animation.mp4",
+  "videoDark": "/previews/magicui/typing-animation-dark.mp4"
+ },
+ "magicui/video-text": {
+  "image": "/previews/magicui/video-text.webp",
+  "imageDark": "/previews/magicui/video-text-dark.webp",
+  "video": "/previews/magicui/video-text.mp4",
+  "videoDark": "/previews/magicui/video-text-dark.mp4"
+ },
+ "magicui/warp-background": {
+  "image": "/previews/magicui/warp-background.webp",
+  "imageDark": "/previews/magicui/warp-background-dark.webp",
+  "video": "/previews/magicui/warp-background.mp4",
+  "videoDark": "/previews/magicui/warp-background-dark.mp4"
+ },
+ "magicui/word-rotate": {
+  "image": "/previews/magicui/word-rotate.webp",
+  "imageDark": "/previews/magicui/word-rotate-dark.webp",
+  "video": "/previews/magicui/word-rotate.mp4",
+  "videoDark": "/previews/magicui/word-rotate-dark.mp4"
+ },
+ "animate-ui/components-animate-avatar-group": {
+  "image": "/previews/animate-ui/components-animate-avatar-group.webp",
+  "imageDark": "/previews/animate-ui/components-animate-avatar-group-dark.webp"
+ },
+ "animate-ui/components-animate-code": {
+  "image": "/previews/animate-ui/components-animate-code.webp",
+  "imageDark": "/previews/animate-ui/components-animate-code-dark.webp",
+  "video": "/previews/animate-ui/components-animate-code.mp4",
+  "videoDark": "/previews/animate-ui/components-animate-code-dark.mp4"
+ },
+ "animate-ui/components-animate-code-tabs": {
+  "image": "/previews/animate-ui/components-animate-code-tabs.webp",
+  "imageDark": "/previews/animate-ui/components-animate-code-tabs-dark.webp",
+  "video": "/previews/animate-ui/components-animate-code-tabs.mp4",
+  "videoDark": "/previews/animate-ui/components-animate-code-tabs-dark.mp4"
+ },
+ "animate-ui/components-animate-cursor": {
+  "image": "/previews/animate-ui/components-animate-cursor.webp",
+  "imageDark": "/previews/animate-ui/components-animate-cursor-dark.webp",
+  "video": "/previews/animate-ui/components-animate-cursor.mp4",
+  "videoDark": "/previews/animate-ui/components-animate-cursor-dark.mp4"
+ },
+ "animate-ui/components-animate-github-stars-wheel": {
+  "image": "/previews/animate-ui/components-animate-github-stars-wheel.webp",
+  "imageDark": "/previews/animate-ui/components-animate-github-stars-wheel-dark.webp",
+  "video": "/previews/animate-ui/components-animate-github-stars-wheel.mp4",
+  "videoDark": "/previews/animate-ui/components-animate-github-stars-wheel-dark.mp4"
+ },
+ "animate-ui/components-backgrounds-bubble": {
+  "image": "/previews/animate-ui/components-backgrounds-bubble.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-bubble-dark.webp"
+ },
+ "animate-ui/components-backgrounds-fireworks": {
+  "image": "/previews/animate-ui/components-backgrounds-fireworks.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-fireworks-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-fireworks.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-fireworks-dark.mp4"
+ },
+ "animate-ui/components-backgrounds-gradient": {
+  "image": "/previews/animate-ui/components-backgrounds-gradient.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-gradient-dark.webp"
+ },
+ "animate-ui/components-backgrounds-gravity-stars": {
+  "image": "/previews/animate-ui/components-backgrounds-gravity-stars.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-gravity-stars-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-gravity-stars.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-gravity-stars-dark.mp4"
+ },
+ "animate-ui/components-backgrounds-hexagon": {
+  "image": "/previews/animate-ui/components-backgrounds-hexagon.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-hexagon-dark.webp"
+ },
+ "animate-ui/components-backgrounds-hole": {
+  "image": "/previews/animate-ui/components-backgrounds-hole.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-hole-dark.webp"
+ },
+ "animate-ui/components-backgrounds-stars": {
+  "image": "/previews/animate-ui/components-backgrounds-stars.webp",
+  "imageDark": "/previews/animate-ui/components-backgrounds-stars-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-stars.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-stars-dark.mp4"
+ },
+ "animate-ui/components-base-menu": {
+  "image": "/previews/animate-ui/components-base-menu.webp",
+  "imageDark": "/previews/animate-ui/components-base-menu-dark.webp",
+  "video": "/previews/animate-ui/components-base-menu.mp4",
+  "videoDark": "/previews/animate-ui/components-base-menu-dark.mp4"
+ },
+ "animate-ui/components-base-preview-card": {
+  "image": "/previews/animate-ui/components-base-preview-card.webp",
+  "imageDark": "/previews/animate-ui/components-base-preview-card-dark.webp",
+  "video": "/previews/animate-ui/components-base-preview-card.mp4",
+  "videoDark": "/previews/animate-ui/components-base-preview-card-dark.mp4"
+ },
+ "animate-ui/components-base-radio": {
+  "image": "/previews/animate-ui/components-base-radio.webp",
+  "imageDark": "/previews/animate-ui/components-base-radio-dark.webp"
+ },
+ "animate-ui/components-buttons-button": {
+  "image": "/previews/animate-ui/components-buttons-button.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-button-dark.webp"
+ },
+ "animate-ui/components-buttons-copy": {
+  "image": "/previews/animate-ui/components-buttons-copy.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-copy-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-copy.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-copy-dark.mp4"
+ },
+ "animate-ui/components-buttons-flip": {
+  "image": "/previews/animate-ui/components-buttons-flip.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-flip-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-flip.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-flip-dark.mp4"
+ },
+ "animate-ui/components-buttons-github-stars": {
+  "image": "/previews/animate-ui/components-buttons-github-stars.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-github-stars-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-github-stars.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-github-stars-dark.mp4"
+ },
+ "animate-ui/components-buttons-icon": {
+  "image": "/previews/animate-ui/components-buttons-icon.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-icon-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-icon.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-icon-dark.mp4"
+ },
+ "animate-ui/components-buttons-liquid": {
+  "image": "/previews/animate-ui/components-buttons-liquid.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-liquid-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-liquid.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-liquid-dark.mp4"
+ },
+ "animate-ui/components-buttons-ripple": {
+  "image": "/previews/animate-ui/components-buttons-ripple.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-ripple-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-ripple.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-ripple-dark.mp4"
+ },
+ "animate-ui/components-buttons-theme-toggler": {
+  "image": "/previews/animate-ui/components-buttons-theme-toggler.webp",
+  "imageDark": "/previews/animate-ui/components-buttons-theme-toggler-dark.webp"
+ },
+ "animate-ui/components-community-flip-card": {
+  "image": "/previews/animate-ui/components-community-flip-card.webp",
+  "imageDark": "/previews/animate-ui/components-community-flip-card-dark.webp"
+ },
+ "animate-ui/components-community-management-bar": {
+  "image": "/previews/animate-ui/components-community-management-bar.webp",
+  "imageDark": "/previews/animate-ui/components-community-management-bar-dark.webp"
+ },
+ "animate-ui/components-community-motion-carousel": {
+  "image": "/previews/animate-ui/components-community-motion-carousel.webp",
+  "imageDark": "/previews/animate-ui/components-community-motion-carousel-dark.webp"
+ },
+ "animate-ui/components-community-notification-list": {
+  "image": "/previews/animate-ui/components-community-notification-list.webp",
+  "imageDark": "/previews/animate-ui/components-community-notification-list-dark.webp"
+ },
+ "animate-ui/components-community-pin-list": {
+  "image": "/previews/animate-ui/components-community-pin-list.webp",
+  "imageDark": "/previews/animate-ui/components-community-pin-list-dark.webp"
+ },
+ "animate-ui/components-community-playful-todolist": {
+  "image": "/previews/animate-ui/components-community-playful-todolist.webp",
+  "imageDark": "/previews/animate-ui/components-community-playful-todolist-dark.webp"
+ },
+ "animate-ui/components-community-radial-intro": {
+  "image": "/previews/animate-ui/components-community-radial-intro.webp",
+  "imageDark": "/previews/animate-ui/components-community-radial-intro-dark.webp",
+  "video": "/previews/animate-ui/components-community-radial-intro.mp4",
+  "videoDark": "/previews/animate-ui/components-community-radial-intro-dark.mp4"
+ },
+ "animate-ui/components-community-radial-menu": {
+  "image": "/previews/animate-ui/components-community-radial-menu.webp",
+  "imageDark": "/previews/animate-ui/components-community-radial-menu-dark.webp",
+  "video": "/previews/animate-ui/components-community-radial-menu.mp4",
+  "videoDark": "/previews/animate-ui/components-community-radial-menu-dark.mp4"
+ },
+ "animate-ui/components-community-radial-nav": {
+  "image": "/previews/animate-ui/components-community-radial-nav.webp",
+  "imageDark": "/previews/animate-ui/components-community-radial-nav-dark.webp"
+ },
+ "animate-ui/components-community-share-button": {
+  "image": "/previews/animate-ui/components-community-share-button.webp",
+  "imageDark": "/previews/animate-ui/components-community-share-button-dark.webp"
+ },
+ "animate-ui/components-community-user-presence-avatar": {
+  "image": "/previews/animate-ui/components-community-user-presence-avatar.webp",
+  "imageDark": "/previews/animate-ui/components-community-user-presence-avatar-dark.webp"
+ },
+ "animate-ui/components-radix-accordion": {
+  "image": "/previews/animate-ui/components-radix-accordion.webp",
+  "imageDark": "/previews/animate-ui/components-radix-accordion-dark.webp",
+  "video": "/previews/animate-ui/components-radix-accordion.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-accordion-dark.mp4"
+ },
+ "animate-ui/components-radix-alert-dialog": {
+  "image": "/previews/animate-ui/components-radix-alert-dialog.webp",
+  "imageDark": "/previews/animate-ui/components-radix-alert-dialog-dark.webp",
+  "video": "/previews/animate-ui/components-radix-alert-dialog.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-alert-dialog-dark.mp4"
+ },
+ "animate-ui/components-radix-checkbox": {
+  "image": "/previews/animate-ui/components-radix-checkbox.webp",
+  "imageDark": "/previews/animate-ui/components-radix-checkbox-dark.webp",
+  "video": "/previews/animate-ui/components-radix-checkbox.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-checkbox-dark.mp4"
+ },
+ "animate-ui/components-radix-dialog": {
+  "image": "/previews/animate-ui/components-radix-dialog.webp",
+  "imageDark": "/previews/animate-ui/components-radix-dialog-dark.webp",
+  "video": "/previews/animate-ui/components-radix-dialog.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-dialog-dark.mp4"
+ },
+ "animate-ui/components-radix-dropdown-menu": {
+  "image": "/previews/animate-ui/components-radix-dropdown-menu.webp",
+  "imageDark": "/previews/animate-ui/components-radix-dropdown-menu-dark.webp",
+  "video": "/previews/animate-ui/components-radix-dropdown-menu.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-dropdown-menu-dark.mp4"
+ },
+ "animate-ui/components-radix-files": {
+  "image": "/previews/animate-ui/components-radix-files.webp",
+  "imageDark": "/previews/animate-ui/components-radix-files-dark.webp"
+ },
+ "animate-ui/components-radix-hover-card": {
+  "image": "/previews/animate-ui/components-radix-hover-card.webp",
+  "imageDark": "/previews/animate-ui/components-radix-hover-card-dark.webp",
+  "video": "/previews/animate-ui/components-radix-hover-card.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-hover-card-dark.mp4"
+ },
+ "animate-ui/components-radix-popover": {
+  "image": "/previews/animate-ui/components-radix-popover.webp",
+  "imageDark": "/previews/animate-ui/components-radix-popover-dark.webp",
+  "video": "/previews/animate-ui/components-radix-popover.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-popover-dark.mp4"
+ },
+ "animate-ui/components-radix-preview-link-card": {
+  "image": "/previews/animate-ui/components-radix-preview-link-card.webp",
+  "imageDark": "/previews/animate-ui/components-radix-preview-link-card-dark.webp",
+  "video": "/previews/animate-ui/components-radix-preview-link-card.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-preview-link-card-dark.mp4"
+ },
+ "animate-ui/components-radix-progress": {
+  "image": "/previews/animate-ui/components-radix-progress.webp",
+  "imageDark": "/previews/animate-ui/components-radix-progress-dark.webp",
+  "video": "/previews/animate-ui/components-radix-progress.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-progress-dark.mp4"
+ },
+ "animate-ui/components-radix-radio-group": {
+  "image": "/previews/animate-ui/components-radix-radio-group.webp",
+  "imageDark": "/previews/animate-ui/components-radix-radio-group-dark.webp"
+ },
+ "animate-ui/components-radix-sheet": {
+  "image": "/previews/animate-ui/components-radix-sheet.webp",
+  "imageDark": "/previews/animate-ui/components-radix-sheet-dark.webp",
+  "video": "/previews/animate-ui/components-radix-sheet.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-sheet-dark.mp4"
+ },
+ "animate-ui/components-radix-sidebar": {
+  "image": "/previews/animate-ui/components-radix-sidebar.webp",
+  "imageDark": "/previews/animate-ui/components-radix-sidebar-dark.webp"
+ },
+ "animate-ui/components-radix-switch": {
+  "image": "/previews/animate-ui/components-radix-switch.webp",
+  "imageDark": "/previews/animate-ui/components-radix-switch-dark.webp",
+  "video": "/previews/animate-ui/components-radix-switch.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-switch-dark.mp4"
+ },
+ "animate-ui/components-radix-tabs": {
+  "image": "/previews/animate-ui/components-radix-tabs.webp",
+  "imageDark": "/previews/animate-ui/components-radix-tabs-dark.webp"
+ },
+ "animate-ui/components-radix-toggle": {
+  "image": "/previews/animate-ui/components-radix-toggle.webp",
+  "imageDark": "/previews/animate-ui/components-radix-toggle-dark.webp",
+  "video": "/previews/animate-ui/components-radix-toggle.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-toggle-dark.mp4"
+ },
+ "animate-ui/components-radix-toggle-group": {
+  "image": "/previews/animate-ui/components-radix-toggle-group.webp",
+  "imageDark": "/previews/animate-ui/components-radix-toggle-group-dark.webp"
+ },
+ "animate-ui/components-radix-tooltip": {
+  "image": "/previews/animate-ui/components-radix-tooltip.webp",
+  "imageDark": "/previews/animate-ui/components-radix-tooltip-dark.webp",
+  "video": "/previews/animate-ui/components-radix-tooltip.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-tooltip-dark.mp4"
+ },
+ "animate-ui/primitives-animate-code-block": {
+  "image": "/previews/animate-ui/primitives-animate-code-block.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-code-block-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-code-block.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-code-block-dark.mp4"
+ },
+ "animate-ui/primitives-animate-github-stars": {
+  "image": "/previews/animate-ui/primitives-animate-github-stars.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-github-stars-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-github-stars.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-github-stars-dark.mp4"
+ },
+ "animate-ui/primitives-animate-motion-grid": {
+  "image": "/previews/animate-ui/primitives-animate-motion-grid.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-motion-grid-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-motion-grid.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-motion-grid-dark.mp4"
+ },
+ "animate-ui/primitives-animate-pinned-list": {
+  "image": "/previews/animate-ui/primitives-animate-pinned-list.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-pinned-list-dark.webp"
+ },
+ "animate-ui/primitives-animate-scroll-progress": {
+  "image": "/previews/animate-ui/primitives-animate-scroll-progress.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-scroll-progress-dark.webp"
+ },
+ "animate-ui/primitives-animate-slot": {
+  "image": "/previews/animate-ui/primitives-animate-slot.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-slot-dark.webp"
+ },
+ "animate-ui/primitives-animate-spring": {
+  "image": "/previews/animate-ui/primitives-animate-spring.webp",
+  "imageDark": "/previews/animate-ui/primitives-animate-spring-dark.webp"
+ },
+ "animate-ui/primitives-base-menu": {
+  "image": "/previews/animate-ui/primitives-base-menu.webp",
+  "imageDark": "/previews/animate-ui/primitives-base-menu-dark.webp",
+  "video": "/previews/animate-ui/primitives-base-menu.mp4",
+  "videoDark": "/previews/animate-ui/primitives-base-menu-dark.mp4"
+ },
+ "animate-ui/primitives-base-preview-card": {
+  "image": "/previews/animate-ui/primitives-base-preview-card.webp",
+  "imageDark": "/previews/animate-ui/primitives-base-preview-card-dark.webp",
+  "video": "/previews/animate-ui/primitives-base-preview-card.mp4",
+  "videoDark": "/previews/animate-ui/primitives-base-preview-card-dark.mp4"
+ },
+ "animate-ui/primitives-effects-auto-height": {
+  "image": "/previews/animate-ui/primitives-effects-auto-height.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-auto-height-dark.webp"
+ },
+ "animate-ui/primitives-effects-blur": {
+  "image": "/previews/animate-ui/primitives-effects-blur.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-blur-dark.webp"
+ },
+ "animate-ui/primitives-effects-click": {
+  "image": "/previews/animate-ui/primitives-effects-click.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-click-dark.webp"
+ },
+ "animate-ui/primitives-effects-effect": {
+  "image": "/previews/animate-ui/primitives-effects-effect.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-effect-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-effect.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-effect-dark.mp4"
+ },
+ "animate-ui/primitives-effects-fade": {
+  "image": "/previews/animate-ui/primitives-effects-fade.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-fade-dark.webp"
+ },
+ "animate-ui/primitives-effects-highlight": {
+  "image": "/previews/animate-ui/primitives-effects-highlight.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-highlight-dark.webp"
+ },
+ "animate-ui/primitives-effects-image-zoom": {
+  "image": "/previews/animate-ui/primitives-effects-image-zoom.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-image-zoom-dark.webp"
+ },
+ "animate-ui/primitives-effects-magnetic": {
+  "image": "/previews/animate-ui/primitives-effects-magnetic.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-magnetic-dark.webp"
+ },
+ "animate-ui/primitives-effects-particles": {
+  "image": "/previews/animate-ui/primitives-effects-particles.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-particles-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-particles.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-particles-dark.mp4"
+ },
+ "animate-ui/primitives-effects-shine": {
+  "image": "/previews/animate-ui/primitives-effects-shine.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-shine-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-shine.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-shine-dark.mp4"
+ },
+ "animate-ui/primitives-effects-slide": {
+  "image": "/previews/animate-ui/primitives-effects-slide.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-slide-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-slide.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-slide-dark.mp4"
+ },
+ "animate-ui/primitives-effects-tilt": {
+  "image": "/previews/animate-ui/primitives-effects-tilt.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-tilt-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-tilt.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-tilt-dark.mp4"
+ },
+ "animate-ui/primitives-effects-zoom": {
+  "image": "/previews/animate-ui/primitives-effects-zoom.webp",
+  "imageDark": "/previews/animate-ui/primitives-effects-zoom-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-zoom.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-zoom-dark.mp4"
+ },
+ "animate-ui/primitives-headless-disclosure": {
+  "image": "/previews/animate-ui/primitives-headless-disclosure.webp",
+  "imageDark": "/previews/animate-ui/primitives-headless-disclosure-dark.webp",
+  "video": "/previews/animate-ui/primitives-headless-disclosure.mp4",
+  "videoDark": "/previews/animate-ui/primitives-headless-disclosure-dark.mp4"
+ },
+ "animate-ui/primitives-radix-collapsible": {
+  "image": "/previews/animate-ui/primitives-radix-collapsible.webp",
+  "imageDark": "/previews/animate-ui/primitives-radix-collapsible-dark.webp",
+  "video": "/previews/animate-ui/primitives-radix-collapsible.mp4",
+  "videoDark": "/previews/animate-ui/primitives-radix-collapsible-dark.mp4"
+ },
+ "animate-ui/primitives-texts-counting-number": {
+  "image": "/previews/animate-ui/primitives-texts-counting-number.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-counting-number-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-counting-number.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-counting-number-dark.mp4"
+ },
+ "animate-ui/primitives-texts-gradient": {
+  "image": "/previews/animate-ui/primitives-texts-gradient.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-gradient-dark.webp"
+ },
+ "animate-ui/primitives-texts-highlight": {
+  "image": "/previews/animate-ui/primitives-texts-highlight.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-highlight-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-highlight.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-highlight-dark.mp4"
+ },
+ "animate-ui/primitives-texts-morphing": {
+  "image": "/previews/animate-ui/primitives-texts-morphing.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-morphing-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-morphing.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-morphing-dark.mp4"
+ },
+ "animate-ui/primitives-texts-rolling": {
+  "image": "/previews/animate-ui/primitives-texts-rolling.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-rolling-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-rolling.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-rolling-dark.mp4"
+ },
+ "animate-ui/primitives-texts-rotating": {
+  "image": "/previews/animate-ui/primitives-texts-rotating.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-rotating-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-rotating.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-rotating-dark.mp4"
+ },
+ "animate-ui/primitives-texts-scrolling-number": {
+  "image": "/previews/animate-ui/primitives-texts-scrolling-number.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-scrolling-number-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-scrolling-number.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-scrolling-number-dark.mp4"
+ },
+ "animate-ui/primitives-texts-shimmering": {
+  "image": "/previews/animate-ui/primitives-texts-shimmering.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-shimmering-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-shimmering.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-shimmering-dark.mp4"
+ },
+ "animate-ui/primitives-texts-sliding-number": {
+  "image": "/previews/animate-ui/primitives-texts-sliding-number.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-sliding-number-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-sliding-number.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-sliding-number-dark.mp4"
+ },
+ "animate-ui/primitives-texts-splitting": {
+  "image": "/previews/animate-ui/primitives-texts-splitting.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-splitting-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-splitting.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-splitting-dark.mp4"
+ },
+ "animate-ui/primitives-texts-typing": {
+  "image": "/previews/animate-ui/primitives-texts-typing.webp",
+  "imageDark": "/previews/animate-ui/primitives-texts-typing-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-typing.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-typing-dark.mp4"
+ }
+}
