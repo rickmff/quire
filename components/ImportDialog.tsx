@@ -25,28 +25,27 @@ export default function ImportDialog({
   onImport: (choice: ImportChoice) => void;
 }) {
   const [url, setUrl] = useState(initialUrl);
-  const [state, setState] = useState<"idle" | "loading" | "error">("idle");
-  const [error, setError] = useState("");
-  const [result, setResult] = useState<ImportResult | null>(null);
+  // empty: nothing looked up yet. found: the site's components, listed below.
+  const [status, setStatus] = useState<
+    { kind: "empty" } | { kind: "loading" } | { kind: "error"; message: string } | { kind: "found"; result: ImportResult }
+  >({ kind: "empty" });
+  const result = status.kind === "found" ? status.result : null;
   const [items, setItems] = useState<(ImportItem & { on: boolean })[]>([]);
   const [toCollection, setToCollection] = useState(true);
 
   const find = async (raw: string) => {
     const u = normalizeUrl(raw);
-    if (!u) return setError("Not a link"), setState("error");
-    setState("loading");
-    setResult(null);
+    if (!u) return setStatus({ kind: "error", message: "Not a link" });
+    setStatus({ kind: "loading" });
     try {
       const res = await fetch(`/api/import?url=${encodeURIComponent(u)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not read that site");
       const r = data as ImportResult;
-      setResult(r);
       setItems(r.items.map((i) => ({ ...i, on: !savedUrls.has(i.url) })));
-      setState("idle");
+      setStatus({ kind: "found", result: r });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not read that site");
-      setState("error");
+      setStatus({ kind: "error", message: e instanceof Error ? e.message : "Could not read that site" });
     }
   };
 
@@ -96,7 +95,7 @@ export default function ImportDialog({
           />
           <button
             type="submit"
-            disabled={state === "loading"}
+            disabled={status.kind === "loading"}
             className="shrink-0 rounded-lg px-3 text-muted transition hover:bg-hover hover:text-fg disabled:opacity-50"
           >
             Find
@@ -104,14 +103,14 @@ export default function ImportDialog({
         </form>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-1.5">
-          {state === "loading" && <p className="px-3 py-10 text-center text-muted">Reading the site…</p>}
-          {state === "error" && <p className="px-3 py-10 text-center text-muted">{error}</p>}
-          {state === "idle" && !result && (
+          {status.kind === "loading" && <p className="px-3 py-10 text-center text-muted">Reading the site…</p>}
+          {status.kind === "error" && <p className="px-3 py-10 text-center text-muted">{status.message}</p>}
+          {status.kind === "empty" && (
             <p className="px-3 py-10 text-center text-muted">
               Paste the page that lists a library&apos;s components. quire finds each one and sorts it by type.
             </p>
           )}
-          {result && state === "idle" && (
+          {result && (
             <>
               <p className="px-2.5 py-2 text-[12px] text-faint">
                 {result.items.length} components on {result.site} · from the {SOURCE[result.source]}
@@ -161,7 +160,7 @@ export default function ImportDialog({
           )}
         </div>
 
-        {result && state === "idle" && (
+        {result && (
           <div className="flex items-center justify-between gap-3 border-t border-line px-3 py-2.5">
             <label className="flex items-center gap-2 text-[12px] text-muted">
               <input type="checkbox" checked={toCollection} onChange={(e) => setToCollection(e.target.checked)} />

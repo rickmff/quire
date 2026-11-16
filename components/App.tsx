@@ -24,10 +24,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
-import { AgentButton, Agents, Detail, Gallery, OpenDetails, Onboarding, Sources } from "@/components/Gallery";
+import { AgentButton, Agents, Detail, Gallery, OpenDetails, Sources } from "@/components/Gallery";
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 import { agentText } from "@/lib/agentText";
+import { useIntro } from "@/lib/useIntro";
 
 // "starred" = the starred components (saved bookmarks, pasted links too),
 // "libraries" = every library's components together, sorted by category,
@@ -107,23 +108,8 @@ export default function App() {
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
 
-  // First load: "deal" hides the chrome while the gallery deals its cards,
-  // "show" brings the sidebar and headers in, then the attribute is dropped
-  // so later views mount without an entrance.
-  // Every entry into /app plays it: a refresh, or arriving from the landing.
-  const [intro, setIntro] = useState<"deal" | "show" | null>("deal");
-  const dealing = useRef(false);
-  useEffect(() => {
-    if (intro === "show") {
-      const t = setTimeout(() => setIntro(null), 900);
-      return () => clearTimeout(t);
-    }
-    if (intro !== "deal") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setIntro(null);
-    // Nothing to deal (another view, onboarding, slow catalog): show the page.
-    const t = setTimeout(() => !dealing.current && setIntro("show"), 1600);
-    return () => clearTimeout(t);
-  }, [intro]);
+  // First load: wait → deal → show → done. See lib/useIntro.ts.
+  const intro = useIntro();
   // Switching views from the sidebar: the new title and the cards in view
   // settle in with a short stagger, a quick echo of the first-load deal.
   const mainRef = useRef<HTMLElement>(null);
@@ -132,7 +118,7 @@ export default function App() {
     if (shownView.current === view) return;
     shownView.current = view;
     const main = mainRef.current;
-    if (!main || intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!main || intro.phase !== "done" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const vh = window.innerHeight;
     const els = [...main.querySelectorAll<HTMLElement>("h1, section > button[data-chrome], [data-grid] > *")].filter((el) => {
       const r = el.getBoundingClientRect();
@@ -144,12 +130,7 @@ export default function App() {
         { duration: 360, delay: Math.min(i, 10) * 28, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" },
       ),
     );
-  }, [view, intro]);
-
-  const onDeal = useCallback((ms: number) => {
-    dealing.current = true;
-    setTimeout(() => setIntro("show"), ms);
-  }, []);
+  }, [view, intro.phase]);
 
   // Quire registers no service worker. One left on this origin by another app
   // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
@@ -167,13 +148,12 @@ export default function App() {
   const words = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
-  const [newCol, setNewCol] = useState<string | null>(null);
-  const [renaming, setRenaming] = useState<string | null>(null);
-  // The collection waiting for the user to confirm its removal.
-  const [confirmDel, setConfirmDel] = useState<string | null>(null);
+  // The sidebar edits one collection name at a time, in place.
+  const [edit, setEdit] = useState<SidebarEdit>(null);
+  // At most one dialog is open over the page.
+  const [dialog, setDialog] = useState<AppDialog>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
-  const [importing, setImporting] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -274,11 +254,22 @@ export default function App() {
     };
   }, [add]);
 
+  // A new visitor (nothing chosen, nothing saved) starts with the curated
+  // catalog: there is no question to answer first. Libraries that already
+  // chose, or that hold their own links, stay as they are.
+  const fresh = !lib.mode && lib.bookmarks.length === 0;
+
   // Sites the user follows from the curated catalog.
   const followed = useMemo(() => {
     if (lib.sources) return new Set(lib.sources);
-    return new Set(lib.mode === "curated" && catalog ? catalog.libraries.map((l) => l.id) : []);
-  }, [lib.sources, lib.mode, catalog]);
+    return new Set((lib.mode === "curated" || fresh) && catalog ? catalog.libraries.map((l) => l.id) : []);
+  }, [lib.sources, lib.mode, fresh, catalog]);
+
+  // Keep that start, so a first star does not turn the curated sites off.
+  useEffect(() => {
+    if (ready && catalog && fresh)
+      update((l) => (l.mode ? l : { ...l, mode: "curated", sources: l.sources ?? catalog.libraries.map((x) => x.id) }));
+  }, [ready, catalog, fresh, update]);
 
   const byDocs = useMemo(() => new Map((catalog?.components ?? []).map((c) => [c.docs.replace(/\/$/, ""), c])), [catalog]);
 
@@ -330,12 +321,11 @@ export default function App() {
     });
   }, [galleryItems, view, words]);
 
-  // Nothing to deal (the onboarding, an empty Starred): show the page now.
-  const nothingToDeal =
-    Boolean(ready && catalog) && (!isGallery(view) || (!lib.mode && lib.bookmarks.length === 0) || galleryView.length === 0);
+  // Nothing to deal (another view, an empty Starred): show the page now.
+  const nothingToDeal = Boolean(ready && catalog) && (!isGallery(view) || galleryView.length === 0);
   useEffect(() => {
-    if (nothingToDeal && intro === "deal") setIntro("show");
-  }, [nothingToDeal, intro]);
+    if (nothingToDeal) intro.skip();
+  }, [nothingToDeal, intro.skip]);
 
   // Library first: every site in the library, with its own components.
   const sites = useMemo(() => {
@@ -416,10 +406,8 @@ export default function App() {
     return true;
   };
   const startImport = (raw: string) => {
-    if (!followCurated(raw)) setImporting(raw);
+    if (!followCurated(raw)) setDialog({ kind: "import", url: raw });
   };
-  const choose = (mode: "curated" | "scratch") =>
-    update((l) => ({ ...l, mode, sources: mode === "curated" ? (catalog?.libraries ?? []).map((x) => x.id) : [] }));
 
   const enableSync = async () => {
     const key = newSyncKey();
@@ -568,7 +556,7 @@ export default function App() {
         }));
       return { ...l, collections, bookmarks: [...fresh, ...l.bookmarks] };
     });
-    setImporting(null);
+    setDialog(null);
     setView("starred");
     flash(`Imported ${items.length} from ${result.site}`);
     capturePreviews(items.map((i) => i.url));
@@ -590,7 +578,7 @@ export default function App() {
 
   const createCollection = (name: string) => {
     const n = name.trim();
-    setNewCol(null);
+    setEdit(null);
     if (!n) return;
     const id = uid();
     update((l) => ({ ...l, collections: [...l.collections, { id, name: n, createdAt: Date.now() }] }));
@@ -598,7 +586,7 @@ export default function App() {
   };
 
   const renameCollection = (id: string, name: string) => {
-    setRenaming(null);
+    setEdit(null);
     const n = name.trim();
     if (!n) return;
     update((l) => ({ ...l, collections: l.collections.map((c) => (c.id === id ? { ...c, name: n } : c)) }));
@@ -674,19 +662,17 @@ export default function App() {
   };
 
   return (
-    <div data-intro={intro ?? undefined} className="flex min-h-dvh flex-col md:flex-row">
+    <div data-intro={intro.phase === "done" ? undefined : intro.phase} className="flex min-h-dvh flex-col md:flex-row">
       <Sidebar
         lib={lib}
         view={view}
         setView={setView}
         counts={counts}
-        newCol={newCol}
-        setNewCol={setNewCol}
+        edit={edit}
+        setEdit={setEdit}
         createCollection={createCollection}
-        renaming={renaming}
-        setRenaming={setRenaming}
         renameCollection={renameCollection}
-        deleteCollection={setConfirmDel}
+        deleteCollection={(id) => setDialog({ kind: "delete", id })}
         moveTo={dropTo}
         sites={sites}
         reorderSites={(keys) => update((l) => ({ ...l, siteOrder: keys }))}
@@ -802,10 +788,7 @@ export default function App() {
         </header>
 
         {isGallery(view) ? (
-          ready && catalog && !lib.mode && lib.bookmarks.length === 0 ? (
-            <Onboarding libraries={catalog.libraries} total={catalog.components.length} onChoose={choose} />
-          ) : (
-            <Gallery
+          <Gallery
               items={galleryView}
               title={viewName}
               sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
@@ -829,8 +812,10 @@ export default function App() {
                   />
                 ) : null;
               }}
-              intro={intro === "deal"}
-              onDeal={onDeal}
+              // Starred cards exist before the catalog arrives; deal only once
+              // every card of the view is there, not just those.
+              intro={intro.phase === "wait" && Boolean(catalog)}
+              onDeal={intro.dealt}
               onAgent={(text) => copy(text, "Copied for your agent")}
               empty={
                 words.length ? (
@@ -850,7 +835,6 @@ export default function App() {
                 )
               }
             />
-          )
         ) : view === "sites" ? (
           <Sources
             libraries={catalog?.libraries ?? []}
@@ -862,7 +846,7 @@ export default function App() {
               setFollowed(next);
             }}
             onAll={(on) => setFollowed(new Set(on ? (catalog?.libraries ?? []).map((l) => l.id) : []))}
-            onAddSite={() => setImporting("")}
+            onAddSite={() => setDialog({ kind: "import", url: "" })}
             imported={importedSites}
           />
         ) : view === "agents" ? (
@@ -1021,18 +1005,18 @@ export default function App() {
             </Command.Item>
           </Command.Group>
           <Command.Group heading="Library">
-            <Command.Item onSelect={run(() => setImporting(""))} className={itemCls}>
+            <Command.Item onSelect={run(() => setDialog({ kind: "import", url: "" }))} className={itemCls}>
               Import every component from a site
             </Command.Item>
-            <Command.Item onSelect={run(() => setNewCol(""))} className={itemCls}>
+            <Command.Item onSelect={run(() => setEdit({ kind: "new", name: "" }))} className={itemCls}>
               New collection
             </Command.Item>
             {current && (
               <>
-                <Command.Item onSelect={run(() => setRenaming(current.id))} className={itemCls}>
+                <Command.Item onSelect={run(() => setEdit({ kind: "rename", id: current.id }))} className={itemCls}>
                   Rename “{current.name}”
                 </Command.Item>
-                <Command.Item onSelect={run(() => setConfirmDel(current.id))} className={itemCls}>
+                <Command.Item onSelect={run(() => setDialog({ kind: "delete", id: current.id }))} className={itemCls}>
                   Delete “{current.name}”
                 </Command.Item>
               </>
@@ -1047,23 +1031,23 @@ export default function App() {
         </Command.List>
       </Command.Dialog>
 
-      {confirmDel !== null && (
+      {dialog?.kind === "delete" && (
         <ConfirmRemove
-          name={lib.collections.find((c) => c.id === confirmDel)?.name ?? "this collection"}
-          count={lib.bookmarks.filter((b) => b.collectionId === confirmDel).length}
-          onCancel={() => setConfirmDel(null)}
+          name={lib.collections.find((c) => c.id === dialog.id)?.name ?? "this collection"}
+          count={lib.bookmarks.filter((b) => b.collectionId === dialog.id).length}
+          onCancel={() => setDialog(null)}
           onConfirm={() => {
-            deleteCollection(confirmDel);
-            setConfirmDel(null);
+            deleteCollection(dialog.id);
+            setDialog(null);
           }}
         />
       )}
 
-      {importing !== null && (
+      {dialog?.kind === "import" && (
         <ImportDialog
-          initialUrl={importing}
+          initialUrl={dialog.url}
           savedUrls={new Set(lib.bookmarks.map((b) => b.url))}
-          onClose={() => setImporting(null)}
+          onClose={() => setDialog(null)}
           onImport={importSite}
         />
       )}
@@ -1088,16 +1072,20 @@ export default function App() {
 const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
 
+// The one collection name being typed in the sidebar: a new one, or a rename.
+type SidebarEdit = { kind: "new"; name: string } | { kind: "rename"; id: string } | null;
+// The dialog over the page: importing a site (url may be empty), or confirming
+// a collection's removal.
+type AppDialog = { kind: "import"; url: string } | { kind: "delete"; id: string } | null;
+
 function Sidebar(props: {
   lib: Library;
   view: View;
   setView: (v: View) => void;
   counts: Record<string, number>;
-  newCol: string | null;
-  setNewCol: (v: string | null) => void;
+  edit: SidebarEdit;
+  setEdit: (edit: SidebarEdit) => void;
   createCollection: (name: string) => void;
-  renaming: string | null;
-  setRenaming: (id: string | null) => void;
   renameCollection: (id: string, name: string) => void;
   deleteCollection: (id: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
@@ -1106,7 +1094,7 @@ function Sidebar(props: {
   openItem: (item: GalleryItem) => void;
   openId?: string;
 }) {
-  const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
+  const { lib, view, setView, counts, edit, setEdit, sites, openItem, openId } = props;
   const activeSite = siteView(view);
   const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(sites.map((x) => x.key), props.reorderSites);
 
@@ -1142,15 +1130,15 @@ function Sidebar(props: {
           {/* First block: rows spaced like the gallery title and its chips row
               (38px apart), and shifted so they share those lines. */}
           <div className="contents md:flex md:flex-col md:gap-2.5 md:pt-1">
-          {newCol !== null ? (
+          {edit?.kind === "new" ? (
             <input
               autoFocus
-              value={newCol}
-              onChange={(e) => setNewCol(e.target.value)}
-              onBlur={() => props.createCollection(newCol)}
+              value={edit.name}
+              onChange={(e) => setEdit({ kind: "new", name: e.target.value })}
+              onBlur={() => props.createCollection(edit.name)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") props.createCollection(newCol);
-                if (e.key === "Escape") setNewCol(null);
+                if (e.key === "Enter") props.createCollection(edit.name);
+                if (e.key === "Escape") setEdit(null);
               }}
               placeholder="Name"
               className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint md:ml-[34px]"
@@ -1158,7 +1146,7 @@ function Sidebar(props: {
           ) : (
             <button
               data-row
-              onClick={() => setNewCol("")}
+              onClick={() => setEdit({ kind: "new", name: "" })}
               className="group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:rounded-none md:px-0"
             >
               <span className="hidden w-[26px] shrink-0 md:block">
@@ -1171,7 +1159,7 @@ function Sidebar(props: {
           </div>
           {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
           {lib.collections.map((c) =>
-            props.renaming === c.id ? (
+            edit?.kind === "rename" && edit.id === c.id ? (
               <input
                 key={c.id}
                 autoFocus
@@ -1179,12 +1167,12 @@ function Sidebar(props: {
                 onBlur={(e) => props.renameCollection(c.id, e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                  if (e.key === "Escape") props.setRenaming(null);
+                  if (e.key === "Escape") setEdit(null);
                 }}
                 className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
               />
             ) : (
-              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} onDelete={() => props.deleteCollection(c.id)} {...props} />
+              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => setEdit({ kind: "rename", id: c.id })} onDelete={() => props.deleteCollection(c.id)} {...props} />
             ),
           )}
           {sites.length > 0 && (

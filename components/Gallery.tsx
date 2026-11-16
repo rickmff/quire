@@ -11,6 +11,7 @@ import StarIcon from "@/components/StarIcon";
 import { Tip } from "@/components/ui/tooltip";
 import { deal } from "@/lib/deal";
 import { agentText } from "@/lib/agentText";
+import { ringLayout } from "@/lib/ring";
 import { ArrowLeft, Maximize2, Settings, X } from "lucide-react";
 
 // The reference gallery: every component in the user's library, organized by
@@ -324,27 +325,41 @@ const current = (g: LiveVariant, picked: Picked) => (g.key in picked ? picked[g.
 
 // The gear on a live preview. It opens the variants in a ring around itself: the options of
 // the one choice there is, or first the choices (Variant, Size, Side...) and then the options
-// of the one picked. Picking an option switches the live demo to it.
+// of the one picked. Picking an option switches the live demo to it. The ring is laid out from
+// the labels' real widths (lib/ring.ts), so long names keep their full text and never overlap.
 // always: shown without a hover (the details panel).
+//
+//   closed ──open──▶ open (grown: false) ──next frame──▶ open (grown: true)
+//     ▲                   │  ▲                                 │
+//     └──── close ────────┘  └── pick a choice or go back ─────┘
+//
+// grown: the pills have moved out from the gear to their places, so the ring grows out of it.
+type Menu = { kind: "closed" } | { kind: "open"; at: Point; group: number | null; grown: boolean };
+// The pills' size, from their text: 11px labels, px-2.5 and py-1 around a 16px line.
+let ruler: CanvasRenderingContext2D | null | undefined;
+function pillSizes(labels: string[]) {
+  if (ruler === undefined) ruler = document.createElement("canvas").getContext("2d");
+  if (ruler) ruler.font = `11px ${getComputedStyle(document.body).fontFamily}`;
+  return labels.map((l) => ({ w: Math.ceil((ruler ? ruler.measureText(l).width : l.length * 6.2) + 22), h: 24 }));
+}
 export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: { groups: LiveVariant[]; picked: Picked; onPick: (p: Picked) => void; onOpenChange?: (open: boolean, at?: { x: number; y: number }) => void; always?: boolean }) {
   const btn = useRef<HTMLButtonElement>(null);
-  const [at, setAt] = useState<{ x: number; y: number } | null>(null);
-  const [group, setGroup] = useState<number | null>(null);
-  const [shown, setShown] = useState(false);
+  const [menu, setMenu] = useState<Menu>({ kind: "closed" });
   const one = groups.length === 1;
   const changed = groups.some((g) => g.key in picked && picked[g.key] !== (g.value ?? ""));
   const events = useRef({ onOpenChange });
   events.current = { onOpenChange };
   // Where the mouse last was over the menu, so the card knows whether it is still on it.
   const mouse = useRef<{ x: number; y: number } | undefined>(undefined);
+  const isOpen = menu.kind === "open";
   const open = (o: boolean) => {
     const r = btn.current?.getBoundingClientRect();
-    setAt(o && r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null);
-    setGroup(one ? 0 : null);
+    setMenu(o && r ? { kind: "open", at: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, group: one ? 0 : null, grown: false } : { kind: "closed" });
     events.current.onOpenChange?.(o, mouse.current);
   };
+  const choose = (group: number | null) => setMenu((m) => (m.kind === "open" ? { ...m, group, grown: false } : m));
   useEffect(() => {
-    if (!at) return;
+    if (!isOpen) return;
     const key = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       e.stopPropagation();
@@ -360,25 +375,28 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
       document.removeEventListener("scroll", away, true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [at]);
+  }, [isOpen]);
   // The ring grows out of the gear: it mounts at the center, then moves out.
+  const growing = menu.kind === "open" && !menu.grown;
   useEffect(() => {
-    setShown(false);
-    if (!at) return;
-    const f = requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)));
+    if (!growing) return;
+    const f = requestAnimationFrame(() => requestAnimationFrame(() => setMenu((m) => (m.kind === "open" ? { ...m, grown: true } : m))));
     return () => cancelAnimationFrame(f);
-  }, [at, group]);
+  }, [growing]);
 
-  const g = group === null ? null : groups[group];
+  const g = menu.kind === "open" && menu.group !== null ? groups[menu.group] : null;
   const items = g
     ? g.options.map((o) => ({ label: o.label, active: current(g, picked) === o.value, pick: () => (onPick({ ...picked, [g.key]: o.value }), open(false)) }))
-    : groups.map((x, i) => ({ label: x.label, active: x.key in picked && picked[x.key] !== (x.value ?? ""), pick: () => setGroup(i) }));
-  // Wide enough that the labels do not touch, and kept on screen.
-  const r = Math.min(130, Math.max(62, (items.length * 78) / (2 * Math.PI)));
-  let cx = at?.x ?? 0, cy = at?.y ?? 0;
-  if (at && typeof window !== "undefined") {
-    cx = Math.min(window.innerWidth - r - 52, Math.max(r + 52, cx));
-    cy = Math.min(window.innerHeight - r - 20, Math.max(r + 20, cy));
+    : groups.map((x, i) => ({ label: x.label, active: x.key in picked && picked[x.key] !== (x.value ?? ""), pick: () => choose(i) }));
+  const labels = items.map((it) => it.label).join("\n");
+  const ring = useMemo(() => (isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null), [isOpen, labels]);
+  const shown = menu.kind === "open" && menu.grown;
+  // The ring's center: the gear, moved just enough that every pill stays on screen.
+  let cx = 0, cy = 0;
+  if (menu.kind === "open" && ring) {
+    const m = 8;
+    cx = Math.min(window.innerWidth - m - ring.box.right, Math.max(m - ring.box.left, menu.at.x));
+    cy = Math.min(window.innerHeight - m - ring.box.bottom, Math.max(m - ring.box.top, menu.at.y));
   }
   const stop = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -393,21 +411,22 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
           type="button"
           data-variants
           aria-label="Variants"
-          aria-expanded={Boolean(at)}
+          aria-expanded={isOpen}
           onClick={(e) => {
             stop(e);
-            open(!at);
+            open(!isOpen);
           }}
           onPointerDown={(e) => e.stopPropagation()}
           className={`absolute bottom-2 left-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
-            at || changed ? "text-fg opacity-100" : always ? "text-muted" : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+            isOpen || changed ? "text-fg opacity-100" : always ? "text-muted" : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
           }`}
         >
-          <Settings size={14} strokeWidth={1.75} aria-hidden className={`transition-transform duration-300 ${at ? "rotate-90" : ""}`} />
+          <Settings size={14} strokeWidth={1.75} aria-hidden className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
           {changed && <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#F59F00] ring-2 ring-bg" />}
         </button>
       </Tip>
-      {at &&
+      {menu.kind === "open" &&
+        ring &&
         createPortal(
           <div
             className="fixed inset-0 z-50"
@@ -420,21 +439,21 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
             {/* A soft disc under the ring, so its labels read over the page. */}
             <div
               aria-hidden
-              style={{ left: cx, top: cy, width: 2 * r + 96, height: 2 * r + 96, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
+              style={{ left: cx, top: cy, width: 2 * ring.reach + 24, height: 2 * ring.reach + 24, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
               className={`pointer-events-none absolute rounded-full bg-bg/70 ring-1 ring-line backdrop-blur-[3px] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"}`}
             />
             {items.map((it, i) => {
-              const a = -Math.PI / 2 + (i / items.length) * 2 * Math.PI;
-              const x = shown ? Math.cos(a) * r : 0, y = shown ? Math.sin(a) * r : 0;
+              const p = ring.at[i] ?? { x: 0, y: 0 };
+              const x = shown ? p.x : 0, y = shown ? p.y : 0;
               return (
                 <button
-                  key={`${group}-${it.label}`}
+                  key={`${menu.group}-${it.label}`}
                   type="button"
                   role="menuitemradio"
                   aria-checked={it.active}
                   onClick={(e) => (stop(e), it.pick())}
                   style={{ left: cx, top: cy, transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${shown ? 1 : 0.4})`, transitionDelay: shown ? `${i * 14}ms` : "0ms" }}
-                  className={`absolute max-w-[150px] truncate rounded-full px-2.5 py-1 text-[11px] leading-4 whitespace-nowrap shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] ring-1 transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"} ${
+                  className={`absolute rounded-full px-2.5 py-1 text-[11px] leading-4 whitespace-nowrap shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] ring-1 transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"} ${
                     it.active ? "bg-fg text-bg ring-fg" : "bg-bg text-fg ring-line hover:bg-hover"
                   }`}
                 >
@@ -445,7 +464,7 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
             <button
               type="button"
               aria-label={g && !one ? "Back to the choices" : "Close"}
-              onClick={(e) => (stop(e), g && !one ? setGroup(null) : open(false))}
+              onClick={(e) => (stop(e), g && !one ? choose(null) : open(false))}
               style={{ left: cx, top: cy }}
               className="absolute flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-fg text-bg shadow-md transition hover:opacity-90"
             >
@@ -485,34 +504,45 @@ function trackPointer() {
 const SLOW = 0.35; // px/ms: slower than a pass across the grid
 const REST = 50; // ms without a move: the mouse stopped
 const DWELL = 300; // ms on the card: it is meant, however the mouse moves
+// The demo's own phase. The pointer facts (inside, held) sit beside it, since they change on
+// their own: the menu can be held open with the mouse off the card.
+//
+//   off ──start──▶ loading ──ready──▶ shown
+//    ▲                │                 │
+//    └────── end ─────┘    end ──▶ (grace, 250 ms) ──▶ off
+//
+// Timers: rest and dwell arm a start (one after the mouse stops, one after 300 ms on the
+// card); grace delays the end of a shown demo. A start or an end clears all three; a move
+// clears rest and grace only, so dwell keeps counting.
+type Demo = "off" | "loading" | "shown";
 function useCardLive(enabled: boolean) {
-  const [on, setOn] = useState(false);
+  const [demo, setDemo] = useState<Demo>("off");
   const ref = useRef<HTMLDivElement>(null);
-  const wait = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const dwell = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // shown: the demo is ready and on screen.
-  const state = useRef({ inside: false, held: false, shown: false });
+  const timers = useRef<{ rest?: ReturnType<typeof setTimeout>; dwell?: ReturnType<typeof setTimeout>; grace?: ReturnType<typeof setTimeout> }>({});
+  // Read by the page's event listeners, which outlive a render. demo mirrors the state above.
+  const state = useRef<{ inside: boolean; held: boolean; demo: Demo }>({ inside: false, held: false, demo: "off" });
   const [fns] = useState(() => {
-    const stop = () => { state.current.shown = false; setOn(false); };
+    const to = (d: Demo) => { state.current.demo = d; setDemo(d); };
+    const clear = (...names: ("rest" | "dwell" | "grace")[]) => names.forEach((n) => clearTimeout(timers.current[n]));
+    const stop = () => to("off");
     const start = () => {
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       if (liveCard !== stop) liveCard?.();
       liveCard = stop;
-      setOn(true);
+      if (state.current.demo === "off") to("loading");
     };
     const end = () => {
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       const off = () => {
         if (state.current.held || state.current.inside) return;
         if (liveCard === stop) liveCard = undefined;
         stop();
       };
       // Not on screen yet: drop it now. On screen: a short grace, so a slip past the edge keeps it.
-      if (!state.current.shown) return off();
-      wait.current = setTimeout(off, 250);
+      if (state.current.demo !== "shown") return off();
+      timers.current.grace = setTimeout(off, 250);
     };
+    const ready = () => { if (state.current.demo === "loading") to("shown"); };
     // Near: on the card or within the variants ring around its corner.
     const near = (at: Point, m = 150) => {
       const r = ref.current?.getBoundingClientRect();
@@ -526,30 +556,30 @@ function useCardLive(enabled: boolean) {
       state.current.inside = false;
       end();
     };
-    return { stop, start, end, near, watch };
+    return { stop, start, end, ready, near, watch, clear };
   });
   useEffect(() => {
     const el = ref.current;
     if (!el || !enabled) return;
-    const { start, end, stop, watch } = fns;
+    const { start, end, stop, watch, clear } = fns;
+    const t = timers.current;
     trackPointer();
     // Start now when the mouse comes in slowly; else when it slows down or stops on the card.
     const enter = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       state.current.inside = true;
       document.removeEventListener("pointermove", watch);
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       // The page saw no move for a while (the mouse was over a live demo's frame): wait for one.
       if (e.timeStamp - pointer.t < 100 && pointer.v < SLOW) return start();
-      wait.current = setTimeout(start, REST);
-      dwell.current = setTimeout(start, DWELL);
+      t.rest = setTimeout(start, REST);
+      t.dwell = setTimeout(start, DWELL);
     };
     const move = (e: PointerEvent) => {
       if (e.pointerType === "touch" || !state.current.inside || liveCard === stop) return;
-      clearTimeout(wait.current);
+      clear("rest", "grace");
       if (pointer.v < SLOW) return start();
-      wait.current = setTimeout(start, REST);
+      t.rest = setTimeout(start, REST);
     };
     // A short grace, so a slip past the edge keeps the demo as it is.
     const leave = () => {
@@ -564,20 +594,19 @@ function useCardLive(enabled: boolean) {
       el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerleave", leave);
       document.removeEventListener("pointermove", watch);
-      clearTimeout(wait.current);
-      clearTimeout(dwell.current);
+      clear("rest", "dwell", "grace");
       if (liveCard === stop) liveCard = undefined;
     };
   }, [enabled, fns]);
   return {
-    on: enabled && on,
+    on: enabled && demo !== "off",
     ref,
     // The demo is ready and fades in.
-    ready: () => { state.current.shown = true; },
+    ready: fns.ready,
     // at: where the mouse is when the menu closes.
     hold: (held: boolean, at?: Point) => {
       state.current.held = held;
-      clearTimeout(wait.current);
+      fns.clear("rest", "grace");
       if (held) return fns.start();
       if (at) state.current.inside = fns.near(at);
       if (state.current.inside) document.addEventListener("pointermove", fns.watch);
@@ -762,7 +791,8 @@ export function Detail({
   onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
-  const [src, setSrc] = useState<{ state: "idle" | "loading" | "done" | "none"; files: SourceFile[]; from?: string }>({ state: "idle", files: [] });
+  // The component's source: not asked for yet, being read, read, or not readable.
+  const [src, setSrc] = useState<{ state: "idle" | "loading" | "none" } | { state: "done"; files: SourceFile[]; from?: string }>({ state: "idle" });
   const [tab, setTab] = useState(0);
   const [run, setRun] = useState(0);
   const [picked, setPicked] = useState<Picked>({});
@@ -774,10 +804,10 @@ export function Detail({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
-  useEffect(() => setSrc({ state: "idle", files: [] }), [item.id]);
+  useEffect(() => setSrc({ state: "idle" }), [item.id]);
 
   const loadSource = async () => {
-    setSrc({ state: "loading", files: [] });
+    setSrc({ state: "loading" });
     try {
       const r = await fetch(`/api/source?id=${encodeURIComponent(item.id)}`);
       if (!r.ok) throw 0;
@@ -785,7 +815,7 @@ export function Detail({
       setSrc({ state: "done", files: d.files ?? [], from: d.from });
       setTab(0);
     } catch {
-      setSrc({ state: "none", files: [] });
+      setSrc({ state: "none" });
     }
   };
 
@@ -928,36 +958,6 @@ export function Detail({
           )}
         </div>
       </aside>
-    </div>
-  );
-}
-
-export function Onboarding({
-  libraries,
-  total,
-  onChoose,
-}: {
-  libraries: CatalogLibrary[];
-  total: number;
-  onChoose: (mode: "curated" | "scratch") => void;
-}) {
-  return (
-    <div className="mx-auto max-w-lg pt-20 pb-24">
-      <p className="text-fg">How do you want to start?</p>
-      <p className="mt-1 text-muted">Either way, your agent reads this library through the Quire MCP.</p>
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <button onClick={() => onChoose("curated")} className="rounded-lg p-4 text-left ring-1 ring-line ring-inset transition hover:bg-hover">
-          <span className="block font-medium">Curated library</span>
-          <span className="mt-1 block text-[12px] text-muted">
-            {total.toLocaleString("en")} components from {libraries.length} sites, sorted by type. Turn sites off any time.
-          </span>
-        </button>
-        <button onClick={() => onChoose("scratch")} className="rounded-lg p-4 text-left ring-1 ring-line ring-inset transition hover:bg-hover">
-          <span className="block font-medium">From scratch</span>
-          <span className="mt-1 block text-[12px] text-muted">Start empty. Paste the link of each component library you want as reference.</span>
-        </button>
-      </div>
-      <p className="mt-8 text-[12px] leading-relaxed text-faint">{libraries.map((l) => l.name).join(" · ")}</p>
     </div>
   );
 }
