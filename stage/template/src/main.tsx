@@ -6,7 +6,6 @@ import { ThemeProvider } from "next-themes";
 
 const q = new URLSearchParams(location.search);
 const theme = q.get("theme") === "dark" ? "dark" : "light";
-// live=1: the page runs inside Quire's gallery (an iframe), not for a screenshot.
 const live = q.has("live");
 document.documentElement.classList.add(theme, live ? "live" : "capture");
 document.documentElement.style.colorScheme = theme;
@@ -18,8 +17,6 @@ if (q.get("zoom")) document.documentElement.style.setProperty("--stage-zoom", q.
 const w = window as any;
 w.__errors = [];
 addEventListener("error", (e) => w.__errors.push(String(e.message)));
-// An image whose URL is dead at its origin shows nothing, not a broken icon with alt text.
-// A rule per dead URL, so it also holds when a component re-mounts or restyles the image.
 const dead = document.head.appendChild(document.createElement("style"));
 addEventListener("error", (e) => {
   const img = e.target;
@@ -37,15 +34,10 @@ const tell = (event: string) => parent !== window && parent.postMessage({ source
 function Ready() { useEffect(() => { requestAnimationFrame(() => { w.__ready = true; if (live) tell("ready"); }); }, []); return null; }
 
 if (live) {
-  // Demo links and forms do not navigate the frame away from the demo.
   addEventListener("click", (e) => { if ((e.target as Element).closest?.("a[href]")) e.preventDefault(); }, true);
   addEventListener("submit", (e) => e.preventDefault(), true);
-  // Escape closes the gallery's panel, unless the demo has its own overlay open to close first.
-  // Window capture runs before the demo's own handlers, so the overlay is still in the DOM here.
   const overlay = ["[role=dialog]", "[role=alertdialog]", "[role=menu]", "[role=listbox]"].map((s) => `${s}:not([data-state=closed])`).join(",");
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.querySelector(overlay)) tell("escape"); }, true);
-  // card=1: a gallery card, where the demo mounts when the mouse rests on it. A demo cannot
-  // take the keyboard focus from the gallery until it is clicked, pressed or typed in.
   if (q.has("card")) {
     const focus = HTMLElement.prototype.focus;
     HTMLElement.prototype.focus = function () {};
@@ -55,8 +47,6 @@ if (live) {
   }
 }
 
-// cursor=<px>: draw a pointer where the mouse is, so a clip shows the hover or click that drives
-// it. The page's own cursor is not in a screenshot.
 if (q.get("cursor")) {
   const size = Number(q.get("cursor"));
   const c = document.createElement("div");
@@ -68,8 +58,6 @@ if (q.get("cursor")) {
   addEventListener("pointerup", () => c.classList.remove("down"), true);
 }
 
-// The clip starts from the demo's first frame: __remount() mounts it again, so entrances,
-// counters and typing play from the start instead of having finished during loading.
 function Stage({ Demo }: { Demo: any }) {
   const [run, setRun] = useState(0);
   useEffect(() => { w.__remount = () => { w.__ready = false; setRun((n) => n + 1); }; }, []);
@@ -80,12 +68,8 @@ function Stage({ Demo }: { Demo: any }) {
   );
 }
 
-// v=<example>: another example of the component (install.mjs); p=<json>: props picked in the
-// gallery's variants menu, over the demo's own defaults.
 const c = q.get("c") || "", v = q.get("v");
 const load = (v && demos[`${c}~${v}`]) || demos[c];
-// The demo's module loads before the first render. A lazy component would suspend instead, and
-// React holds a revealed Suspense boundary back up to 300 ms, which the live card waits through.
 const pick = (m: any) => m.default ?? Object.values(m).find((x) => typeof x === "function");
 const render = (Demo: any) => createRoot(document.getElementById("root")!).render(
   <ThemeProvider attribute="class" forcedTheme={q.get("freetheme") ? undefined : theme} defaultTheme={theme} storageKey={`stage-theme-${theme}`} enableSystem={false}>

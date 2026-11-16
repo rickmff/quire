@@ -1,6 +1,3 @@
-// Stage build only: shiki with just the grammars and themes the demos use, so the
-// built stage does not ship every language. Same engine (Oniguruma) as shiki's own
-// codeToHtml, so the output matches.
 import { createHighlighterCore, type HighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 

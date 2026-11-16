@@ -12,7 +12,6 @@ const REPO = "https://github.com/rickmff/quire";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
-// Structured data for search engines: the site, and Quire as a free web app.
 const JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -37,9 +36,6 @@ const JSON_LD = {
 const LEAD = "Keep every component you find.";
 const TAIL = "Hand them to your agent.";
 
-// Splits a line into words that fade in one after another, the way a chat
-// reply streams in. `from` is the index of the first word, so both halves
-// share one running delay.
 function Stream({ text, from }: { text: string; from: number }) {
   return text.split(" ").map((w, i) => (
     <Fragment key={i}>

@@ -1,6 +1,3 @@
-// Quire stage capture: open each component on the stage, pose it, frame what is visible,
-// save 1600x1000 WebP stills (light + dark) and report errors.
-//   node capture.mjs <library> <port> <outDir> [name ...]
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import sharp from "sharp";
@@ -10,8 +7,6 @@ mkdirSync(OUT, { recursive: true });
 const demos = JSON.parse(readFileSync(`app-${lib}/demos.json`, "utf8")).filter((d) => d.demo && (!only.length || only.includes(d.name)));
 const POSES = existsSync("poses.json") ? JSON.parse(readFileSync("poses.json", "utf8")) : {};
 const D = 4, VW = 1280, VH = 800;
-// Frames from frame.py (frames/<library>.json): centered on the demo at rest and fitted to
-// everything it shows over its clip, in both themes. They replace the frame cut around the still.
 const FRAMES = existsSync(`frames/${lib}.json`) ? JSON.parse(readFileSync(`frames/${lib}.json`, "utf8")) : {};
 const MIRROR = existsSync("mirror/manifest.json") ? JSON.parse(readFileSync("mirror/manifest.json", "utf8")) : null;
 
@@ -53,7 +48,6 @@ async function shoot(ctx, d, theme, cfg, zoom) {
   p.on("pageerror", (e) => errs.push(String(e.message).slice(0, 200)));
   p.on("requestfailed", (r) => { if (!/favicon|localhost/.test(r.url())) { errs.push("net " + new URL(r.url()).host); blocked.push(r.url()); } });
   p.on("response", (r) => { if (r.status() >= 400 && !/favicon/.test(r.url())) errs.push(`http ${r.status()} ${r.url().slice(0, 120)}`); });
-  // Assets mirrored from hosts this machine cannot reach (mirror/manifest.json: url -> file).
   if (MIRROR) await p.route(/^https?:\/\/(?!localhost)/, async (route) => {
     const hit = MIRROR[route.request().url()];
     if (hit) return route.fulfill({ path: `mirror/${hit.file}`, contentType: hit.type, headers: { "access-control-allow-origin": "*" } });
@@ -86,7 +80,6 @@ async function worker() {
         shot = await shoot(ctx, d, theme, cfg, zoom);
         errs = shot.errs; blocked = shot.blocked;
         if (!shot.t) { errs.push("blank"); throw new Error("blank"); }
-        // Too big for the stage: shrink the subject and shoot again (not for full-bleed backgrounds).
         const t = shot.t, tw = t.info.width / D, th = t.info.height / D, top = -t.info.trimOffsetTop / D, left = -t.info.trimOffsetLeft / D;
         const touches = top < 2 || top + th > VH - 2 || left < 2 || left + tw > VW - 2;
         if (fixed || cfg.fullFrame || cfg.fill || cfg.zoom || !touches || tw >= VW * 0.97 || attempt >= 2) break;
@@ -108,6 +101,5 @@ async function worker() {
 }
 await Promise.all(Array.from({ length: Number(process.env.JOBS || 3) }, worker));
 writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 1));
-// Every URL this machine could not reach, for mirroring (see mirror/README.md).
 writeFileSync(`${OUT}/blocked.json`, JSON.stringify([...new Set(Object.values(report).flatMap((r) => r.blocked ?? []))].sort(), null, 1));
 await browser.close();

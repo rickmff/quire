@@ -2,9 +2,6 @@ import { kv } from "./kv";
 import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { libraries } from "./catalog";
 
-// Server side of a synced library. The key is a random secret held by the
-// browser; whoever has it can read and replace that library.
-
 export const KEY_RE = /^[a-z0-9]{24,48}$/;
 const MAX_BYTES = 1_500_000;
 const store = (key: string) => `lib:${key}`;
@@ -29,7 +26,6 @@ const url = (v: unknown) => {
   return x && /^https?:\/\//.test(x) ? x : undefined;
 };
 
-// Accept only the fields we know, with caps, so a key cannot hold arbitrary data.
 export function cleanLibrary(input: any): SyncedLibrary | null {
   if (!input || typeof input !== "object") return null;
   const known = new Set(libraries.map((l) => l.id));

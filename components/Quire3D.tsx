@@ -5,7 +5,6 @@ import Quire from "./Quire";
 import s from "./Landing.module.css";
 import { FRAG, SHEETS, VERT } from "./quire3d/shader";
 
-// What each sheet holds: a component, the library it came from, how to install it.
 const CARDS = [
   ["Switch", "shadcn/ui", "npx shadcn@latest add switch"],
   ["Shimmer Button", "Magic UI", "npx shadcn@latest add @magicui/shimmer-button"],
@@ -18,20 +17,18 @@ const CARDS = [
 
 const N = SHEETS;
 const DEG = Math.PI / 180;
-const YAW = 34 * DEG; // the stack, as on the brand board
-const SHOW = { x: 0.02, lift: 1.3, z: 0.1, yaw: 9 * DEG, tilt: 38 * DEG }; // the sheet handed over
-const HOLD = 4.2; // seconds a sheet stays up when nobody touches it
+const YAW = 34 * DEG;
+const SHOW = { x: 0.02, lift: 1.3, z: 0.1, yaw: 9 * DEG, tilt: 38 * DEG };
+const HOLD = 4.2;
 const FLOOR = -1.05;
-const FOV = 12 * DEG; // half angle
+const FOV = 12 * DEG;
 const DIST = 11;
 const TAN = Math.tan(FOV);
-const MAX_FIT = 180; // px per world unit: the sheet never gets wider than about 370 px
-// Leaving for /app: the sheets settle into one flat pile under a camera that
-// rises to look straight down, the pile /app then deals (lib/deal.ts).
-const LEAVE = 0.62; // seconds
-const PILE_Y = -0.3; // height of the pile's top sheet
+const MAX_FIT = 180;
+const LEAVE = 0.62;
+const PILE_Y = -0.3;
 const PILE_GAP = 0.018;
-const pileTurn = (p: number) => (((p * 37) % 7) - 3) * 0.9 * DEG; // as pileRot in lib/deal.ts, in radians
+const pileTurn = (p: number) => (((p * 37) % 7) - 3) * 0.9 * DEG;
 
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a: number, b: number, x: number) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -55,7 +52,6 @@ function compile(gl: WebGL2RenderingContext, type: number, src: string) {
   return sh;
 }
 
-/** Draws the three text lines of every sheet into one strip atlas. */
 function drawLabels(font: string) {
   const W = 2048, H = 128, c = document.createElement("canvas");
   c.width = W;
@@ -78,7 +74,6 @@ function drawLabels(font: string) {
   return c;
 }
 
-/** Is this point of sheet i, in its own coordinates, on the component's control? */
 function onControl(i: number, x: number, y: number) {
   if (i === 0) return Math.abs(x) < 0.42 && Math.abs(y) < 0.24;
   if (i === 1) return Math.abs(x) < 0.5 && Math.abs(y) < 0.18;
@@ -89,15 +84,6 @@ function onControl(i: number, x: number, y: number) {
   return false;
 }
 
-/**
- * The quire in WebGL2: seven glass sheets, each a captured component with its
- * preview, source library and install command. The stack hands one sheet over
- * at a time, the way an agent pulls one reference from the library.
- *
- * Everything on it answers the pointer. The component on the sheet works: the
- * switch flips, the slider drags, the tabs select, the OTP takes digits. Drag
- * anywhere else to leaf through the stack; the wheel and the arrow keys do too.
- */
 export default function Quire3D() {
   const stageRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLCanvasElement>(null);
@@ -130,7 +116,6 @@ export default function Quire3D() {
       light: U("uLight"), glint: U("uGlint"), floor: U("uFloorY"), floorK: U("uFloorK"), intro: U("uIntro"),
     };
 
-    // Label atlas. Blank until the font is ready, then drawn once.
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([0]));
@@ -143,8 +128,6 @@ export default function Quire3D() {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, drawLabels(font));
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      // The text is seen at a slant, so plain trilinear would pick the blurry mip
-      // for the short axis. Anisotropic filtering keeps it sharp along both.
       const af = gl.getExtension("EXT_texture_filter_anisotropic");
       if (af) gl.texParameterf(gl.TEXTURE_2D, af.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(af.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -156,13 +139,7 @@ export default function Quire3D() {
     const scheme = matchMedia("(prefers-color-scheme: dark)");
     let dark = scheme.matches ? 1 : 0;
 
-    // The canvas covers the page, so sheets can travel anywhere. The quire itself
-    // is sized to the stage box, up to a fixed limit.
-    const view = { cx: 0, cy: 0, fit: 100 }; // CSS px; fit is px per world unit
-    // Render scale, in device pixels per CSS pixel. Below 1.5x the screen is too
-    // coarse for the sheet's text and edges, so render at twice the screen and let
-    // the browser average each 2x2 block back down: real supersampling. If frames
-    // run slow, drop the supersampling first, then resolution, a step at a time.
+    const view = { cx: 0, cy: 0, fit: 100 };
     const native = devicePixelRatio || 1;
     const scales: number[] = [];
     for (const v of [native < 1.5 ? native * 2 : Math.min(native, 2), Math.min(native, 2), 1.5, 1.125, 1])
@@ -175,19 +152,17 @@ export default function Quire3D() {
       const b = stage.getBoundingClientRect(), fw = innerWidth - 24, fh = Math.max(60, b.height);
       view.fit = Math.min(fh / 2.92, fw / 2.5, MAX_FIT);
       view.cx = innerWidth / 2;
-      view.cy = b.top + fh / 2 - fh * 0.08; // sits a little above the middle of its box
+      view.cy = b.top + fh / 2 - fh * 0.08;
     };
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
     ro.observe(stage);
     resize();
 
-    // Scene state, kept from the last frame so the pointer can be traced into it.
     const C = new Float32Array(N * 3), R = new Float32Array(N * 9), P = new Float32Array(N), G = new Float32Array(N * 4);
     let cam = [0, 0, 1], cr = [1, 0, 0], cu = [0, 1, 0], cf = [0, 0, -1];
-    let top = -1; // the sheet handed over, or -1 while sheets are travelling
+    let top = -1;
 
-    /** Traces a pointer into the scene: which sheet it lands on, and where on that sheet. */
     const pick = (clientX: number, clientY: number) => {
       const unit = view.fit * 2 * TAN * DIST;
       const ux = ((clientX - view.cx) * 2 / unit) * TAN, uy = (-(clientY - view.cy) * 2 / unit) * TAN;
@@ -205,15 +180,10 @@ export default function Quire3D() {
       return { hit, x: hx, y: hy };
     };
 
-    // The turn: sheet i sits in slot (i + turn) mod N. Slots 0..N-2 are the stack,
-    // slot N-1 is the sheet handed over. Leaving it, a sheet goes round the back
-    // and comes in again underneath. The turn is a spring, so it can be dragged.
     const turn: Spring = { x: -1, v: 0 };
-    // Leaving: when it started (clock), the turn it froze at, whether /app was told.
     let leaveAt = -1, leaveSlot = 0, leftSent = false;
     let goal = 0, idleAt = HOLD + 2.2, clock = 0, prev = 0, raf = 0, visible = true, glintAt = -10;
 
-    // Component state. Each one plays by itself until someone touches it.
     const c = {
       swOn: false, sw: { x: 0, v: 0 }, swAt: 0,
       btnDown: false, btnPress: 0, btnRipple: 1, btnHover: 0, btnT0: 0, btnGo: 0,
@@ -231,7 +201,6 @@ export default function Quire3D() {
       c.otpAt = clock + (c.otpN >= 6 ? 1.7 : 0.42);
     };
 
-    // Pointer.
     let px = 0, py = 0, tx = 0, ty = 0, near = 0, nearT = 0;
     const hov = { on: false, x: 0, y: 0, tx: 0, ty: 0, z: 0 };
     let mode: "" | "scrub" | "slider" | "button" = "";
@@ -292,8 +261,8 @@ export default function Quire3D() {
       if (mode === "button") { c.btnDown = false; c.btnRipple = 0; touch(); }
       else if (mode === "scrub") {
         if (drag.moved) goal = Math.round(turn.x + clamp(turn.v * 0.22, -0.6, 0.6));
-        else if (drag.hit >= 0 && drag.hit !== top) goal = Math.round(turn.x) + 1; // a tap on the stack takes the next sheet
-        else if (drag.hit >= 0) glintAt = clock - 0.2; // a tap on the sheet catches the light
+        else if (drag.hit >= 0 && drag.hit !== top) goal = Math.round(turn.x) + 1;
+        else if (drag.hit >= 0) glintAt = clock - 0.2;
         idleAt = clock + HOLD;
       }
       mode = "";
@@ -336,7 +305,6 @@ export default function Quire3D() {
       hov.x += (hov.tx - hov.x) * damp(dt, 14);
       hov.y += (hov.ty - hov.y) * damp(dt, 14);
 
-      // Turn the stack: by itself when idle, never under a hand.
       const settled = Math.abs(turn.x - goal) < 0.02 && Math.abs(turn.v) < 0.05;
       if (hov.on || mode) idleAt = Math.max(idleAt, clock + 1.6);
       if (!(mode === "scrub" && drag.moved)) {
@@ -345,8 +313,7 @@ export default function Quire3D() {
       }
       const t = reduce ? 1.2 : clock;
       const L = leaveAt < 0 ? 0 : clamp((clock - leaveAt) / LEAVE);
-      const lv = L * L * L * (L * (L * 6 - 15) + 10); // smootherstep
-      // The sheet in hand lands on the stack a little ahead of the rest.
+      const lv = L * L * L * (L * (L * 6 - 15) + 10);
       const lvTop = sm(0, 0.8, L);
 
       const breathe = reduce ? 0.5 : Math.sin(t * 0.9) * 0.5 + 0.5;
@@ -386,30 +353,26 @@ export default function Quire3D() {
           pres = 1 - sm(0, 0.32, v);
         }
         if (L > 0) {
-          // Pile slot: the sheet in hand on top (0), then the stack from its top down.
           const slot = (((i + leaveSlot) % N) + N) % N, p = slot >= N - 1 ? 0 : N - 1 - slot, k = p === 0 ? lvTop : lv;
           x = mix(x, 0, k);
           y = mix(y, PILE_Y - p * PILE_GAP, k);
-          z = mix(z, (p * 1.5) / view.fit, k); // each one peeks 1.5 px below the one above
+          z = mix(z, (p * 1.5) / view.fit, k);
           yaw = mix(yaw, -pileTurn(p), k);
           tilt = mix(tilt, 0, k);
           pres *= 1 - sm(0, 0.5, L);
         }
         const cy = Math.cos(yaw), sy = Math.sin(yaw), ct = Math.cos(tilt), st = Math.sin(tilt);
-        // R = Ry(yaw) * Rx(tilt), column-major.
         R.set([cy, 0, -sy, st * sy, ct, st * cy, ct * sy, -st, ct * cy], i * 9);
         C.set([x, y, z], i * 3);
         P[i] = pres;
         if (pres > best) { best = pres; top = i; }
       }
       if (top !== was && top >= 0) {
-        // A new sheet is up: one sweep of light, and its component starts over.
         glintAt = clock + 0.15;
         c.swAt = clock + 1.1; c.tabAt = clock + 1.2; c.otpAt = clock + 0.8; c.toastAt = clock + 0.9; c.btnT0 = clock - 0.1;
         hov.on = false;
       }
 
-      // Components.
       const auto = !reduce && clock - userAt > 3;
       if (auto && top === 0 && clock > c.swAt) { c.swOn = !c.swOn; c.swAt = clock + 1.9; }
       spring(c.sw, c.swOn ? 1 : 0, dt, 260, 17);
@@ -445,22 +408,18 @@ export default function Quire3D() {
         c.toast.x, 0, 0, 0,
       ]);
 
-      // Camera: 34 degrees above the horizon, nudged by the pointer.
-      // Leaving, it rises until it looks straight down on the pile's top sheet,
-      // which then sits in the middle of the stage at 1 world unit = fit px.
       const el = mix((34 + py * 4) * DEG, 89.9 * DEG, lv), az = mix(-px * 5 * DEG, 0, lv), ay = mix(0.2, PILE_Y, lv);
       cam = [Math.sin(az) * Math.cos(el) * DIST, Math.sin(el) * DIST + ay, Math.cos(az) * Math.cos(el) * DIST];
       let f = [-cam[0], ay - cam[1], -cam[2]];
       const fl = Math.hypot(f[0], f[1], f[2]);
       f = [f[0] / fl, f[1] / fl, f[2] / fl];
       const rl = Math.hypot(f[2], f[0]);
-      const r = [-f[2] / rl, 0, f[0] / rl]; // cross(f, up)
+      const r = [-f[2] / rl, 0, f[0] / rl];
       const upv = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
       cr = r; cu = upv; cf = f;
 
       const lx = -0.35 + px * 0.5, ly = 0.9, lz = 0.45 - py * 0.3, ll = Math.hypot(lx, ly, lz);
 
-      // Shade only the pixels the quire can reach: the sheets, and the floor under them.
       const W = canvas.width, H = canvas.height;
       const unit = view.fit * 2 * TAN * DIST * scale, ccx = view.cx * scale, ccy = H - view.cy * scale;
       let x0 = W, y0p = H, x1 = 0, y1 = 0;
@@ -508,9 +467,6 @@ export default function Quire3D() {
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
       if (L >= 1 && !leftSent) {
-        // Settled: tell the page where the pile is and how each sheet's foil
-        // sits (its hue turn and the centre of its pinwheel, as the shader has
-        // them now), so the HTML pile drawn over it matches this frame.
         leftSent = true;
         const sheets: { from: number; cx: number; cy: number }[] = [];
         for (let i = 0; i < N; i++) {
@@ -523,7 +479,6 @@ export default function Quire3D() {
       }
     };
 
-    // "Start collecting" asks the quire to settle into a pile (StartLink).
     const leaveFor = (e: Event) => {
       if (reduce || leaveAt >= 0 || !visible) return;
       (e as CustomEvent<{ accept?: () => void }>).detail?.accept?.();

@@ -7,13 +7,6 @@ import { handOff, handOffPile, type Pile } from "@/lib/deal";
 import { preloadCatalog } from "@/lib/useCatalog";
 import s from "@/components/Landing.module.css";
 
-// "Start collecting": the words step back, the hero's own sheets settle into
-// one flat pile facing us (Quire3D), an HTML pile takes its place in that same
-// frame, and /app/all-libraries deals it into the gallery. Without the WebGL hero a pile
-// lies down over the stage instead. Reduced motion or a modified click: a
-// plain link.
-
-// Where "Start collecting" lands: every library together.
 const TO = "/app/all-libraries";
 
 export default function StartLink({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -49,7 +42,6 @@ export default function StartLink({ className, children }: { className?: string;
 
         if (accepted) {
           page.classList.add(s.leaving);
-          // If the hero stalls (say the tab went to the background), go anyway.
           setTimeout(() => {
             if (done) return;
             done = true;

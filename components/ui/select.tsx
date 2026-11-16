@@ -1,8 +1,5 @@
 "use client";
 
-// shadcn/ui Select (Radix), restyled with Quire's tokens: a quiet text
-// trigger for the gallery header and a small panel that follows the theme.
-
 import * as React from "react";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
@@ -83,7 +80,6 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
   );
 }
 
-// `hint` sits on the right (a count, a shortcut) and stays out of the trigger.
 function SelectItem({
   className,
   children,

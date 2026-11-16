@@ -43,6 +43,23 @@ Needs Ubuntu or Debian, 2 GB RAM or more (4 cores and 8 GB run 3 captures at onc
 
 Update later with the same command. Media lives in the `media` Docker volume.
 
+## Configuration
+
+`server.mjs` reads `.env` next to it, so it runs the same with or without Docker.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `CAPTURE_TOKEN` | required | Bearer token for `POST /capture` |
+| `PUBLIC_URL` | `http://localhost:<PORT>` | Base of the media URLs it returns |
+| `PORT` | `8080` | Port to listen on |
+| `MEDIA_DIR` | `capture/media` (`/data/media` in Docker) | Where stills and clips are saved |
+| `CONCURRENCY` | `2` | Captures run at once |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL` | unset | With all five set, files go to a Cloudflare R2 bucket and the returned URLs point at `R2_PUBLIC_URL`. The local disk is then only a cache. `R2_ENDPOINT` overrides the bucket endpoint. |
+| `ALLOW_PRIVATE` | unset | `1` lets it capture private network addresses. For local testing only. |
+
+The Docker image is based on Playwright's, which brings Chromium and its system libraries. `compose.yml` runs
+the service with Caddy in front of it for HTTPS, with a certificate from Let's Encrypt.
+
 ## API
 
 | Call | What it does |

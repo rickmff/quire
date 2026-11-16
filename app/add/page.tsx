@@ -17,13 +17,11 @@ function Add() {
     if (params.get("mode") === "site") return window.location.replace(`/app?import=${encodeURIComponent(url)}`);
     const lib = readLibrary();
     if (lib.bookmarks.some((b) => b.url === url)) return setState("exists");
-    // The extension can pass what it read from the page, e.g. a post on X.
     const hint = (k: string) => params.get(k)?.trim().slice(0, 300) || undefined;
     const hintTitle = hint("title")?.slice(0, 160);
     const hintImage = /^https:\/\//.test(hint("image") ?? "") ? hint("image") : undefined;
     (async () => {
       const m = matchLibrary(url);
-      // A page of the curated catalog: save it with its catalog id, so agents get its source.
       let known: ClientCatalog["components"][number] | undefined;
       try {
         const cat: ClientCatalog = await (await fetch("/api/catalog")).json();

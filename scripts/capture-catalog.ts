@@ -1,18 +1,3 @@
-// Records a preview for every catalog component that has none, with the
-// capture service (capture/). It runs on your own machine by default.
-//
-//   1. cd capture && npm install && npx playwright install chromium && npm start
-//   2. node scripts/capture-catalog.ts [--library magicui] [--limit 50] [--parallel 3] [--video] [--retry]
-//
-// Each still is saved into public/previews/<library>/<name>.webp, so it ships
-// with the site and needs no server. lib/catalog/captures.json maps ids to
-// those files, and build-catalog.ts merges it on every build. Pages that could
-// not be captured go to lib/catalog/no-preview.json with the reason; the
-// gallery leaves those out. --retry tries them again.
-//
-// Env (optional): QUIRE_CAPTURE_URL (default http://localhost:8080),
-// QUIRE_CAPTURE_TOKEN (default: CAPTURE_TOKEN from capture/.env).
-
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -58,7 +43,6 @@ console.log(`${todo.length} to capture with ${base}`);
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "item";
 
-// Copies a file the capture service made into public/, and returns its site path.
 async function keep(url: string, path: string) {
   const r = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!r.ok) throw new Error(`download ${r.status}`);
@@ -104,7 +88,6 @@ async function worker() {
 await Promise.all(Array.from({ length: parallel }, worker));
 save();
 
-// Merge into data.json now, so the site shows them without a full rebuild.
 for (const c of catalog.components) {
   const s = shots[c.id];
   if (s?.image && !c.preview) c.preview = s.image;

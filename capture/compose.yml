@@ -1,5 +1,3 @@
-# capture: Chromium that records component previews
-# caddy:   HTTPS in front of it, with a certificate from Let's Encrypt
 services:
   capture:
     build: .

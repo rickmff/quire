@@ -1,7 +1,3 @@
-/* The wordmark writes itself on first load: each letter is traced as an
-   outline, one after another, and then fills in as the outline fades. The
-   end state (filled, no stroke) is the base style, so with reduced motion,
-   or once the animation ends, it is just the logo. */
 .stroke {
   fill: currentColor;
   stroke: currentColor;

@@ -30,27 +30,14 @@ import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 import { agentText } from "@/lib/agentText";
 import { useIntro } from "@/lib/useIntro";
 
-// "starred" = the starred components (saved bookmarks, pasted links too),
-// "libraries" = every library's components together, sorted by category,
-// "type:<id>" = one component type across the library, "sites", "agents",
-// else a collection id. The old "library" and "all" (Saved) views open Starred.
 type View = "starred" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
-// "site:<key>" = one library and its own components; "site:<key>|<group>" =
-// one category of that library (a sidebar group, see groupItems).
 const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
 const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
 const PAGES = new Set(["starred", "libraries", "sites", "agents"]);
 const isGallery = (v: View) => v === "starred" || v === "libraries" || typeView(v) !== null || siteView(v) !== null;
 
-// Each view has its own address under /app, so a reload, a shared link and
-// the browser's back and forward land on the same view:
-//   /app                                       Starred
-//   /app/all-libraries                         All libraries
-//   /app/all-libraries/<library>[/<category>]  one library, or one of its categories
-//   /app/types/<type>, /app/collections/<id>, /app/sites, /app/agents
-// A category is its family ("input") or, for a family split by type, the type ("text-effect").
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 const FAMILIES = [...new Set([...TYPES, OTHER].map((t) => t.family))];
 function viewPath(v: View): string {
@@ -80,7 +67,6 @@ function pathView(path: string): View {
   if (root === "collections" && a) return a;
   return "starred";
 }
-// Curated components group by library id; your own links by the site they came from.
 const siteKey = (i: { library: string; site?: string }) =>
   i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
@@ -92,9 +78,6 @@ const EXAMPLES = [
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
-  // The address is the source of truth: picking a view pushes its path, and
-  // back, forward or a link moves the view. App lives in the /app layout, so
-  // these moves never remount it or replay the first-load deal.
   const pathname = usePathname();
   const [view, setViewRaw] = useState<View>(() => pathView(pathname));
   const setView = useCallback((v: View) => {
@@ -108,10 +91,7 @@ export default function App() {
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
 
-  // First load: wait → deal → show → done. See lib/useIntro.ts.
   const intro = useIntro();
-  // Switching views from the sidebar: the new title and the cards in view
-  // settle in with a short stagger, a quick echo of the first-load deal.
   const mainRef = useRef<HTMLElement>(null);
   const shownView = useRef(view);
   useLayoutEffect(() => {
@@ -132,8 +112,6 @@ export default function App() {
     );
   }, [view, intro.phase]);
 
-  // Quire registers no service worker. One left on this origin by another app
-  // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
   useEffect(() => {
     navigator.serviceWorker
       ?.getRegistrations()
@@ -141,16 +119,12 @@ export default function App() {
       .catch(() => {});
   }, []);
   const [input, setInput] = useState("");
-  // The top bar's input either searches the current view or adds a link
-  // (a component or a whole library). Search is the default.
   const [barMode, setBarMode] = useState<"search" | "add">("search");
   const query = barMode === "search" ? input.trim().toLowerCase() : "";
   const words = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
-  // The sidebar edits one collection name at a time, in place.
   const [edit, setEdit] = useState<SidebarEdit>(null);
-  // At most one dialog is open over the page.
   const [dialog, setDialog] = useState<AppDialog>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
@@ -220,7 +194,6 @@ export default function App() {
         capturePreviews([url]);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [lib.bookmarks, update, view, flash, catalog],
   );
 
@@ -254,18 +227,13 @@ export default function App() {
     };
   }, [add]);
 
-  // A new visitor (nothing chosen, nothing saved) starts with the curated
-  // catalog: there is no question to answer first. Libraries that already
-  // chose, or that hold their own links, stay as they are.
   const fresh = !lib.mode && lib.bookmarks.length === 0;
 
-  // Sites the user follows from the curated catalog.
   const followed = useMemo(() => {
     if (lib.sources) return new Set(lib.sources);
     return new Set((lib.mode === "curated" || fresh) && catalog ? catalog.libraries.map((l) => l.id) : []);
   }, [lib.sources, lib.mode, fresh, catalog]);
 
-  // Keep that start, so a first star does not turn the curated sites off.
   useEffect(() => {
     if (ready && catalog && fresh)
       update((l) => (l.mode ? l : { ...l, mode: "curated", sources: l.sources ?? catalog.libraries.map((x) => x.id) }));
@@ -279,8 +247,6 @@ export default function App() {
       const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
       return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
     });
-    // One card per component: a saved copy of a curated component (same id or
-    // same page) replaces the curated card, and a page saved twice shows once.
     const page = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase();
     const ids = new Set<string>();
     const pages = new Set<string>();
@@ -291,8 +257,6 @@ export default function App() {
       pages.add(p);
       return true;
     });
-    // Every card shows a preview. Curated components without one stay out of
-    // the gallery (the MCP still serves them); saved ones wait for a capture.
     const curated = (catalog?.components ?? []).filter(
       (c) => c.preview && followed.has(c.library) && !ids.has(c.id) && !pages.has(page(c.docs)),
     );
@@ -311,8 +275,7 @@ export default function App() {
           : t
             ? galleryItems.filter((i) => i.type === t)
             : view === "libraries"
-              ? // Category by category, in the sidebar's group order; starred first within each.
-                groupItems(galleryItems).flatMap((g) => g.items)
+              ? groupItems(galleryItems).flatMap((g) => g.items)
               : galleryItems.filter((i) => i.saved);
     if (!words.length) return inView;
     return inView.filter((i) => {
@@ -321,13 +284,11 @@ export default function App() {
     });
   }, [galleryItems, view, words]);
 
-  // Nothing to deal (another view, an empty Starred): show the page now.
   const nothingToDeal = Boolean(ready && catalog) && (!isGallery(view) || galleryView.length === 0);
   useEffect(() => {
     if (nothingToDeal) intro.skip();
   }, [nothingToDeal, intro.skip]);
 
-  // Library first: every site in the library, with its own components.
   const sites = useMemo(() => {
     const m = new Map<string, { key: string; name: string; items: GalleryItem[] }>();
     for (const i of galleryItems) {
@@ -335,13 +296,11 @@ export default function App() {
       if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
       m.get(key)!.items.push(i);
     }
-    // The user's own order first (dragged in the sidebar), the rest by name.
     const rank = new Map((lib.siteOrder ?? []).map((k, i) => [k, i]));
     const at = (k: string) => rank.get(k) ?? Infinity;
     return [...m.values()].sort((a, b) => at(a.key) - at(b.key) || a.name.localeCompare(b.name));
   }, [galleryItems, catalog, lib.siteOrder]);
 
-  // Starred: only the components with a saved bookmark, grouped like the sites.
   const starredSites = useMemo(
     () => sites.map((x) => ({ ...x, items: x.items.filter((i) => i.saved) })).filter((x) => x.items.length),
     [sites],
@@ -374,9 +333,6 @@ export default function App() {
     flash("Starred");
   };
 
-  // The star (on a card or in the drawer) is the only way to save: it saves
-  // the component, or removes the saved copy. Looks the copy up live, since
-  // the open drawer holds a snapshot of the item.
   const toggleStar = (c: GalleryItem) => {
     const id = lib.bookmarks.find((b) => b.id === c.saved || b.ref === c.id || b.url === c.docs)?.id;
     if (id) removeBookmark(id);
@@ -385,8 +341,6 @@ export default function App() {
 
   const setFollowed = (next: Set<string>) => update((l) => ({ ...l, sources: [...next] }));
 
-  // A link to the home or index page of a curated site turns that site on,
-  // instead of scraping it again.
   const followCurated = (raw: string) => {
     const url = normalizeUrl(raw);
     if (!url || !catalog) return false;
@@ -441,16 +395,13 @@ export default function App() {
 
   useEffect(() => setSel(-1), [view, libFilter]);
 
-  // The extension opens /app?import=<url> to add a whole site.
   useEffect(() => {
     const u = new URLSearchParams(window.location.search).get("import");
     if (!u || !catalog) return;
     startImport(u);
     window.history.replaceState(null, "", window.location.pathname);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog]);
 
-  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to un-star.
   const navRef = useRef<{ visible: Bookmark[]; sel: number }>({ visible: [], sel: -1 });
   navRef.current = { visible: isGallery(view) || PAGES.has(view ?? "") ? [] : visible, sel };
   useEffect(() => {
@@ -511,7 +462,6 @@ export default function App() {
                   .filter(Boolean)
                   .join(" · ")
               : (current?.name ?? "Starred");
-  // Starred holds every saved bookmark, which the store calls "all".
   const exportView = view === "starred" || view === "libraries" ? "all" : view;
 
   const setType = (bookmarkId: string, type: string) =>
@@ -562,8 +512,6 @@ export default function App() {
     capturePreviews(items.map((i) => i.url));
   };
 
-  // Record a preview for each new card, one at a time, when the server has a
-  // capture service. Cards update as each capture lands.
   const capturePreviews = async (urls: string[]) => {
     if (!(await getStatus()).capture) return;
     for (const url of urls) {
@@ -592,7 +540,6 @@ export default function App() {
     update((l) => ({ ...l, collections: l.collections.map((c) => (c.id === id ? { ...c, name: n } : c)) }));
   };
 
-  // Removes the collection only. Its components stay saved, with no collection.
   const deleteCollection = (id: string) => {
     const idx = lib.collections.findIndex((c) => c.id === id);
     const gone = lib.collections[idx];
@@ -634,7 +581,6 @@ export default function App() {
     }
   };
 
-  // The drawer item for a saved card in a collection: its gallery card, or the same build.
   const itemFor = (b: Bookmark): GalleryItem => {
     const shown = galleryItems.find((i) => i.saved === b.id);
     if (shown) return shown;
@@ -643,7 +589,6 @@ export default function App() {
     return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
   };
 
-  // Same text as the drawer's "Copy for agent", for a saved card in a collection.
   const copyForAgent = (b: Bookmark) => {
     const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
     const i = hit ?? toComponent(b);
@@ -686,7 +631,6 @@ export default function App() {
             className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              // Search filters as you type; Enter adds only a link.
               if (barMode === "search" && !normalizeUrl(input)) return;
               add(input);
               setInput("");
@@ -724,7 +668,6 @@ export default function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                // Escape clears first, then leaves the field.
                 if (e.key === "Escape" && input) {
                   e.preventDefault();
                   e.stopPropagation();
@@ -812,13 +755,9 @@ export default function App() {
                   />
                 ) : null;
               }}
-              // Starred cards exist before the catalog arrives; deal only once
-              // every card of the view is there, not just those.
               intro={intro.phase === "wait" && Boolean(catalog)}
               onDeal={intro.dealt}
               onAgent={(text) => copy(text, "Copied for your agent")}
-              // Nothing shows while the catalog loads (the gallery fills in a
-              // moment), and an empty library is just the empty page.
               empty={
                 !catalog ? (
                   <div />
@@ -1069,11 +1008,7 @@ export default function App() {
 
 const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
-
-// The one collection name being typed in the sidebar: a new one, or a rename.
 type SidebarEdit = { kind: "new"; name: string } | { kind: "rename"; id: string } | null;
-// The dialog over the page: importing a site (url may be empty), or confirming
-// a collection's removal.
 type AppDialog = { kind: "import"; url: string } | { kind: "delete"; id: string } | null;
 
 function Sidebar(props: {
@@ -1096,7 +1031,6 @@ function Sidebar(props: {
   const activeSite = siteView(view);
   const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(sites.map((x) => x.key), props.reorderSites);
 
-  // Ticks within ~3 rows of the pointer grow, nearest the most.
   const ruler = useRef<HTMLElement>(null);
   const grow = (e: React.MouseEvent) => {
     for (const el of ruler.current?.querySelectorAll<HTMLElement>("[data-row]") ?? []) {
@@ -1125,8 +1059,6 @@ function Sidebar(props: {
           onMouseLeave={settle}
           className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
         >
-          {/* First block: rows spaced like the gallery title and its chips row
-              (38px apart), and shifted so they share those lines. */}
           <div className="contents md:flex md:flex-col md:gap-2.5 md:pt-1">
           {edit?.kind === "new" ? (
             <input
@@ -1227,7 +1159,6 @@ function Sidebar(props: {
 
 type SiteDrag = { key: string; from: number; to: number; dy: number; heights: number[]; settling?: boolean };
 
-// How far a library that is not being dragged slides to open the gap.
 function shiftFor(d: SiteDrag, i: number) {
   const h = d.heights[d.from];
   if (d.from < d.to && i > d.from && i <= d.to) return -h;
@@ -1235,8 +1166,6 @@ function shiftFor(d: SiteDrag, i: number) {
   return 0;
 }
 
-// Drag a library row up or down to change the order. A press that does not
-// move stays a plain click; a drag swallows the click that follows it.
 function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
   const [drag, setDrag] = useState<SiteDrag | null>(null);
   const blocks = useRef(new Map<string, HTMLDivElement>());
@@ -1252,15 +1181,12 @@ function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>, key: string) => {
     if (e.button !== 0 || busy.current || !window.matchMedia("(min-width: 768px)").matches) return;
-    // Only the library row is a handle, not the groups under it.
     if ((e.target as HTMLElement).closest("button")?.parentElement !== e.currentTarget) return;
     const order = latest.current.keys;
     const from = order.indexOf(key);
     const rects = order.map((k) => blocks.current.get(k)?.getBoundingClientRect());
     if (from < 0 || order.length < 2 || rects.some((r) => !r)) return;
     const heights = rects.map((r) => r!.height);
-    // Measured on the library row itself (28px), not its open groups, so an
-    // expanded library swaps as soon as its row passes a neighbour's.
     const centers = rects.map((r) => r!.top + Math.min(r!.height, 28) / 2);
     const y0 = e.clientY;
     let current: SiteDrag | null = null;
@@ -1273,7 +1199,6 @@ function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
         document.documentElement.classList.add("dragging-site");
       }
       ev.preventDefault();
-      // The dragged row's centre decides the slot it would drop into.
       const c = centers[from] + dy;
       let to = 0;
       for (let i = 0; i < centers.length; i++) if (i !== from && centers[i] < c) to++;
@@ -1291,7 +1216,6 @@ function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
       setTimeout(() => (swallow.current = false), 0);
       const d = current;
       const to = cancel ? d.from : d.to;
-      // Glide into the open slot, then commit the new order.
       let slot = 0;
       if (to > d.from) for (let i = d.from + 1; i <= to; i++) slot += heights[i];
       else for (let i = to; i < d.from; i++) slot -= heights[i];
@@ -1327,7 +1251,6 @@ function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
   return { drag, blockRef, onPointerDown, onClickCapture };
 }
 
-// Large families split into their types, so no group runs past a screen.
 const SPLIT_AT = 15;
 const FAMILY_LABEL: Record<string, string> = {
   Input: "Inputs",
@@ -1359,12 +1282,9 @@ function groupItems(items: GalleryItem[]) {
     for (const i of list) byType.set(i.type, [...(byType.get(i.type) ?? []), i]);
     for (const [t, l] of byType) groups.push({ key: `${family}/${t}`, name: TYPE_LABEL[t] ?? typeById(t).name, items: l });
   }
-  // Biggest groups first; "Other" always last.
   return groups.sort((a, b) => Number(a.key === OTHER.family) - Number(b.key === OTHER.family) || b.items.length - a.items.length || a.name.localeCompare(b.name));
 }
 
-// Opens and closes its rows with a quick height and fade. Closed rows stay
-// mounted so they can animate out, and inert so they take no focus.
 function Collapse({ open, className = "grid", children }: { open: boolean; className?: string; children: React.ReactNode }) {
   return (
     <div
@@ -1378,7 +1298,6 @@ function Collapse({ open, className = "grid", children }: { open: boolean; class
   );
 }
 
-// The sidebar name of a group key from groupItems ("Input", "Effect/text-effect").
 const groupLabel = (key: string) => {
   const [family, type] = key.split("/");
   return type ? (TYPE_LABEL[type] ?? typeById(type).name) : (FAMILY_LABEL[family] ?? family);
@@ -1394,14 +1313,11 @@ function SiteGroups({
   items: GalleryItem[];
   openItem: (item: GalleryItem) => void;
   openId?: string;
-  // The category the gallery is filtered to, if any.
   active: string | null;
   onGroup: (key: string | null) => void;
 }) {
   const groups = useMemo(() => groupItems(items), [items]);
-  // One group open at a time, like an accordion.
   const [open, setOpen] = useState<string | null>(null);
-  // The group that holds the open component, or the filtered category, opens with it.
   useEffect(() => {
     const g = groups.find((g) => g.items.some((i) => i.id === openId));
     if (g) setOpen(g.key);
@@ -1409,8 +1325,6 @@ function SiteGroups({
   useEffect(() => {
     if (active) setOpen(active);
   }, [active]);
-  // A click filters the gallery to the category and opens it; a click on the
-  // filtered category goes back to the whole library and closes it.
   const toggle = (k: string) => {
     const off = active === k;
     setOpen(off ? null : k);
@@ -1539,7 +1453,6 @@ function NavItem({
   const [over, setOver] = useState(false);
   const active = view === id;
   const droppable = !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
-  // A click on the library already open goes back to all libraries.
   const deselect = active && typeof id === "string" && id.startsWith("site:");
   return (
     <Tip label={onRename ? "Double-click to rename" : undefined} side="right">
@@ -1571,7 +1484,6 @@ function NavItem({
         {count || ""}
       </span>
       {onDelete && (
-        // A span, not a button: it sits inside the row's button.
         <Tip label="Remove collection">
         <span
           role="button"
@@ -1636,10 +1548,8 @@ function Card({
       className="group pop"
     >
       <div className="relative">
-        {/* The preview is only a picture; the corner icon opens the details. */}
         <div className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}>
           {b.image && imgOk ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={b.image}
               alt=""
@@ -1657,7 +1567,6 @@ function Card({
         </div>
         <OpenDetails onClick={onOpen} />
 
-        {/* Every saved card is starred; un-starring is how it is removed. */}
         <Tip label="Remove from Starred">
         <button
           type="button"
@@ -1725,8 +1634,6 @@ function Card({
   );
 }
 
-// The hover toolbar of a saved card: copy, note, collection, type. The star
-// beside it removes the card.
 function CardTools({
   b,
   lib,
@@ -1791,8 +1698,6 @@ function CardTools({
   );
 }
 
-// The same toolbar on a starred gallery card, beside the star. Its clicks stay
-// off the card, and the note opens in a small field under the toolbar.
 function StarredTools({
   b,
   lib,
@@ -1951,12 +1856,9 @@ function Favicon({ url }: { url: string }) {
     src = new URL("/favicon.ico", url).href;
   } catch {}
   if (!src || !ok) return null;
-  // eslint-disable-next-line @next/next/no-img-element
   return <img src={src} alt="" width={20} height={20} onError={() => setOk(false)} className="size-5 rounded opacity-70 grayscale" />;
 }
 
-// Gallery order: components with a preview first, then the rest, each part
-// interleaved across sites so no single library fills the first screen.
 function mix<T extends { library: string; preview?: string }>(items: T[]): T[] {
   const deal = (list: T[]) => {
     const by = new Map<string, T[]>();
