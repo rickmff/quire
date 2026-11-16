@@ -1,0 +1,56 @@
+/* X and GitHub links, shared by the landing and the app header. */
+.social { display: flex; align-items: center; gap: 2px; }
+.social .x {
+  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px;
+  color: var(--muted); transition: color 0.2s, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.social .x:hover, .social .x:focus-visible { color: var(--fg); transform: translateY(-1px); }
+.social .x:focus-visible { outline: 2px solid var(--edge, var(--line)); outline-offset: 2px; }
+
+/* GitHub mark that opens into a "Star" pill on hover; the mark stays put
+   and the label grows to its left. */
+.social .gh {
+  display: inline-flex; align-items: center; height: 30px; padding: 0 8px; margin-right: -8px;
+  border-radius: 999px; border: 1px solid transparent; color: var(--muted);
+  transition: color 0.2s, background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.social .gh:hover, .social .gh:focus-visible {
+  color: var(--fg); background: var(--sheet, var(--panel)); border-color: var(--edge, var(--line));
+  box-shadow: 0 4px 14px -6px var(--floor, rgb(0 0 0 / 0.1));
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.social .gh:focus-visible { outline: 2px solid var(--edge, var(--line)); outline-offset: 2px; }
+.reveal {
+  display: grid; grid-template-columns: 0fr; opacity: 0;
+  transition: grid-template-columns 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s;
+}
+.reveal > span {
+  min-width: 0; overflow: hidden; display: flex; align-items: center; gap: 5px;
+  padding-right: 7px; white-space: nowrap; font-size: 13px; font-weight: 500;
+}
+.gh:hover .reveal, .gh:focus-visible .reveal { grid-template-columns: 1fr; opacity: 1; }
+.star {
+  flex: none; fill: transparent; stroke: currentColor; stroke-width: 1.3; stroke-linejoin: round;
+  transition: fill 0.3s 0.1s, stroke 0.3s 0.1s;
+}
+.gh:hover .star, .gh:focus-visible .star {
+  fill: url(#quire-star); stroke: url(#quire-star);
+  animation: star-pop 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+.stopA { stop-color: #b3438a; }
+.stopB { stop-color: #7a54e8; }
+.stopC { stop-color: #2f7fd0; }
+@media (prefers-color-scheme: dark) {
+  .stopA { stop-color: #ffa8dc; }
+  .stopB { stop-color: #d3a4ff; }
+  .stopC { stop-color: #9ac4ff; }
+}
+@keyframes star-pop {
+  0% { transform: scale(0.4) rotate(-72deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .social .gh, .social .x, .reveal, .star { transition: none; }
+  .social .x:hover { transform: none; }
+  .gh:hover .star, .gh:focus-visible .star { animation: none; }
+}

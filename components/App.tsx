@@ -1,7 +1,7 @@
 "use client";
 
 import { Command } from "cmdk";
-import GitHubMark from "@/components/GitHubMark";
+import SocialLinks from "@/components/SocialLinks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type Bookmark,
@@ -575,7 +575,7 @@ export default function App() {
               ⌘K
             </button>
             </div>
-            <GitHubLink />
+            <SocialLinks className="hidden md:flex" />
           </form>
         </header>
 
@@ -834,21 +834,6 @@ export default function App() {
 
 const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
-// Link to the source on GitHub, top right of the main view.
-function GitHubLink() {
-  return (
-    <a
-      href="https://github.com/rickmff/quire"
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Quire on GitHub (open source, MIT)"
-      title="Open source · MIT"
-      className="hidden size-7 shrink-0 place-items-center rounded-md text-faint transition hover:text-muted md:grid"
-    >
-      <GitHubMark />
-    </a>
-  );
-}
 
 function Sidebar(props: {
   lib: Library;

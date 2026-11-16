@@ -101,10 +101,7 @@
 .copy { position: relative; z-index: 1; display: grid; justify-items: center; gap: clamp(12px, 2.4dvh, 22px); text-align: center; }
 .copy a { pointer-events: auto; }
 .title { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
-.title span {
-  background: var(--ink); -webkit-background-clip: text; background-clip: text;
-  color: transparent; -webkit-text-fill-color: transparent;
-}
+.title span { color: var(--muted); }
 .cta { display: flex; align-items: center; gap: 6px; }
 
 /* The one detail: a quire of holographic sheets. */
