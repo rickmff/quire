@@ -1,19 +1,13 @@
 /* X and GitHub links, shared by the landing and the app header. */
 .social { display: flex; align-items: center; gap: 2px; }
-.social .x {
-  display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px;
-  color: var(--muted); transition: color 0.2s, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.social .x:hover, .social .x:focus-visible { color: var(--fg); transform: translateY(-1px); }
-.social .x:focus-visible { outline: 2px solid var(--edge, var(--line)); outline-offset: 2px; }
-
-/* GitHub mark that opens into a "Star" pill on hover; the mark stays put
-   and the label grows to its left. */
+/* Each mark opens into a pill on hover ("@rickmff" on X, "Star" on GitHub);
+   the mark stays put and the label grows to its left. */
 .social .gh {
   display: inline-flex; align-items: center; height: 30px; padding: 0 8px; margin-right: -8px;
   border-radius: 999px; border: 1px solid transparent; color: var(--muted);
   transition: color 0.2s, background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
 }
+.social .x { margin-right: 0; }
 .social .gh:hover, .social .gh:focus-visible {
   color: var(--fg); background: var(--sheet, var(--panel)); border-color: var(--edge, var(--line));
   box-shadow: 0 4px 14px -6px var(--floor, rgb(0 0 0 / 0.1));
@@ -50,7 +44,6 @@
   100% { transform: scale(1) rotate(0deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .social .gh, .social .x, .reveal, .star { transition: none; }
-  .social .x:hover { transform: none; }
+  .social .gh, .reveal, .star { transition: none; }
   .gh:hover .star, .gh:focus-visible .star { animation: none; }
 }

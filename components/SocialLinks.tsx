@@ -2,15 +2,18 @@ import GitHubMark from "@/components/GitHubMark";
 import s from "@/components/SocialLinks.module.css";
 
 export const REPO_URL = "https://github.com/rickmff/quire";
-// Author's X profile. Handle not confirmed yet.
+// Author's X profile.
 export const X_URL = "https://x.com/rickmff";
 
-// X and GitHub links, top right of the landing and the app. On hover the
-// GitHub mark opens into a "Star" pill that invites a star on the repo.
+// X and GitHub links, top right of the landing and the app. On hover the X
+// mark shows the handle and the GitHub mark opens into a "Star" pill.
 export default function SocialLinks({ className = "" }: { className?: string }) {
   return (
     <nav className={`${s.social} ${className}`} aria-label="Elsewhere">
-      <a href={X_URL} target="_blank" rel="noreferrer" className={s.x} aria-label="Quire's author on X">
+      <a href={X_URL} target="_blank" rel="noreferrer" className={`${s.gh} ${s.x}`} aria-label="@rickmff on X">
+        <span className={s.reveal} aria-hidden="true">
+          <span>@rickmff</span>
+        </span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
