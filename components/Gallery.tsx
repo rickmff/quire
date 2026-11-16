@@ -225,9 +225,9 @@ export function Gallery({
                 <span className="text-faint tabular-nums">{sec.items.length}</span>
                 <span className="text-[12px] text-faint opacity-0 transition group-hover:opacity-100">View all</span>
               </button>
-              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
                 {sec.items.slice(0, 4).map((i, n) => (
-                  <div key={i.id} className={n === 3 ? "xl:hidden 2xl:block" : undefined}>
+                  <div key={i.id} className={n === 3 ? "xl:hidden" : undefined}>
                     <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
                   </div>
                 ))}
@@ -238,7 +238,7 @@ export function Gallery({
       ) : filtered.length === 0 ? (
         empty ?? <p className="pt-16 text-center text-muted">Nothing here yet.</p>
       ) : (
-        <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, shown).map((i) => (
             <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
           ))}
