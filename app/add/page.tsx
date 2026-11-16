@@ -81,7 +81,7 @@ function Add() {
 
   const text = {
     saving: "Saving…",
-    saved: "Saved to your Inbox",
+    saved: "Saved to your library",
     exists: "Already in your library",
     error: "That page can't be saved",
   }[state];

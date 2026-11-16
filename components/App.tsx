@@ -22,7 +22,7 @@ import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Galle
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 
-// "library" = the whole reference gallery, "all" = saved cards, null = Inbox,
+// "library" = the whole reference gallery, "all" = saved cards,
 // "type:<id>" = one component type across the library, "sites", "agents",
 // else a collection id.
 type View = "library" | "all" | null | string;
@@ -359,9 +359,7 @@ export default function App() {
       ? "Library"
       : view === "all"
         ? "Saved"
-        : view === null
-          ? "Inbox"
-          : viewType
+        : viewType
             ? typeById(viewType).name
             : siteView(view)
               ? (sites.find((x) => x.key === siteView(view))?.name ?? "Library")
@@ -622,7 +620,7 @@ export default function App() {
                 selected={visible[sel]?.id === b.id}
                 onMove={(cid) => {
                   moveTo(b.id, cid);
-                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
+                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
                 }}
                 onDelete={() => removeBookmark(b.id)}
                 onType={(t) => setType(b.id, t)}
@@ -702,14 +700,13 @@ export default function App() {
           <Command.Group heading="Go to">
             {[
               { id: "all", name: "All" },
-              { id: "inbox", name: "Inbox" },
               ...lib.collections,
               ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
             ].map((c) => (
               <Command.Item
                 key={c.id}
                 value={`go ${c.name} ${c.id}`}
-                onSelect={run(() => setView(c.id === "all" ? "all" : c.id === "inbox" ? null : c.id))}
+                onSelect={run(() => setView(c.id))}
                 className={itemCls}
               >
                 {c.name}
@@ -848,7 +845,6 @@ function Sidebar(props: {
         >
           <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
           <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
-          <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
           <div className="hidden h-6 md:block" />
           {lib.collections.map((c) =>
             props.renaming === c.id ? (
@@ -1147,7 +1143,7 @@ function Card({
               aria-label="Move to collection"
               className="absolute inset-0 cursor-pointer opacity-0"
             >
-              <option value="">Inbox</option>
+              <option value="">No collection</option>
               {lib.collections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
