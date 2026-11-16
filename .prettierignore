@@ -1,0 +1,10 @@
+.next/
+.open-next/
+.wrangler/
+node_modules/
+public/
+lib/catalog/*.json
+stage/poses.json
+package-lock.json
+**/package-lock.json
+*.md
