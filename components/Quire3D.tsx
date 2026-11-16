@@ -169,7 +169,7 @@ export default function Quire3D() {
       const b = stage.getBoundingClientRect(), fw = innerWidth - 24, fh = Math.max(60, b.height);
       view.fit = Math.min(fh / 2.92, fw / 2.5, MAX_FIT);
       view.cx = innerWidth / 2;
-      view.cy = b.top + fh / 2;
+      view.cy = b.top + fh / 2 - fh * 0.08; // sits a little above the middle of its box
     };
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
