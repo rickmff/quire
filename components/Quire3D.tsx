@@ -26,6 +26,12 @@ const FOV = 12 * DEG; // half angle
 const DIST = 11;
 const TAN = Math.tan(FOV);
 const MAX_FIT = 180; // px per world unit: the sheet never gets wider than about 370 px
+// Leaving for /app: the sheets settle into one flat pile under a camera that
+// rises to look straight down, the pile /app then deals (lib/deal.ts).
+const LEAVE = 0.62; // seconds
+const PILE_Y = -0.3; // height of the pile's top sheet
+const PILE_GAP = 0.018;
+const pileTurn = (p: number) => (((p * 37) % 7) - 3) * 0.9 * DEG; // as pileRot in lib/deal.ts, in radians
 
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const sm = (a: number, b: number, x: number) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -121,7 +127,7 @@ export default function Quire3D() {
     const u = {
       center: U("uCenter"), unit: U("uUnit"), time: U("uTime"), dark: U("uDark"), fov: U("uFov"), camPos: U("uCamPos"),
       cam: U("uCam"), c: U("uC"), r: U("uR"), pres: U("uPres"), g: U("uG"), hover: U("uHover"), pointer: U("uPointer"),
-      light: U("uLight"), glint: U("uGlint"), floor: U("uFloorY"), intro: U("uIntro"),
+      light: U("uLight"), glint: U("uGlint"), floor: U("uFloorY"), floorK: U("uFloorK"), intro: U("uIntro"),
     };
 
     // Label atlas. Blank until the font is ready, then drawn once.
@@ -203,6 +209,8 @@ export default function Quire3D() {
     // slot N-1 is the sheet handed over. Leaving it, a sheet goes round the back
     // and comes in again underneath. The turn is a spring, so it can be dragged.
     const turn: Spring = { x: -1, v: 0 };
+    // Leaving: when it started (clock), the turn it froze at, whether /app was told.
+    let leaveAt = -1, leaveSlot = 0, leftSent = false;
     let goal = 0, idleAt = HOLD + 2.2, clock = 0, prev = 0, raf = 0, visible = true, glintAt = -10;
 
     // Component state. Each one plays by itself until someone touches it.
@@ -232,6 +240,7 @@ export default function Quire3D() {
     const touch = () => { userAt = clock; idleAt = Math.max(idleAt, clock + HOLD); };
 
     const move = (e: PointerEvent) => {
+      if (leaveAt >= 0) return;
       tx = (e.clientX / innerWidth) * 2 - 1;
       ty = (e.clientY / innerHeight) * 2 - 1;
       const sx = e.clientX - view.cx, sy = e.clientY - (view.cy + view.fit * 0.75);
@@ -259,7 +268,7 @@ export default function Quire3D() {
     };
 
     const down = (e: PointerEvent) => {
-      if (e.button) return;
+      if (e.button || leaveAt >= 0) return;
       canvas.setPointerCapture(e.pointerId);
       const h = pick(e.clientX, e.clientY);
       drag.hit = h.hit;
@@ -279,6 +288,7 @@ export default function Quire3D() {
     };
 
     const up = (e: PointerEvent) => {
+      if (leaveAt >= 0) return;
       if (mode === "button") { c.btnDown = false; c.btnRipple = 0; touch(); }
       else if (mode === "scrub") {
         if (drag.moved) goal = Math.round(turn.x + clamp(turn.v * 0.22, -0.6, 0.6));
@@ -294,6 +304,7 @@ export default function Quire3D() {
 
     let wheelAt = 0;
     const wheel = (e: WheelEvent) => {
+      if (leaveAt >= 0) return;
       const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(d) < 8 || clock < wheelAt) return;
       wheelAt = clock + 0.32;
@@ -301,6 +312,7 @@ export default function Quire3D() {
       idleAt = clock + HOLD;
     };
     const key = (e: KeyboardEvent) => {
+      if (leaveAt >= 0) return;
       if (e.metaKey || e.ctrlKey || e.altKey || (e.target as Element | null)?.closest?.("input,textarea,[contenteditable]")) return;
       if (e.key === "ArrowRight" || e.key === "ArrowLeft") { goal = Math.round(goal) + (e.key === "ArrowRight" ? 1 : -1); idleAt = clock + HOLD; }
       else if (top === 5 && /^\d$/.test(e.key)) { otpAdd(); touch(); }
@@ -332,6 +344,10 @@ export default function Quire3D() {
         spring(turn, goal, dt, 15, 7.4);
       }
       const t = reduce ? 1.2 : clock;
+      const L = leaveAt < 0 ? 0 : clamp((clock - leaveAt) / LEAVE);
+      const lv = L * L * L * (L * (L * 6 - 15) + 10); // smootherstep
+      // The sheet in hand lands on the stack a little ahead of the rest.
+      const lvTop = sm(0, 0.8, L);
 
       const breathe = reduce ? 0.5 : Math.sin(t * 0.9) * 0.5 + 0.5;
       const gap = 0.07 + breathe * 0.014 + near * 0.085;
@@ -368,6 +384,16 @@ export default function Quire3D() {
           y = mix(showY, y0, fall);
           tilt = showTilt * (1 - sm(0, 0.42, v)) - Math.sin(Math.PI * v) * 9 * DEG;
           pres = 1 - sm(0, 0.32, v);
+        }
+        if (L > 0) {
+          // Pile slot: the sheet in hand on top (0), then the stack from its top down.
+          const slot = (((i + leaveSlot) % N) + N) % N, p = slot >= N - 1 ? 0 : N - 1 - slot, k = p === 0 ? lvTop : lv;
+          x = mix(x, 0, k);
+          y = mix(y, PILE_Y - p * PILE_GAP, k);
+          z = mix(z, (p * 1.5) / view.fit, k); // each one peeks 1.5 px below the one above
+          yaw = mix(yaw, -pileTurn(p), k);
+          tilt = mix(tilt, 0, k);
+          pres *= 1 - sm(0, 0.5, L);
         }
         const cy = Math.cos(yaw), sy = Math.sin(yaw), ct = Math.cos(tilt), st = Math.sin(tilt);
         // R = Ry(yaw) * Rx(tilt), column-major.
@@ -420,9 +446,11 @@ export default function Quire3D() {
       ]);
 
       // Camera: 34 degrees above the horizon, nudged by the pointer.
-      const el = (34 + py * 4) * DEG, az = -px * 5 * DEG;
-      cam = [Math.sin(az) * Math.cos(el) * DIST, Math.sin(el) * DIST + 0.2, Math.cos(az) * Math.cos(el) * DIST];
-      let f = [-cam[0], 0.2 - cam[1], -cam[2]];
+      // Leaving, it rises until it looks straight down on the pile's top sheet,
+      // which then sits in the middle of the stage at 1 world unit = fit px.
+      const el = mix((34 + py * 4) * DEG, 89.9 * DEG, lv), az = mix(-px * 5 * DEG, 0, lv), ay = mix(0.2, PILE_Y, lv);
+      cam = [Math.sin(az) * Math.cos(el) * DIST, Math.sin(el) * DIST + ay, Math.cos(az) * Math.cos(el) * DIST];
+      let f = [-cam[0], ay - cam[1], -cam[2]];
       const fl = Math.hypot(f[0], f[1], f[2]);
       f = [f[0] / fl, f[1] / fl, f[2] / fl];
       const rl = Math.hypot(f[2], f[0]);
@@ -475,8 +503,39 @@ export default function Quire3D() {
       gl.uniform3f(u.light, lx / ll, ly / ll, lz / ll);
       gl.uniform1f(u.glint, reduce ? 9 : -2 + 4.2 * clamp((clock - glintAt) / 1.1));
       gl.uniform1f(u.floor, FLOOR);
+      gl.uniform1f(u.floorK, 1 - lv);
       gl.uniform1f(u.intro, reduce ? 1 : sm(0, 0.9, clock));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      if (L >= 1 && !leftSent) {
+        // Settled: tell the page where the pile is and how each sheet's foil
+        // sits (its hue turn and the centre of its pinwheel, as the shader has
+        // them now), so the HTML pile drawn over it matches this frame.
+        leftSent = true;
+        const sheets: { from: number; cx: number; cy: number }[] = [];
+        for (let i = 0; i < N; i++) {
+          const slot = (((i + leaveSlot) % N) + N) % N, p = slot >= N - 1 ? 0 : N - 1 - slot;
+          const off = i * 0.061 + t * 0.04 + px * 0.25;
+          const qx = px * 0.3 - 0.16 * Math.sin(t * 0.31 + i * 1.3), qy = py * 0.22 - 0.16 * Math.cos(-t * 0.27 + i * 2.1);
+          sheets[p] = { from: (((90 - off * 360) % 360) + 360) % 360, cx: 50 + qx * 50, cy: 50 + (qy / 1.5) * 100 };
+        }
+        dispatchEvent(new CustomEvent("quire:left", { detail: { x: view.cx, y: view.cy, w: view.fit * 2, sheets } }));
+      }
+    };
+
+    // "Start collecting" asks the quire to settle into a pile (StartLink).
+    const leaveFor = (e: Event) => {
+      if (reduce || leaveAt >= 0 || !visible) return;
+      (e as CustomEvent<{ accept?: () => void }>).detail?.accept?.();
+      leaveAt = clock;
+      leaveSlot = Math.round(turn.x);
+      goal = leaveSlot;
+      idleAt = Infinity;
+      tx = ty = nearT = 0;
+      hov.on = false;
+      c.tabHover = -1;
+      mode = "";
+      canvas.style.cursor = "";
     };
 
     const vis = () => { visible = !document.hidden; };
@@ -490,6 +549,7 @@ export default function Quire3D() {
     canvas.addEventListener("wheel", wheel, { passive: true });
     canvas.addEventListener("webglcontextlost", lost);
     addEventListener("keydown", key);
+    addEventListener("quire:leave", leaveFor);
     addEventListener("resize", resize);
     document.addEventListener("visibilitychange", vis);
     raf = requestAnimationFrame(frame);
@@ -505,6 +565,7 @@ export default function Quire3D() {
       canvas.removeEventListener("wheel", wheel);
       canvas.removeEventListener("webglcontextlost", lost);
       removeEventListener("keydown", key);
+      removeEventListener("quire:leave", leaveFor);
       removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", vis);
     };

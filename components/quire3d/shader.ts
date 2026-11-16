@@ -36,6 +36,7 @@ uniform vec2 uPointer;
 uniform vec3 uLight;
 uniform float uGlint;
 uniform float uFloorY;
+uniform float uFloorK;
 uniform float uIntro;
 uniform sampler2D uLabels;
 
@@ -345,7 +346,7 @@ void main() {
     tint /= float(N);
     vec4 night = vec4(mix(vec3(0.66, 0.59, 1.0), tint * 2.2, 0.55) * occ * 0.2, 0.0);
     vec4 day = vec4(mix(vec3(0.0), tint, 0.5) * occ * 0.16, occ * 0.16);
-    acc += (1.0 - acc.a) * mix(day, night, uDark);
+    acc += (1.0 - acc.a) * mix(day, night, uDark) * uFloorK;
   }
 
   acc *= uIntro;
