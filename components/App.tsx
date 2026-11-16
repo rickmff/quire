@@ -512,7 +512,6 @@ export default function App() {
         renameCollection={renameCollection}
         deleteCollection={deleteCollection}
         moveTo={dropTo}
-        openPalette={() => setPalette(true)}
         sites={sites}
         openItem={setOpen}
         openId={open?.id}
@@ -521,7 +520,7 @@ export default function App() {
       <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
         <header className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
-            className="flex h-14 items-center"
+            className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               add(input);
@@ -556,12 +555,13 @@ export default function App() {
             <button
               type="button"
               onClick={() => setPalette(true)}
-              className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
+              className="shrink-0 rounded-md md:hidden px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
               aria-label="Open command menu"
             >
               ⌘K
             </button>
             </div>
+            <Shortcuts openPalette={() => setPalette(true)} />
           </form>
         </header>
 
@@ -807,6 +807,32 @@ export default function App() {
 
 const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
+// Save button, commands and licence, top right of the main view.
+function Shortcuts({ openPalette }: { openPalette: () => void }) {
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
+  const bookmarklet = origin
+    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
+    : "#";
+
+  return (
+    <div className="hidden shrink-0 items-center gap-0.5 whitespace-nowrap text-[11px] md:flex">
+      <a
+        href={bookmarklet}
+        onClick={(e) => e.preventDefault()}
+        title="Drag to your bookmarks bar, then click it on any page to save it"
+        className="rounded-md px-2 py-1 text-faint transition hover:text-muted"
+      >
+        Save button <span className="text-faint">· drag to bar</span>
+      </a>
+      <button type="button" onClick={openPalette} className="rounded-md px-2 py-1 text-faint transition hover:text-muted">
+        Commands <span>⌘K</span>
+      </button>
+      <span className="px-2 py-1 text-faint">Open source · MIT</span>
+    </div>
+  );
+}
+
 function Sidebar(props: {
   lib: Library;
   view: View;
@@ -820,16 +846,12 @@ function Sidebar(props: {
   renameCollection: (id: string, name: string) => void;
   deleteCollection: (id: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
-  openPalette: () => void;
   sites: { key: string; name: string; items: GalleryItem[] }[];
   openItem: (item: GalleryItem) => void;
   openId?: string;
 }) {
   const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
   const activeSite = siteView(view);
-  const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
-
 
   // Ticks within ~3 rows of the pointer grow, nearest the most.
   const ruler = useRef<HTMLElement>(null);
@@ -844,10 +866,6 @@ function Sidebar(props: {
   useEffect(() => {
     ruler.current?.querySelector("[aria-current=page]")?.scrollIntoView({ block: "nearest" });
   }, [view]);
-
-  const bookmarklet = origin
-    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
-    : "#";
 
   return (
     <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
@@ -917,24 +935,9 @@ function Sidebar(props: {
           )}
         </nav>
 
-        <div className="-mx-1 flex shrink-0 gap-0.5 pb-2 md:mx-0 md:flex-col md:border-t md:border-line md:pt-3 md:pb-3">
+        <div className="-mx-1 flex shrink-0 gap-0.5 pb-2 md:mx-0 md:flex-col md:border-t md:border-line md:pt-3 md:pb-5">
           <NavItem id="sites" name="Sites" count={0} {...props} />
           <NavItem id="agents" name="Agents" count={0} {...props} />
-        </div>
-
-        <div className="hidden shrink-0 flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
-          <a
-            href={bookmarklet}
-            onClick={(e) => e.preventDefault()}
-            title="Drag to your bookmarks bar, then click it on any page to save it"
-            className="rounded-md px-2 py-1 text-faint transition hover:text-muted md:pl-[34px]"
-          >
-            Save button <span className="text-faint">· drag to bar</span>
-          </a>
-          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted md:pl-[34px]">
-            Commands <span>⌘K</span>
-          </button>
-          <span className="px-2 py-1 text-faint md:pl-[34px]">Open source · MIT</span>
         </div>
       </div>
     </aside>

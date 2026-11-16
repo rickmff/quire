@@ -82,6 +82,8 @@ export function Gallery({
 
   return (
     <section>
+      {/* Title, filters and interaction chips stay pinned under the top bar. */}
+      <div className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
       <div className="flex h-12 items-center justify-between gap-4">
         <h1 className="flex items-baseline gap-2">
           <span className="font-medium">{title}</span>
@@ -139,7 +141,7 @@ export function Gallery({
       </div>
 
       {triggerCounts.size > 1 && (
-        <div className="-mx-1 mb-5 flex gap-0.5 overflow-x-auto pb-1">
+        <div className="-mx-1 flex gap-0.5 overflow-x-auto pb-2">
           {TRIGGERS.filter((t) => triggerCounts.has(t.id)).map((t) => (
             <button
               key={t.id}
@@ -153,6 +155,7 @@ export function Gallery({
           ))}
         </div>
       )}
+      </div>
 
       {sections && !q && !trigger && !library && !type ? (
         <div className="flex flex-col gap-12">
