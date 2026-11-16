@@ -11,6 +11,7 @@ import StarIcon from "@/components/StarIcon";
 import { Tip } from "@/components/ui/tooltip";
 import { deal } from "@/lib/deal";
 import { agentText } from "@/lib/agentText";
+import { ringLayout } from "@/lib/ring";
 import { ArrowLeft, Maximize2, Settings, X } from "lucide-react";
 
 // The reference gallery: every component in the user's library, organized by
@@ -324,27 +325,41 @@ const current = (g: LiveVariant, picked: Picked) => (g.key in picked ? picked[g.
 
 // The gear on a live preview. It opens the variants in a ring around itself: the options of
 // the one choice there is, or first the choices (Variant, Size, Side...) and then the options
-// of the one picked. Picking an option switches the live demo to it.
+// of the one picked. Picking an option switches the live demo to it. The ring is laid out from
+// the labels' real widths (lib/ring.ts), so long names keep their full text and never overlap.
 // always: shown without a hover (the details panel).
+//
+//   closed ──open──▶ open (grown: false) ──next frame──▶ open (grown: true)
+//     ▲                   │  ▲                                 │
+//     └──── close ────────┘  └── pick a choice or go back ─────┘
+//
+// grown: the pills have moved out from the gear to their places, so the ring grows out of it.
+type Menu = { kind: "closed" } | { kind: "open"; at: Point; group: number | null; grown: boolean };
+// The pills' size, from their text: 11px labels, px-2.5 and py-1 around a 16px line.
+let ruler: CanvasRenderingContext2D | null | undefined;
+function pillSizes(labels: string[]) {
+  if (ruler === undefined) ruler = document.createElement("canvas").getContext("2d");
+  if (ruler) ruler.font = `11px ${getComputedStyle(document.body).fontFamily}`;
+  return labels.map((l) => ({ w: Math.ceil((ruler ? ruler.measureText(l).width : l.length * 6.2) + 22), h: 24 }));
+}
 export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: { groups: LiveVariant[]; picked: Picked; onPick: (p: Picked) => void; onOpenChange?: (open: boolean, at?: { x: number; y: number }) => void; always?: boolean }) {
   const btn = useRef<HTMLButtonElement>(null);
-  const [at, setAt] = useState<{ x: number; y: number } | null>(null);
-  const [group, setGroup] = useState<number | null>(null);
-  const [shown, setShown] = useState(false);
+  const [menu, setMenu] = useState<Menu>({ kind: "closed" });
   const one = groups.length === 1;
   const changed = groups.some((g) => g.key in picked && picked[g.key] !== (g.value ?? ""));
   const events = useRef({ onOpenChange });
   events.current = { onOpenChange };
   // Where the mouse last was over the menu, so the card knows whether it is still on it.
   const mouse = useRef<{ x: number; y: number } | undefined>(undefined);
+  const isOpen = menu.kind === "open";
   const open = (o: boolean) => {
     const r = btn.current?.getBoundingClientRect();
-    setAt(o && r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null);
-    setGroup(one ? 0 : null);
+    setMenu(o && r ? { kind: "open", at: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, group: one ? 0 : null, grown: false } : { kind: "closed" });
     events.current.onOpenChange?.(o, mouse.current);
   };
+  const choose = (group: number | null) => setMenu((m) => (m.kind === "open" ? { ...m, group, grown: false } : m));
   useEffect(() => {
-    if (!at) return;
+    if (!isOpen) return;
     const key = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       e.stopPropagation();
@@ -360,25 +375,28 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
       document.removeEventListener("scroll", away, true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [at]);
+  }, [isOpen]);
   // The ring grows out of the gear: it mounts at the center, then moves out.
+  const growing = menu.kind === "open" && !menu.grown;
   useEffect(() => {
-    setShown(false);
-    if (!at) return;
-    const f = requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)));
+    if (!growing) return;
+    const f = requestAnimationFrame(() => requestAnimationFrame(() => setMenu((m) => (m.kind === "open" ? { ...m, grown: true } : m))));
     return () => cancelAnimationFrame(f);
-  }, [at, group]);
+  }, [growing]);
 
-  const g = group === null ? null : groups[group];
+  const g = menu.kind === "open" && menu.group !== null ? groups[menu.group] : null;
   const items = g
     ? g.options.map((o) => ({ label: o.label, active: current(g, picked) === o.value, pick: () => (onPick({ ...picked, [g.key]: o.value }), open(false)) }))
-    : groups.map((x, i) => ({ label: x.label, active: x.key in picked && picked[x.key] !== (x.value ?? ""), pick: () => setGroup(i) }));
-  // Wide enough that the labels do not touch, and kept on screen.
-  const r = Math.min(130, Math.max(62, (items.length * 78) / (2 * Math.PI)));
-  let cx = at?.x ?? 0, cy = at?.y ?? 0;
-  if (at && typeof window !== "undefined") {
-    cx = Math.min(window.innerWidth - r - 52, Math.max(r + 52, cx));
-    cy = Math.min(window.innerHeight - r - 20, Math.max(r + 20, cy));
+    : groups.map((x, i) => ({ label: x.label, active: x.key in picked && picked[x.key] !== (x.value ?? ""), pick: () => choose(i) }));
+  const labels = items.map((it) => it.label).join("\n");
+  const ring = useMemo(() => (isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null), [isOpen, labels]);
+  const shown = menu.kind === "open" && menu.grown;
+  // The ring's center: the gear, moved just enough that every pill stays on screen.
+  let cx = 0, cy = 0;
+  if (menu.kind === "open" && ring) {
+    const m = 8;
+    cx = Math.min(window.innerWidth - m - ring.box.right, Math.max(m - ring.box.left, menu.at.x));
+    cy = Math.min(window.innerHeight - m - ring.box.bottom, Math.max(m - ring.box.top, menu.at.y));
   }
   const stop = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -393,21 +411,22 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
           type="button"
           data-variants
           aria-label="Variants"
-          aria-expanded={Boolean(at)}
+          aria-expanded={isOpen}
           onClick={(e) => {
             stop(e);
-            open(!at);
+            open(!isOpen);
           }}
           onPointerDown={(e) => e.stopPropagation()}
           className={`absolute bottom-2 left-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
-            at || changed ? "text-fg opacity-100" : always ? "text-muted" : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+            isOpen || changed ? "text-fg opacity-100" : always ? "text-muted" : "text-muted opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
           }`}
         >
-          <Settings size={14} strokeWidth={1.75} aria-hidden className={`transition-transform duration-300 ${at ? "rotate-90" : ""}`} />
+          <Settings size={14} strokeWidth={1.75} aria-hidden className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`} />
           {changed && <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#F59F00] ring-2 ring-bg" />}
         </button>
       </Tip>
-      {at &&
+      {menu.kind === "open" &&
+        ring &&
         createPortal(
           <div
             className="fixed inset-0 z-50"
@@ -420,21 +439,21 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
             {/* A soft disc under the ring, so its labels read over the page. */}
             <div
               aria-hidden
-              style={{ left: cx, top: cy, width: 2 * r + 96, height: 2 * r + 96, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
+              style={{ left: cx, top: cy, width: 2 * ring.reach + 24, height: 2 * ring.reach + 24, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
               className={`pointer-events-none absolute rounded-full bg-bg/70 ring-1 ring-line backdrop-blur-[3px] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"}`}
             />
             {items.map((it, i) => {
-              const a = -Math.PI / 2 + (i / items.length) * 2 * Math.PI;
-              const x = shown ? Math.cos(a) * r : 0, y = shown ? Math.sin(a) * r : 0;
+              const p = ring.at[i] ?? { x: 0, y: 0 };
+              const x = shown ? p.x : 0, y = shown ? p.y : 0;
               return (
                 <button
-                  key={`${group}-${it.label}`}
+                  key={`${menu.group}-${it.label}`}
                   type="button"
                   role="menuitemradio"
                   aria-checked={it.active}
                   onClick={(e) => (stop(e), it.pick())}
                   style={{ left: cx, top: cy, transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${shown ? 1 : 0.4})`, transitionDelay: shown ? `${i * 14}ms` : "0ms" }}
-                  className={`absolute max-w-[150px] truncate rounded-full px-2.5 py-1 text-[11px] leading-4 whitespace-nowrap shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] ring-1 transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"} ${
+                  className={`absolute rounded-full px-2.5 py-1 text-[11px] leading-4 whitespace-nowrap shadow-[0_6px_20px_-6px_rgb(0_0_0/0.35)] ring-1 transition-[transform,opacity,background-color] duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${shown ? "opacity-100" : "opacity-0"} ${
                     it.active ? "bg-fg text-bg ring-fg" : "bg-bg text-fg ring-line hover:bg-hover"
                   }`}
                 >
@@ -445,7 +464,7 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
             <button
               type="button"
               aria-label={g && !one ? "Back to the choices" : "Close"}
-              onClick={(e) => (stop(e), g && !one ? setGroup(null) : open(false))}
+              onClick={(e) => (stop(e), g && !one ? choose(null) : open(false))}
               style={{ left: cx, top: cy }}
               className="absolute flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-fg text-bg shadow-md transition hover:opacity-90"
             >
