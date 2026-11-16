@@ -8,6 +8,7 @@ import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
 import { deal } from "@/lib/deal";
+import { agentText } from "@/lib/agentText";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
@@ -26,6 +27,7 @@ export function Gallery({
   tools,
   intro,
   onDeal,
+  onAgent,
 }: {
   items: GalleryItem[];
   title: string;
@@ -43,6 +45,8 @@ export function Gallery({
   // ms until the last card lands, so the rest of the page can follow it.
   intro?: boolean;
   onDeal?: (ms: number) => void;
+  // "Copy for agent" under the library name: gets the same text as the drawer's button.
+  onAgent?: (text: string) => void;
 }) {
   const [trigger, setTrigger] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
@@ -153,7 +157,7 @@ export function Gallery({
               <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
                 {sec.items.slice(0, 4).map((i, n) => (
                   <div key={i.id} className={n === 3 ? "xl:hidden" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} />
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
                   </div>
                 ))}
               </div>
@@ -165,7 +169,7 @@ export function Gallery({
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} />
+            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
           ))}
         </div>
       )}
@@ -345,12 +349,14 @@ function ComponentCard({
   onOpen,
   onStar,
   tools,
+  onAgent,
 }: {
   item: GalleryItem;
   site: string;
   onOpen: () => void;
   onStar?: () => void;
   tools?: React.ReactNode;
+  onAgent?: () => void;
 }) {
   const starred = Boolean(item.saved);
   // Plays the pop and glint once, right after the user stars the card.
@@ -397,11 +403,33 @@ function ComponentCard({
           </button>
           <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
-        <p className="mt-0.5 truncate text-[12px] text-faint">
-          {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
-        </p>
+        <div className="mt-0.5 flex items-start justify-between gap-3">
+          <p className="min-w-0 truncate text-[12px] text-faint">
+            {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
+          </p>
+          {onAgent && <AgentButton onClick={onAgent} />}
+        </div>
       </div>
     </article>
+  );
+}
+
+// "Copy for agent" on a card, under the library name. Its click stays off the card.
+export function AgentButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+      title="Copy an agent-ready description"
+      className="btn btn-secondary btn-sm -mr-0.5 mt-1 shrink-0 !h-[22px] !px-2 text-[11px]"
+    >
+      Copy for agent
+    </button>
   );
 }
 
@@ -449,15 +477,7 @@ export function Detail({
     }
   };
 
-  const forAgent = [
-    `${item.title} (${site}), ${typeById(item.type).name}.`,
-    item.description,
-    `Reference: ${item.docs}`,
-    item.install && `Install: ${item.install}`,
-    !mine && `Quire id: ${item.id} (get_component_source in the Quire MCP returns its code)`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const forAgent = agentText(item, site);
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-label={item.title}>

@@ -22,9 +22,10 @@ import { OTHER, TYPES, typeById } from "@/lib/types";
 import Link from "next/link";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
-import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
+import { AgentButton, Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
+import { agentText } from "@/lib/agentText";
 
 // "starred" = the starred components (saved bookmarks, pasted links too),
 // "type:<id>" = one component type across the library, "sites", "agents",
@@ -590,6 +591,13 @@ export default function App() {
     }
   };
 
+  // Same text as the drawer's "Copy for agent", for a saved card in a collection.
+  const copyForAgent = (b: Bookmark) => {
+    const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
+    const i = hit ?? toComponent(b);
+    copy(agentText(i, i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library), "Copied for your agent");
+  };
+
   const copyInstall = () => {
     const cmds = visible.map((b) => b.install).filter(Boolean).join("\n");
     if (!cmds) return flash("No install commands here");
@@ -757,6 +765,7 @@ export default function App() {
               }}
               intro={intro === "deal"}
               onDeal={onDeal}
+              onAgent={(text) => copy(text, "Copied for your agent")}
               empty={
                 words.length ? (
                   <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
@@ -838,6 +847,7 @@ export default function App() {
                   }))
                 }
                 onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                onAgent={() => copyForAgent(b)}
               />
             ))}
           </div>
@@ -1538,6 +1548,7 @@ function Card({
   onType,
   onNote,
   onCopy,
+  onAgent,
 }: {
   b: Bookmark;
   lib: Library;
@@ -1547,6 +1558,7 @@ function Card({
   onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
+  onAgent: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [imgOk, setImgOk] = useState(true);
@@ -1609,10 +1621,13 @@ function Card({
           </a>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
-        <p className="mt-0.5 truncate text-[12px] text-faint">
-          {typeById(typeOf(b)).name}
-          {b.description && <span className="text-faint"> · {b.description}</span>}
-        </p>
+        <div className="mt-0.5 flex items-start justify-between gap-3">
+          <p className="min-w-0 truncate text-[12px] text-faint">
+            {typeById(typeOf(b)).name}
+            {b.description && <span className="text-faint"> · {b.description}</span>}
+          </p>
+          <AgentButton onClick={onAgent} />
+        </div>
 
         {b.install && (
           <button
