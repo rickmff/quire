@@ -7,12 +7,16 @@ import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
+import { SearchIcon } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { deal } from "@/lib/deal";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
 
 const PAGE = 48;
+// Radix Select has no empty value, so "no filter" gets its own.
+const ALL = "__all";
 
 export function Gallery({
   items,
@@ -146,52 +150,51 @@ export function Gallery({
           <span className="text-faint tabular-nums">{filtered.length || ""}</span>
         </h1>
         <div className="flex items-center gap-1">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter"
-            aria-label="Filter components"
-            className="h-7 w-28 rounded-md bg-transparent px-2 text-right outline-none transition-[width,background-color] placeholder:text-faint focus:w-44 focus:bg-field-focus focus:text-left"
-          />
+          <label className="relative flex h-7 items-center rounded-md text-faint transition-colors focus-within:bg-field-focus focus-within:text-fg hover:bg-hover">
+            <SearchIcon className="pointer-events-none absolute left-2 size-3.5 opacity-70" aria-hidden />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Filter"
+              aria-label="Filter components"
+              className="h-7 w-24 bg-transparent pr-2 pl-7 text-[12px] text-fg outline-none transition-[width] duration-200 placeholder:text-faint focus:w-44"
+            />
+          </label>
           {libCounts.length <= 1 && typeCounts.length > 1 && (
-            <label className="relative">
-              <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${type ? "text-fg" : "text-faint hover:text-muted"}`}>
-                {type ? typeById(type).name : "All types"}
-              </span>
-              <select
-                value={type ?? ""}
-                onChange={(e) => setType(e.target.value || null)}
-                aria-label="Filter by type"
-                className="absolute inset-0 cursor-pointer opacity-0"
-              >
-                <option value="">All types</option>
+            <Select value={type ?? ALL} onValueChange={(v) => setType(v === ALL ? null : v)}>
+              <SelectTrigger aria-label="Filter by type" className={type ? "text-fg" : undefined}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL} hint={items.length}>
+                  All types
+                </SelectItem>
+                <SelectSeparator />
                 {typeCounts.map(([id, n]) => (
-                  <option key={id} value={id}>
-                    {typeById(id).name} ({n})
-                  </option>
+                  <SelectItem key={id} value={id} hint={n}>
+                    {typeById(id).name}
+                  </SelectItem>
                 ))}
-              </select>
-            </label>
+              </SelectContent>
+            </Select>
           )}
           {libCounts.length > 1 && (
-            <label className="relative">
-              <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${library ? "text-fg" : "text-faint hover:text-muted"}`}>
-                {library ? libName.get(library) ?? library : "All sites"}
-              </span>
-              <select
-                value={library ?? ""}
-                onChange={(e) => setLibrary(e.target.value || null)}
-                aria-label="Filter by site"
-                className="absolute inset-0 cursor-pointer opacity-0"
-              >
-                <option value="">All sites</option>
+            <Select value={library ?? ALL} onValueChange={(v) => setLibrary(v === ALL ? null : v)}>
+              <SelectTrigger aria-label="Filter by site" className={library ? "text-fg" : undefined}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL} hint={items.length}>
+                  All sites
+                </SelectItem>
+                <SelectSeparator />
                 {libCounts.map(([id, n]) => (
-                  <option key={id} value={id}>
-                    {libName.get(id) ?? id} ({n})
-                  </option>
+                  <SelectItem key={id} value={id} hint={n}>
+                    {libName.get(id) ?? id}
+                  </SelectItem>
                 ))}
-              </select>
-            </label>
+              </SelectContent>
+            </Select>
           )}
         </div>
       </div>

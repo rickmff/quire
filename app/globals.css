@@ -249,3 +249,8 @@ textarea:focus-visible { outline: none; }
   button:disabled, [aria-disabled="true"], [data-disabled], select:disabled,
   input:disabled { cursor: not-allowed; }
 }
+
+/* Select menus (components/ui/select.tsx) open with a short drop. */
+@keyframes select-pop { from { opacity: 0; transform: translateY(-3px) scale(.98) } }
+.select-pop[data-state="open"] { animation: select-pop 140ms cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .select-pop { animation: none !important; } }
