@@ -280,9 +280,11 @@ export default function App() {
     flash("Saved");
   };
 
-  // The star on a card: saves the component, or removes the saved copy.
+  // The star (on a card or in the drawer) is the only way to save: it saves
+  // the component, or removes the saved copy. Looks the copy up live, since
+  // the open drawer holds a snapshot of the item.
   const toggleStar = (c: GalleryItem) => {
-    const id = c.saved ?? lib.bookmarks.find((b) => b.ref === c.id || b.url === c.docs)?.id;
+    const id = lib.bookmarks.find((b) => b.id === c.saved || b.ref === c.id || b.url === c.docs)?.id;
     if (id) removeBookmark(id, "Removed from Saved");
     else saveFromCatalog(c);
   };
@@ -709,9 +711,9 @@ export default function App() {
         <Detail
           item={open}
           site={open.site ?? catalog?.libraries.find((l) => l.id === open.library)?.name ?? open.library}
-          saved={Boolean(open.saved) || lib.bookmarks.some((b) => b.ref === open.id)}
+          saved={lib.bookmarks.some((b) => b.id === open.saved || b.ref === open.id || b.url === open.docs)}
           onClose={() => setOpen(null)}
-          onSave={() => saveFromCatalog(open)}
+          onStar={() => toggleStar(open)}
           copy={copy}
         />
       )}

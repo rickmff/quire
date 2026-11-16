@@ -379,19 +379,21 @@ export function Detail({
   site,
   saved,
   onClose,
-  onSave,
+  onStar,
   copy,
 }: {
   item: GalleryItem;
   site: string;
   saved: boolean;
   onClose: () => void;
-  onSave: () => void;
+  // The star is the only way to save: it adds to Saved or removes from it.
+  onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
   const [src, setSrc] = useState<{ state: "idle" | "loading" | "done" | "none"; files: SourceFile[]; from?: string }>({ state: "idle", files: [] });
   const [tab, setTab] = useState(0);
   const mine = item.id.startsWith("mine/");
+  const [pop, setPop] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -488,8 +490,21 @@ export function Detail({
           )}
 
           <div className="mt-3 flex flex-wrap gap-1.5">
-            <button onClick={onSave} disabled={saved} className="btn btn-primary">
-              {saved ? "Saved" : "Save to my library"}
+            <button
+              type="button"
+              data-star
+              onClick={() => {
+                setPop(!saved);
+                onStar();
+              }}
+              aria-pressed={saved}
+              title={saved ? "Remove from Saved" : "Save"}
+              className={`group btn ${saved ? "btn-secondary" : "btn-primary"}`}
+            >
+              <span className={`flex ${pop ? "star-pop" : ""}`} onAnimationEnd={() => setPop(false)}>
+                <StarIcon filled={saved} />
+              </span>
+              {saved ? "Starred" : "Star"}
             </button>
             <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
