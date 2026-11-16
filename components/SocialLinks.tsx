@@ -3,11 +3,8 @@ import StarIcon from "@/components/StarIcon";
 import s from "@/components/SocialLinks.module.css";
 
 export const REPO_URL = "https://github.com/rickmff/quire";
-// Author's X profile.
 export const X_URL = "https://x.com/rickmff";
 
-// X and GitHub links, top right of the landing and the app. On hover the X
-// mark shows the handle and the GitHub mark opens into a "Star" pill.
 export default function SocialLinks({ className = "" }: { className?: string }) {
   return (
     <nav className={`${s.social} ${className}`} aria-label="Elsewhere">

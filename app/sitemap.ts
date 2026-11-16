@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
 import { catalog } from "@/lib/catalog";
 
-// /add is the extension's save page and /api is for agents, so neither is listed.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date(catalog.generatedAt);
   return [

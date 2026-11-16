@@ -1,8 +1,3 @@
-// Copies the stage output into the site: public/previews/<library>/ and
-// lib/catalog/stage.json, then updates lib/catalog/data.json in place.
-// It also records each component's live demo: the stage page built into
-// public/stage/<library>/ (build.sh) and the frame the stills were cut from.
-//   node publish.mjs <repoRoot> <library> [<library> ...]
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 const [root, ...libs] = process.argv.slice(2);
@@ -11,7 +6,7 @@ const DATA = join(root, "lib/catalog/data.json");
 const shots = existsSync(STAGE) ? JSON.parse(readFileSync(STAGE, "utf8")) : {};
 const data = JSON.parse(readFileSync(DATA, "utf8"));
 const POSES = existsSync("poses.json") ? JSON.parse(readFileSync("poses.json", "utf8")) : {};
-const VIEW = [1280, 800]; // the capture viewport (capture.mjs VW, VH)
+const VIEW = [1280, 800];
 const round = (n) => Math.round(n * 10) / 10;
 for (const lib of libs) {
   const out = join("out", lib);
@@ -20,13 +15,11 @@ for (const lib of libs) {
   mkdirSync(dir, { recursive: true });
   const report = existsSync(join(out, "report.json")) ? JSON.parse(readFileSync(join(out, "report.json"), "utf8")) : {};
   const built = existsSync(join(root, "public/stage", lib, "index.html"));
-  // Variants the live demo can switch to (variants.mjs): other examples (v=) or props (p=).
   const variants = Object.fromEntries((existsSync(join(`app-${lib}`, "demos.json")) ? JSON.parse(readFileSync(join(`app-${lib}`, "demos.json"), "utf8")) : []).filter((d) => d.variants).map((d) => [d.name, d.variants]));
   if (!built) console.log(`no live demos for ${lib}: run ./build.sh ${root} ${lib} first`);
   for (const c of data.components.filter((c) => c.library === lib)) {
     const s = {};
     const cfg = POSES[`${lib}/${c.name}`] ?? {};
-    // The live demo opens the same stage page the stills were shot from, with the same frame.
     const page = (theme) => {
       const r = report[`${c.name}|${theme}`];
       if (!built || !r?.frame) return null;
@@ -45,7 +38,6 @@ for (const lib of libs) {
       const img = join(out, `${c.name}-${theme}.webp`);
       if (existsSync(img)) { copyFileSync(img, join(dir, `${c.name}${suffix}.webp`)); s[theme === "light" ? "image" : "imageDark"] = `/previews/${lib}/${c.name}${suffix}.webp`; }
     }
-    // A clip only when both themes have one, so dark mode never plays the light clip.
     const vids = ["light", "dark"].map((t) => join(out, `${c.name}-${t}.mp4`));
     if (vids.every(existsSync)) {
       copyFileSync(vids[0], join(dir, `${c.name}.mp4`));

@@ -6,19 +6,13 @@ import s from "./Landing.module.css";
 type Part = { text: string; muted?: boolean };
 type Box = { x: number; y: number; w: number; h: number };
 
-const STEP = 230; // ms the frame rests on each word
+const STEP = 230;
 const PAD_X = 6, PAD_Y = 3;
 
-/**
- * Focus reveal. Every word starts blurred and dim. A corner-bracket frame moves
- * from word to word and brings each one into focus; a word stays sharp once the
- * frame has passed. After that, pointing at a word puts the frame back on it and
- * softens the rest.
- */
 export default function FocusReveal({ parts, className }: { parts: Part[]; className?: string }) {
   const words = parts.flatMap((p) => p.text.split(" ").map((w) => ({ w, muted: !!p.muted })));
   const root = useRef<HTMLHeadingElement>(null);
-  const [at, setAt] = useState(-1); // the word the reveal has reached
+  const [at, setAt] = useState(-1);
   const [hover, setHover] = useState(-1);
   const [box, setBox] = useState<Box | null>(null);
   const [still, setStill] = useState(false);
@@ -38,7 +32,6 @@ export default function FocusReveal({ parts, className }: { parts: Part[]; class
   const done = at >= words.length;
   const focus = done ? hover : at;
 
-  // The frame follows the focused word, wherever the line wraps.
   useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;

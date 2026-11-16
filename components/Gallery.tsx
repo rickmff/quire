@@ -14,9 +14,6 @@ import { agentText } from "@/lib/agentText";
 import { ringLayout } from "@/lib/ring";
 import { ArrowLeft, Maximize2, Settings, X } from "lucide-react";
 
-// The reference gallery: every component in the user's library, organized by
-// library, shown the way inspo shows a page (preview, credit, tags, details).
-
 const PAGE = 48;
 
 export function Gallery({
@@ -38,18 +35,12 @@ export function Gallery({
   libraries: CatalogLibrary[];
   onOpen: (item: GalleryItem) => void;
   empty?: React.ReactNode;
-  // Library view: one row of cards per library, each opening its own page.
   sections?: { key: string; name: string; items: GalleryItem[] }[];
   onSite?: (key: string) => void;
-  // Star on each card: saves the component to Saved, or removes it.
   onStar?: (item: GalleryItem) => void;
-  // Actions for a starred card (collection, type, note, copy, delete), shown beside the star.
   tools?: (item: GalleryItem) => React.ReactNode;
-  // First load: deal the visible cards from a pile. onDeal gets the time in
-  // ms until the last card lands, so the rest of the page can follow it.
   intro?: boolean;
   onDeal?: (ms: number) => void;
-  // "Copy for agent" beside the card title: gets the same text as the drawer's button.
   onAgent?: (text: string) => void;
 }) {
   const [trigger, setTrigger] = useState<string | null>(null);
@@ -67,8 +58,6 @@ export function Gallery({
     return m;
   }, [items]);
 
-  // Starring moves a card to the top. Measure every card before the change,
-  // then glide each one from its old place to its new one (FLIP).
   const root = useRef<HTMLElement>(null);
   const before = useRef<Map<string, DOMRect> | null>(null);
   const star = onStar && ((i: GalleryItem) => {
@@ -92,7 +81,6 @@ export function Gallery({
       const dx = was.left - now.left;
       const dy = was.top - now.top;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
-      // Far moves take a little longer, so every card reads as one motion.
       const duration = Math.min(700, 380 + Math.hypot(dx, dy) * 0.25);
       el.style.position = "relative";
       el.style.zIndex = "2";
@@ -103,13 +91,11 @@ export function Gallery({
     });
   }, [items]);
 
-  // Runs once, as soon as the first cards are in the page.
   const dealtRef = useRef(false);
   useLayoutEffect(() => {
     if (!intro || dealtRef.current || !root.current?.querySelector("[data-card]")) return;
     dealtRef.current = true;
     onDeal?.(deal(root.current));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intro, items, sections]);
 
   useEffect(() => setShown(PAGE), [items, trigger]);
@@ -123,7 +109,6 @@ export function Gallery({
 
   return (
     <section ref={root}>
-      {/* Title and interaction chips stay pinned under the top bar. */}
       <div data-chrome style={{ "--d": "120ms" } as React.CSSProperties} className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
       <div className="flex h-12 items-center">
         <h1 className="flex items-baseline gap-2">
@@ -182,7 +167,6 @@ export function Gallery({
   );
 }
 
-// Follows the system theme, like the rest of the site.
 function useDark() {
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -207,7 +191,6 @@ function useReducedMotion() {
   return reduce;
 }
 
-// still: the image only. A live demo plays over it, so the clip is not needed.
 export function Preview({ item, site, large, still }: { item: GalleryItem; site: string; large?: boolean; still?: boolean }) {
   const dark = useDark();
   const image = (dark && item.previewDark) || item.preview;
@@ -215,9 +198,6 @@ export function Preview({ item, site, large, still }: { item: GalleryItem; site:
   return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
 }
 
-// Card clips loop on their own while they are on screen (or about to be), and pause off
-// screen, so only the cards in view decode at a time. One observer serves every card.
-// With reduced motion a clip plays only while the mouse is over it.
 const onScreen = new Map<Element, (visible: boolean) => void>();
 let screenObserver: IntersectionObserver | undefined;
 function watchOnScreen(el: Element, cb: (visible: boolean) => void) {
@@ -265,7 +245,6 @@ function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; 
     );
   if (img && image)
     return (
-      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={image}
         alt=""
@@ -275,7 +254,6 @@ function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; 
         className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.015]"
       />
     );
-  // A saved page whose preview is still being recorded.
   return <Pending item={item} site={site} large={large} />;
 }
 
@@ -294,12 +272,6 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
   );
 }
 
-// The component itself, running on the Quire stage (public/stage/, built by stage/build.sh)
-// in a frame on this site's own origin. The frame lays the demo out at the size it was
-// captured at (live.view) and shows the part the stills and clips show (live.frame), scaled
-// to fit, so it lines up with the clip under it. It fades in once the demo has mounted.
-// card: the frame runs in a gallery card, where nothing in it reaches the card.
-// picked: the variants chosen in the gear menu, which the stage page takes as v= and p=.
 function LiveDemo({ live, title, onEscape, onReady, card, picked }: { live: Live; title: string; onEscape?: () => void; onReady?: () => void; card?: boolean; picked?: Picked }) {
   const dark = useDark();
   const base = (dark && live.srcDark) || live.src;
@@ -307,7 +279,6 @@ function LiveDemo({ live, title, onEscape, onReady, card, picked }: { live: Live
   return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} onReady={onReady} />;
 }
 
-// Variants: other examples of a component (v, Magic UI) or its docs controls (Animate UI props).
 type Picked = Record<string, unknown>;
 function variantQuery(groups: LiveVariant[] | undefined, picked: Picked = {}) {
   const q = new URLSearchParams();
@@ -323,19 +294,7 @@ function variantQuery(groups: LiveVariant[] | undefined, picked: Picked = {}) {
 }
 const current = (g: LiveVariant, picked: Picked) => (g.key in picked ? picked[g.key] : (g.value ?? ""));
 
-// The gear on a live preview. It opens the variants in a ring around itself: the options of
-// the one choice there is, or first the choices (Variant, Size, Side...) and then the options
-// of the one picked. Picking an option switches the live demo to it. The ring is laid out from
-// the labels' real widths (lib/ring.ts), so long names keep their full text and never overlap.
-// always: shown without a hover (the details panel).
-//
-//   closed ──open──▶ open (grown: false) ──next frame──▶ open (grown: true)
-//     ▲                   │  ▲                                 │
-//     └──── close ────────┘  └── pick a choice or go back ─────┘
-//
-// grown: the pills have moved out from the gear to their places, so the ring grows out of it.
 type Menu = { kind: "closed" } | { kind: "open"; at: Point; group: number | null; grown: boolean };
-// The pills' size, from their text: 11px labels, px-2.5 and py-1 around a 16px line.
 let ruler: CanvasRenderingContext2D | null | undefined;
 function pillSizes(labels: string[]) {
   if (ruler === undefined) ruler = document.createElement("canvas").getContext("2d");
@@ -349,7 +308,6 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   const changed = groups.some((g) => g.key in picked && picked[g.key] !== (g.value ?? ""));
   const events = useRef({ onOpenChange });
   events.current = { onOpenChange };
-  // Where the mouse last was over the menu, so the card knows whether it is still on it.
   const mouse = useRef<{ x: number; y: number } | undefined>(undefined);
   const isOpen = menu.kind === "open";
   const open = (o: boolean) => {
@@ -374,9 +332,7 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
       window.removeEventListener("resize", away);
       document.removeEventListener("scroll", away, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
-  // The ring grows out of the gear: it mounts at the center, then moves out.
   const growing = menu.kind === "open" && !menu.grown;
   useEffect(() => {
     if (!growing) return;
@@ -391,7 +347,6 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   const labels = items.map((it) => it.label).join("\n");
   const ring = useMemo(() => (isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null), [isOpen, labels]);
   const shown = menu.kind === "open" && menu.grown;
-  // The ring's center: the gear, moved just enough that every pill stays on screen.
   let cx = 0, cy = 0;
   if (menu.kind === "open" && ring) {
     const m = 8;
@@ -436,7 +391,6 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
             role="menu"
             aria-label={g ? g.label : "Variants"}
           >
-            {/* A soft disc under the ring, so its labels read over the page. */}
             <div
               aria-hidden
               style={{ left: cx, top: cy, width: 2 * ring.reach + 24, height: 2 * ring.reach + 24, transform: `translate(-50%, -50%) scale(${shown ? 1 : 0.3})` }}
@@ -477,18 +431,8 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   );
 }
 
-// A card runs its component live as soon as the mouse means it, so it can be hovered, clicked,
-// dragged and typed in right in the grid. The clip loops until then and comes back when the
-// mouse leaves. Only one card runs live at a time, so 160+ cards stay light.
-// Intent: the mouse enters slowly, slows down on the card, stops on it, or stays on it for
-// 300 ms. A pass across the grid is fast and starts nothing; a demo that has not shown yet when
-// the mouse leaves is dropped at once, so a pass never flashes one.
-// hold: the variants menu is open, so the demo stays live while the mouse is on the menu.
-// The enter and leave events are the page's own, not React's: the menu is a portal, outside the
-// card on the page but inside it in React, and leaving the card for the menu must count.
 let liveCard: (() => void) | undefined;
 type Point = { x: number; y: number };
-// The mouse's speed in px/ms, smoothed, from one listener for the whole page.
 const pointer = { x: 0, y: 0, t: 0, v: Infinity, on: false };
 function trackPointer() {
   if (pointer.on) return;
@@ -496,30 +440,18 @@ function trackPointer() {
   document.addEventListener("pointermove", (e) => {
     const dt = e.timeStamp - pointer.t;
     const d = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
-    // After a pause, the first move's distance is what it covered in about one frame.
     pointer.v = dt > 100 ? d / 16 : dt > 0 ? pointer.v * 0.5 + (d / dt) * 0.5 : pointer.v;
     pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = e.timeStamp;
   }, { passive: true, capture: true });
 }
-const SLOW = 0.35; // px/ms: slower than a pass across the grid
-const REST = 50; // ms without a move: the mouse stopped
-const DWELL = 300; // ms on the card: it is meant, however the mouse moves
-// The demo's own phase. The pointer facts (inside, held) sit beside it, since they change on
-// their own: the menu can be held open with the mouse off the card.
-//
-//   off ──start──▶ loading ──ready──▶ shown
-//    ▲                │                 │
-//    └────── end ─────┘    end ──▶ (grace, 250 ms) ──▶ off
-//
-// Timers: rest and dwell arm a start (one after the mouse stops, one after 300 ms on the
-// card); grace delays the end of a shown demo. A start or an end clears all three; a move
-// clears rest and grace only, so dwell keeps counting.
+const SLOW = 0.35;
+const REST = 50;
+const DWELL = 300;
 type Demo = "off" | "loading" | "shown";
 function useCardLive(enabled: boolean) {
   const [demo, setDemo] = useState<Demo>("off");
   const ref = useRef<HTMLDivElement>(null);
   const timers = useRef<{ rest?: ReturnType<typeof setTimeout>; dwell?: ReturnType<typeof setTimeout>; grace?: ReturnType<typeof setTimeout> }>({});
-  // Read by the page's event listeners, which outlive a render. demo mirrors the state above.
   const state = useRef<{ inside: boolean; held: boolean; demo: Demo }>({ inside: false, held: false, demo: "off" });
   const [fns] = useState(() => {
     const to = (d: Demo) => { state.current.demo = d; setDemo(d); };
@@ -538,18 +470,14 @@ function useCardLive(enabled: boolean) {
         if (liveCard === stop) liveCard = undefined;
         stop();
       };
-      // Not on screen yet: drop it now. On screen: a short grace, so a slip past the edge keeps it.
       if (state.current.demo !== "shown") return off();
       timers.current.grace = setTimeout(off, 250);
     };
     const ready = () => { if (state.current.demo === "loading") to("shown"); };
-    // Near: on the card or within the variants ring around its corner.
     const near = (at: Point, m = 150) => {
       const r = ref.current?.getBoundingClientRect();
       return Boolean(r && at.x >= r.left - m && at.x <= r.right + m && at.y >= r.top - m && at.y <= r.bottom + m);
     };
-    // After a pick the demo stays, so the variant shows, until the mouse moves away from the
-    // card and its ring (the page sends the card no enter or leave until the mouse is back on it).
     const watch = (e: PointerEvent) => {
       if (near({ x: e.clientX, y: e.clientY })) return;
       document.removeEventListener("pointermove", watch);
@@ -564,13 +492,11 @@ function useCardLive(enabled: boolean) {
     const { start, end, stop, watch, clear } = fns;
     const t = timers.current;
     trackPointer();
-    // Start now when the mouse comes in slowly; else when it slows down or stops on the card.
     const enter = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       state.current.inside = true;
       document.removeEventListener("pointermove", watch);
       clear("rest", "dwell", "grace");
-      // The page saw no move for a while (the mouse was over a live demo's frame): wait for one.
       if (e.timeStamp - pointer.t < 100 && pointer.v < SLOW) return start();
       t.rest = setTimeout(start, REST);
       t.dwell = setTimeout(start, DWELL);
@@ -581,7 +507,6 @@ function useCardLive(enabled: boolean) {
       if (pointer.v < SLOW) return start();
       t.rest = setTimeout(start, REST);
     };
-    // A short grace, so a slip past the edge keeps the demo as it is.
     const leave = () => {
       state.current.inside = false;
       end();
@@ -601,9 +526,7 @@ function useCardLive(enabled: boolean) {
   return {
     on: enabled && demo !== "off",
     ref,
-    // The demo is ready and fades in.
     ready: fns.ready,
-    // at: where the mouse is when the menu closes.
     hold: (held: boolean, at?: Point) => {
       state.current.held = held;
       fns.clear("rest", "grace");
@@ -624,7 +547,6 @@ function LiveFrame({ src, frame, view, title, onEscape, onReady }: { src: string
   const events = useRef({ onEscape, onReady });
   events.current = { onEscape, onReady };
 
-  // Measured before paint, so the frame starts loading in the same commit as the box.
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
@@ -675,14 +597,12 @@ function ComponentCard({
   onAgent?: () => void;
 }) {
   const starred = Boolean(item.saved);
-  // Plays the pop and glint once, right after the user stars the card.
   const [pop, setPop] = useState(false);
   const live = useCardLive(Boolean(item.live));
   const [picked, setPicked] = useState<Picked>({});
   return (
     <article data-card={item.id} className="group pop">
       <div ref={live.ref} className="relative">
-        {/* The preview runs the component live under the mouse; the corner icon opens the details. */}
         <div className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
           {live.on && item.live && <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={live.ready} />}
@@ -695,7 +615,6 @@ function ComponentCard({
             type="button"
             data-star
             onClick={(e) => {
-              // The card opens on click; the star must not.
               e.preventDefault();
               e.stopPropagation();
               setPop(!starred);
@@ -731,7 +650,6 @@ function ComponentCard({
   );
 }
 
-// The open-details icon in a card preview's bottom-right corner, styled like the star.
 export function OpenDetails({ onClick }: { onClick: () => void }) {
   return (
     <Tip label="Open details">
@@ -753,7 +671,6 @@ export function OpenDetails({ onClick }: { onClick: () => void }) {
   );
 }
 
-// "Copy for agent" on a card, beside the title. Its click stays off the card.
 export function AgentButton({ onClick }: { onClick: () => void }) {
   return (
     <Tip label="Copy an agent-ready description">
@@ -787,11 +704,9 @@ export function Detail({
   site: string;
   saved: boolean;
   onClose: () => void;
-  // The star is the only way to save: it adds to Saved or removes from it.
   onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
-  // The component's source: not asked for yet, being read, read, or not readable.
   const [src, setSrc] = useState<{ state: "idle" | "loading" | "none" } | { state: "done"; files: SourceFile[]; from?: string }>({ state: "idle" });
   const [tab, setTab] = useState(0);
   const [run, setRun] = useState(0);

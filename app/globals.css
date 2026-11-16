@@ -73,9 +73,6 @@ textarea:focus-visible { outline: none; }
 .slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
 
-/* First load of the app (lib/useIntro.ts, lib/deal.ts): the chrome waits
-   while the cards are dealt, then settles in like the landing does. Cards stay
-   hidden only until the deal takes them over. */
 :is([data-intro="wait"], [data-intro="deal"]) [data-chrome],
 :is([data-intro="wait"], [data-intro="deal"]) [data-card]:not([data-dealt]) > * { opacity: 0; }
 [data-intro="show"] [data-chrome] { animation: intro-rise 560ms cubic-bezier(.2,.8,.2,1) var(--d, 0ms) both; }
@@ -84,8 +81,6 @@ textarea:focus-visible { outline: none; }
   [data-intro] [data-chrome], [data-intro] [data-card] > * { opacity: 1; animation: none; }
 }
 
-/* Saved star: gold with a soft glow. A glint sweeps across it when it is
-   starred and when the pointer is on the card. */
 .star-gold { filter: drop-shadow(0 0 3px rgb(252 196 25 / 0.55)); }
 .star-glint { transform: translateX(-10px); }
 @keyframes star-glint { from { transform: translateX(-10px) } to { transform: translateX(26px) } }
@@ -94,22 +89,16 @@ textarea:focus-visible { outline: none; }
 .star-pop { animation: star-pop 380ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .star-pop, .star-glint { animation: none !important; } }
 
-/* Sidebar scrolls without a visible scrollbar. */
 .ruler { scrollbar-width: none; }
 .ruler::-webkit-scrollbar { display: none; }
 
-/* While a library is dragged in the sidebar: no text selection, grab cursor. */
 .dragging-site, .dragging-site * { cursor: grabbing !important; user-select: none !important; }
 
-/* Sidebar ruler: a tick per item. Ticks near the pointer grow; the active
-   item is marked with a long accent tick and steps right. */
 @media (min-width: 768px) {
   .ruler {
     mask-image: linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent);
     padding-block: 10px;
   }
-  /* Each tick sits centered in the 34px gutter before its label, so the
-     space before and after it match as it grows. */
   [data-tick] {
     width: calc(10px + var(--grow, 0) * 10px);
     margin-left: calc(12px - var(--grow, 0) * 5px);
@@ -123,10 +112,6 @@ textarea:focus-visible { outline: none; }
   [data-tick], [data-label] { transition: none; }
 }
 
-/* Buttons, after Clerk's: a 0.5px ring, a lit 1px top lip, stacked contact
-   shadows, a soft top-down glow (::before) that brightens on hover, and a
-   faint split highlight across the middle (::after). Shared by the landing
-   and the app. */
 @layer components {
   .btn {
     --btn-bg: transparent;
@@ -184,7 +169,6 @@ textarea:focus-visible { outline: none; }
   .btn-sm { height: 26px; padding: 0 10px; border-radius: 6px; font-size: 12px; }
   .btn-lg { height: 32px; padding: 0 14px; border-radius: 7px; }
 
-  /* Primary: Clerk's dark button in light mode, Clerk's white button in dark. */
   .btn-primary {
     --btn-bg: #212126; --btn-bg-hover: #2a2a30;
     --btn-fg: #ffffff; --btn-fg-hover: #ffffff;
@@ -197,7 +181,6 @@ textarea:focus-visible { outline: none; }
     --btn-band-blend: overlay;
   }
 
-  /* Secondary: Clerk's white button in light mode, its glass button in dark. */
   .btn-secondary {
     --btn-bg: #e9e9ec; --btn-bg-hover: #f0f0f2;
     --btn-fg: #131316; --btn-fg-hover: #131316;
@@ -211,7 +194,6 @@ textarea:focus-visible { outline: none; }
   }
   .btn-secondary:active { --btn-bg: #e3e3e6; --btn-bg-hover: #e3e3e6; }
 
-  /* Ghost: text until touched. */
   .btn-ghost { --btn-fg: var(--muted); }
 
   @media (prefers-color-scheme: dark) {
@@ -248,9 +230,6 @@ textarea:focus-visible { outline: none; }
   }
 }
 
-/* Everything clickable shows the pointer (Tailwind's preflight resets buttons
-   to the default cursor). Kept in the base layer so a cursor-* utility, such
-   as the text cursor on the editable note, still wins. */
 @layer base {
   a[href], button, summary, select, label[for],
   label:has(select, input[type="checkbox"], input[type="radio"], input[type="file"]),
@@ -262,12 +241,10 @@ textarea:focus-visible { outline: none; }
   input:disabled { cursor: not-allowed; }
 }
 
-/* Select menus (components/ui/select.tsx) open with a short drop. */
 @keyframes select-pop { from { opacity: 0; transform: translateY(-3px) scale(.98) } }
 .select-pop[data-state="open"] { animation: select-pop 140ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .select-pop { animation: none !important; } }
 
-/* Tooltips (components/ui/tooltip.tsx) fade in with a 2px drift from the trigger. */
 @keyframes tip-pop { from { opacity: 0; transform: translateY(var(--tip-y, 2px)) scale(.97) } }
 .tip-pop[data-state="delayed-open"], .tip-pop[data-state="instant-open"] { animation: tip-pop 120ms cubic-bezier(.2,.8,.2,1); }
 .tip-pop[data-side="bottom"] { --tip-y: -2px; }

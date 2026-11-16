@@ -1,10 +1,5 @@
-/* X and GitHub links, shared by the landing and the app header. */
 .social { display: flex; flex: none; align-items: center; gap: 2px; }
-/* Nothing in the pill may shrink: inside a tight header (the /app search bar)
-   flex would squeeze the label under the mark. */
 .social .gh, .social .gh > * { flex: none; }
-/* Each mark opens into a pill on hover ("@rickmff" on X, "Star" on GitHub);
-   the mark stays put and the label grows to its left. */
 .social .gh {
   display: inline-flex; align-items: center; height: 30px; padding: 0 8px; margin-right: -8px;
   border-radius: 999px; border: 1px solid transparent; color: var(--muted);

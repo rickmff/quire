@@ -1,11 +1,3 @@
-// Quire stage video: short looping clips of each demo, with the same framing and zoom as the
-// stills. The demo is mounted again right before the clip starts, so entrances and counters
-// play from their first frame. Interactions (hover, click, drag, typing) are driven by the
-// steps in poses.json (video.steps), with a drawn pointer so the clip shows what is done.
-// Frames are grabbed as fast as Chrome paints them and resampled to 30 fps. A demo Chrome
-// cannot paint fast enough here is recorded in slow motion (its clocks run k times slower)
-// and played back at normal speed. Clips that do not move are skipped: the still is enough.
-//   node video.mjs <library> <port> <outDir> [name ...]
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync, writeFileSync, existsSync, rmSync, renameSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -20,12 +12,8 @@ const demos = JSON.parse(readFileSync(`app-${lib}/demos.json`, "utf8")).filter((
 const VREPORT = `${OUT}/${process.env.MEASURE ? "measure" : "video"}.json`;
 const vreport = existsSync(VREPORT) ? JSON.parse(readFileSync(VREPORT, "utf8")) : {};
 const POINTER = new Set(["hover", "to", "path", "click", "rightclick", "drag", "down", "leave", "dblclick"]);
-// MEASURE=1: no clip. Run the same steps and note where the demo paints over time (both
-// themes), so frame.mjs can center the frame on the demo at rest and fit everything it shows.
 const MEASURE = Boolean(process.env.MEASURE);
 
-// Turn a still's pose into timed video steps when poses.json gives no video.steps:
-// waits become gaps (capped), actions keep their order, and the pointer leaves at the end.
 function timeline(cfg) {
   if (cfg.video?.steps) return cfg.video.steps;
   const out = [];
@@ -40,8 +28,6 @@ function timeline(cfg) {
   return out;
 }
 
-// Page clocks running k times slower: timers, animation frames, Date, performance and
-// (through CDP) CSS and Web Animations. Used when Chrome paints the demo too slowly here.
 const slowClock = (k) => `(() => {
   const k = ${k}, pn = performance.now.bind(performance), p0 = pn(), dn = Date.now, d0 = dn();
   performance.now = () => p0 + (pn() - p0) / k;
@@ -62,14 +48,12 @@ async function record(browser, d, theme, slow) {
   const f = r.frame, zoom = r.zoom ?? 1;
   const steps = timeline(cfg);
   const pointer = v.cursor ?? steps.some((s) => Object.keys(s).some((x) => POINTER.has(x)));
-  // Pointer size in CSS px, so it shows at about the same size in every clip.
   const cursor = pointer && !MEASURE ? Math.round(Math.max(12, (20 * f.width) / 640)) : 0;
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: MEASURE ? 1 : 2, colorScheme: theme, reducedMotion: "no-preference" });
   if (k !== 1) await ctx.addInitScript(slowClock(k));
   const p = await ctx.newPage();
   const cdp = await ctx.newCDPSession(p);
   if (MIRROR) await p.route(/^https?:\/\/(?!localhost)/, async (route) => {
-    // Video embeds cannot load here; show the black of a player that is still loading.
     if (/^https:\/\/www\.youtube\.com\/embed\//.test(route.request().url())) return route.fulfill({ contentType: "text/html", body: "<body style='margin:0;background:#000'></body>" });
     const hit = MIRROR[route.request().url()];
     if (hit) return route.fulfill({ path: `mirror/${hit.file}`, contentType: hit.type, headers: { "access-control-allow-origin": "*" } });
@@ -88,7 +72,6 @@ async function record(browser, d, theme, slow) {
     await p.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
     await p.waitForTimeout(400 * k);
 
-    // Frame-relative points: [0, 0] is the clip's top left, [1, 1] its bottom right.
     const at = ([fx, fy]) => [Math.min(1279, Math.max(0, f.x + fx * f.width)), Math.min(799, Math.max(0, f.y + fy * f.height))];
     const mouse = { x: 0, y: 0 };
     const jump = async (x, y) => { mouse.x = x; mouse.y = y; await p.mouse.move(x, y); };
@@ -99,8 +82,6 @@ async function record(browser, d, theme, slow) {
     }
     await p.waitForTimeout((v.lead ?? 0) * k);
 
-    // The pointer glides with an ease, so it reads as a hand. Each move goes where the pointer
-    // should be by now: screenshots slow the moves down, but not the glide.
     const glide = async (x, y, ms = 650) => {
       const x0 = mouse.x, y0 = mouse.y, g0 = Date.now(), dur = ms * k;
       for (;;) {
@@ -142,7 +123,6 @@ async function record(browser, d, theme, slow) {
         if (s.down) await p.mouse.down();
         if (s.up) await p.mouse.up();
         if (s.scroll) {
-          // Wheel steps on the same clock: each one brings the total to where it should be by now.
           const dur = (ms ?? 600) * k, g0 = Date.now();
           let done = 0;
           for (;;) {
@@ -161,8 +141,6 @@ async function record(browser, d, theme, slow) {
         }
       }
     })();
-    // A screenshot clip is in page coordinates, so when a step may scroll the page, grab the
-    // whole viewport (what is on screen) and cut the frame out of it afterwards.
     const pageScroll = steps.some((s) => s.scroll || s.eval);
     if (MEASURE) {
       const samples = [];
@@ -185,7 +163,6 @@ async function record(browser, d, theme, slow) {
     await actions;
     const fps = grabbed.length / seconds;
     const force = v.force || process.env.FORCE;
-    // In slow motion the frames are resampled anyway; 12 a second of clip time is smooth enough.
     if (fps < (k > 1 ? 12 : 18) && !force) return { skip: "slow", fps: +fps.toFixed(1), k };
     const total = Math.floor(seconds * FPS);
     const frames = [];
@@ -194,9 +171,7 @@ async function record(browser, d, theme, slow) {
       while (j + 1 < grabbed.length && grabbed[j + 1].t <= (i * 1000) / FPS) j++;
       frames.push(grabbed[j].data);
     }
-    // A ping-pong clip plays forward then back, so a slow drift loops without a jump.
     if (v.pingpong) frames.push(...frames.slice(1, -1).reverse());
-    // Device pixels per CSS pixel in the viewport shots, read from the first one.
     const dpr = pageScroll ? (await sharp(Buffer.from(frames[0], "base64")).metadata()).width / 1280 : 1;
     const cut = { left: Math.round(f.x * dpr), top: Math.round(f.y * dpr) };
     Object.assign(cut, { width: Math.min(Math.round(f.width * dpr), Math.round(1280 * dpr) - cut.left), height: Math.min(Math.round(f.height * dpr), Math.round(800 * dpr) - cut.top) });
@@ -205,17 +180,13 @@ async function record(browser, d, theme, slow) {
       if (pageScroll) await sharp(Buffer.from(data, "base64")).extract(cut).resize(W, H).jpeg({ quality: 92 }).toFile(file);
       else writeFileSync(file, Buffer.from(data, "base64"));
     }
-    // Share of pixels that change between sampled frames; thin moving lines count too.
     const raw = async (i) => sharp(`${dir}/${String(i).padStart(4, "0")}.jpg`).resize(320, 200).greyscale().raw().toBuffer();
     const idx = [0, 0.2, 0.4, 0.6, 0.8, 0.99].map((x) => Math.floor(x * (frames.length - 1)));
     const bufs = await Promise.all(idx.map(raw));
     let motion = 0;
     for (let x = 1; x < bufs.length; x++) { let n = 0; for (let i = 0; i < bufs[x].length; i++) if (Math.abs(bufs[x][i] - bufs[x - 1][i]) > 10) n++; motion = Math.max(motion, n / bufs[x].length); }
     if (motion < 0.0008 && !force) return { skip: "static", motion };
-    // A skipped clip keeps the last good one; a new clip replaces it only once it is encoded.
     const out = `${OUT}/${d.name}-${theme}.mp4`;
-    // Cards loop these clips, so keep each one light: a clip over 600 KB (photos, full-frame
-    // gradients) is encoded again smaller, at 960x600 and a higher CRF.
     for (const [crf, w, h] of [[20, W, H], [26, 960, 600], [30, 960, 600]]) {
       execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", `${dir}/%04d.jpg`, "-vf", `scale=${w}:${h}:flags=lanczos,format=yuv420p`, "-c:v", "libx264", "-preset", "slow", "-crf", String(crf), "-movflags", "+faststart", "-an", `${dir}/clip.mp4`]);
       if (statSync(`${dir}/clip.mp4`).size <= 600 * 1024) break;
@@ -236,7 +207,6 @@ await Promise.all(Array.from({ length: Number(process.env.JOBS || 3) }, async ()
     try {
       let r = await record(browser, d, theme);
       if (MEASURE) { vreport[`${d.name}|${theme}`] = r; console.log(d.name, theme, r.samples?.length ?? JSON.stringify(r)); continue; }
-      // Too slow to paint here: record again in slow motion, fast enough for 24+ fps.
       if (r.skip === "slow") r = await record(browser, d, theme, Math.min(12, Math.ceil(22 / Math.max(r.fps, 1))));
       vreport[`${d.name}|${theme}`] = r;
       console.log(d.name, theme, JSON.stringify(r));

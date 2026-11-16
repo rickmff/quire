@@ -36,6 +36,20 @@ python3 frame.py magicui --write                   # then capture and record tho
 node publish.mjs .. magicui animate-ui             # copy into public/previews and the catalog
 ```
 
+Environment variables:
+
+| Variable | Used by | What it does |
+| --- | --- | --- |
+| `REG_LOCAL_MAGICUI`, `REG_LOCAL_ANIMATE_UI` | `install.mjs` | Local checkout of a library's `public/r` registry folder, read before GitHub |
+| `REG_CACHE` | `install.mjs` | Where registry files are cached (default `/tmp/quire-reg`) |
+| `JOBS` | `capture.mjs`, `video.mjs` | Components processed at once (default 3) |
+| `MEASURE=1` | `video.mjs` | Measure where each clip paints instead of recording it (see Framing) |
+| `FORCE=1` | `video.mjs` | Keep every clip, even one that barely moves |
+| `DEBUG=1` | `video.mjs` | Print when each step starts |
+| `REPORT` | `frame.py` | The capture report to compare frames with (default `out/<library>/report.json`) |
+
+`setup.sh` pins `lucide-react@0.577.0` for Animate UI: lucide-react 1.x dropped the brand icons its demos use.
+
 `capture.mjs` and `video.mjs` take component names after the output folder to
 redo only those. Look at `out/<library>/*.thumb.png` before publishing
 (`python3 sheet.py <library> <light|dark>` makes contact sheets).

@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "opennextjs-cloudflare build",
     "start": "next start",
-    "build:next": "next build"
+    "build:next": "next build",
+    "check:comments": "node scripts/check-comments.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

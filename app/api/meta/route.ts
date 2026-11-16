@@ -59,7 +59,6 @@ export async function GET(req: Request) {
       }
     }
   } catch {
-    // Network errors fall through to a URL-only card.
   }
 
   if (!title) title = titleFromUrl(u.href);

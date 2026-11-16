@@ -1,12 +1,3 @@
-// Builds lib/catalog/data.json: the curated starter library.
-//
-//   node scripts/build-catalog.ts            all sources
-//   node scripts/build-catalog.ts magicui    one source (merged into the existing file)
-//
-// Reads each source's GitHub repo with a blobless clone (no API token needed),
-// so it runs locally and in CI. Live registries on the sites are tried first
-// for sources without a repo.
-
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -88,7 +79,6 @@ function entry(src: Source, raw: {
   };
 }
 
-// React Bits: map each component to its docs category from the site's sidebar.
 function reactBitsCategories(show: (p: string) => string) {
   const map = new Map<string, string>();
   try {
@@ -100,8 +90,6 @@ function reactBitsCategories(show: (p: string) => string) {
   return map;
 }
 
-// Preview images and clips that libraries keep in their repos
-// (covers, og images, previews), indexed by a normalized base name.
 const MEDIA_DIR = /(^|\/)(og|covers?|previews?|thumbs?|thumbnails|screenshots?|posters?)(\/|$)/i;
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -175,7 +163,6 @@ async function build(src: Source): Promise<CatalogComponent[]> {
     const reg = JSON.parse(show(src.path!));
     const items: any[] = Array.isArray(reg) ? reg : reg.items ?? [];
     const cats = src.id === "reactbits" ? reactBitsCategories(show) : null;
-    // Group variants of one component and keep the preferred one.
     const picked = new Map<string, any>();
     const rank = (n: string) => {
       const i = (src.prefer ?? []).findIndex((suf) => n.endsWith(suf));
@@ -199,14 +186,12 @@ async function build(src: Source): Promise<CatalogComponent[]> {
         dependencies: i.dependencies,
         files: paths.map((p: string) => resolve(p, src.pathHint?.(i.name))).filter(Boolean) as string[],
       });
-      // Docs pages use the base name, not the variant.
       if (src.variant) c.docs = src.docs(base, category);
       out.push(withPreview(c, base));
     }
     return out;
   }
 
-  // mdx and pages: one docs file per component.
   const out: CatalogComponent[] = [];
   for (const f of files) {
     const m = f.match(src.pattern!);
@@ -256,8 +241,6 @@ for (const src of SOURCES) {
   }
 }
 
-// Previews rendered on the Quire stage (stage/) win over a library's own
-// media: the same framing, size and themes for every card.
 const STAGE = join(ROOT, "lib/catalog/stage.json");
 if (existsSync(STAGE)) {
   type Shot = { image?: string; imageDark?: string; video?: string; videoDark?: string; live?: CatalogComponent["live"] };
@@ -273,8 +256,6 @@ if (existsSync(STAGE)) {
   }
 }
 
-// Previews recorded by the capture service (scripts/capture-catalog.ts) fill
-// in where a component has none yet.
 const CAPTURES = join(ROOT, "lib/catalog/captures.json");
 if (existsSync(CAPTURES)) {
   const shots: Record<string, { image?: string; video?: string }> = JSON.parse(readFileSync(CAPTURES, "utf8"));

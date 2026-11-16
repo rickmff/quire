@@ -3,10 +3,6 @@ import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { triggerById } from "./motion";
 import { readSource } from "./source";
 
-// A Model Context Protocol server over Streamable HTTP, without an SDK.
-// It answers JSON-RPC with plain JSON responses (no SSE stream), which the
-// spec allows and every major client accepts. Every tool is read-only.
-
 const VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 
 export const MOTION_GUIDANCE =
@@ -108,7 +104,6 @@ async function callTool(name: string, args: any, ctx: Ctx) {
       const per = Math.max(1, Math.min(Number(args?.perType) || 4, 8));
       const read = readBrief(brief);
       const trigger = read.triggers[0];
-      // Spread references across sites: at most two from one library.
       const spread = (list: CatalogComponent[]) => {
         const seen = new Map<string, number>();
         return list.filter((c) => {

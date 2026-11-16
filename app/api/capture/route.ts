@@ -1,9 +1,6 @@
 import { capture, captureEnabled } from "@/lib/capture";
 import { safeUrl } from "@/lib/net";
 
-// Preview for a component the user added by link: a still and a short clip,
-// recorded by the capture service. 404 when no capture service is configured.
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;

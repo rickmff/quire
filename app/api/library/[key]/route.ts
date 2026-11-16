@@ -1,8 +1,6 @@
 import { cleanLibrary, KEY_RE, loadLibrary, saveLibrary } from "@/lib/sync";
 import { kv } from "@/lib/kv";
 
-// The browser pushes its library here so the MCP can read it.
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 

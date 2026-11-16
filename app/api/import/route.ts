@@ -4,12 +4,6 @@ import { classify } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-// Reads a component site (e.g. https://www.rareui.com/components) and returns
-// every component it lists. It tries the most structured source first:
-//   1. a shadcn registry (registry.json): names, descriptions, install commands
-//   2. links on the page, under the page's path, grouped by the page headings
-//   3. sitemap.xml, under the page's path
-
 export type ImportItem = {
   url: string;
   title: string;
@@ -58,7 +52,6 @@ function decode(s: string) {
     .trim();
 }
 
-// Collect links under the page's path, each with the heading above it.
 function scanLinks(html: string, page: URL) {
   const base = page.pathname.replace(/\/$/, "").replace(/(\/index)?\.html?$/, "");
   const found = new Map<string, { url: string; title: string; category?: string }>();
@@ -66,7 +59,6 @@ function scanLinks(html: string, page: URL) {
   const re = /<h([1-4])[^>]*>([\s\S]*?)<\/h\1>|<a\b[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   for (const m of html.matchAll(re)) {
     if (m[2] !== undefined) {
-      // Drop counters such as "Inputs [6]" or "Inputs (6)".
       heading = decode(m[2]).replace(/[\[(]\s*\d+\s*[\])]/g, "").trim() || heading;
       continue;
     }
@@ -85,7 +77,6 @@ function scanLinks(html: string, page: URL) {
     const text = decode(m[4]).replace(/\bnew\b$/i, "").trim();
     const prev = found.get(key);
     if (prev) {
-      // Keep the first real category; "New releases" style headings repeat items.
       if (prev.category && /new|latest|recent|featured|popular/i.test(prev.category)) prev.category = heading;
       continue;
     }
@@ -121,7 +112,6 @@ async function registryIndex() {
 
 type Found = { registry: Registry; install: (name: string) => string; ref: (name: string) => string };
 
-// Look for a registry.json that belongs to this site.
 async function findRegistry(page: URL, html: string, extraHtml: () => Promise<string>): Promise<Found | null> {
   const host = page.hostname.replace(/^www\./, "");
   const tryRegistry = async (url: string) => {
@@ -129,7 +119,6 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
     return r && Array.isArray(r.items) && r.items.length ? r : null;
   };
 
-  // a) Listed in the public shadcn registry index.
   const entry = (await registryIndex()).find((e) => {
     try {
       return e.homepage && new URL(e.homepage).hostname.replace(/^www\./, "") === host;
@@ -145,8 +134,6 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
     }
   }
 
-  // b) A registry hosted on GitHub, referenced by the site:
-  //    "npx shadcn add owner/repo/name" or raw.githubusercontent.com/owner/repo/branch/...
   const scan = async (text: string) => {
     const gh =
       text.match(/raw\.githubusercontent\.com\/([\w.-]+)\/([\w.-]+)\/([\w.-]+)\//) ??
@@ -162,7 +149,6 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
   const viaHtml = (await scan(html)) ?? (await scan(await extraHtml()));
   if (viaHtml) return viaHtml;
 
-  // c) The conventional location on the site itself.
   for (const p of ["/r/registry.json", "/registry.json"]) {
     const r = await tryRegistry(new URL(p, page).href);
     if (r) {
@@ -191,7 +177,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // Component pages often carry the install command the index page lacks.
   const extraHtml = async () => {
     const first = links[0]?.url;
     if (!first) return "";

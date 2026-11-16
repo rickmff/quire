@@ -1,6 +1,3 @@
-// Known component libraries: detect the source library from a URL and,
-// where the library publishes a shadcn registry, derive the install command.
-
 export type LibraryMatch = { library: string; install?: string };
 
 type Rule = {

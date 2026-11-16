@@ -112,7 +112,7 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 - `npm run build` runs `opennextjs-cloudflare build`, which calls `npm run build:next` and writes the worker to `.open-next/`.
 - [`wrangler.jsonc`](wrangler.jsonc) points the worker at `.open-next/worker.js` and serves static files (including `public/`) from the `ASSETS` binding.
 - Cloudflare Workers Builds deploys `main` to [quire.fyi](https://quire.fyi) and builds a preview for every other branch.
-- [CI](.github/workflows/ci.yml) runs on every pull request and on pushes to `main`: `npm ci`, `tsc --noEmit` and the OpenNext build, on Node 24 like Workers Builds.
+- [CI](.github/workflows/ci.yml) runs on every pull request and on pushes to `main`: `npm ci`, the comment check, `tsc --noEmit` and the OpenNext build, on Node 24 like Workers Builds.
 
 `package-lock.json` must install on Linux. If you regenerate it on Windows or macOS, check that `npm ci` still passes in CI.
 
@@ -124,7 +124,9 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 
 Issues and pull requests are welcome. For a large change, open an issue first to discuss it.
 
-When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing; and draw the transitions in a comment above the state. Examples: `lib/useIntro.ts` (the /app entrance), `useCardLive` in `components/Gallery.tsx` (a card's live demo), `SidebarEdit` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
+The code has no comments. Names, types and small functions carry the meaning, and what the code cannot show goes in [docs/architecture.md](docs/architecture.md) or the README of its folder. `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
+
+When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing; and draw the transitions in [docs/architecture.md](docs/architecture.md). Examples: `lib/useIntro.ts` (the /app entrance), `useCardLive` in `components/Gallery.tsx` (a card's live demo), `SidebarEdit` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
 
 ## License
 

@@ -1,7 +1,3 @@
-// Second axis of the taxonomy: what makes a component move.
-// The type says what a component is (button, navbar). The trigger says when
-// it animates (on hover, on scroll). Agents look for both.
-
 export type Trigger = { id: string; name: string; re: RegExp };
 
 export const TRIGGERS: Trigger[] = [
@@ -32,7 +28,6 @@ export function techFrom(deps: string[] = []): string[] {
   return [...out];
 }
 
-// Text first (the component name is the strongest signal), then description.
 export function triggersFor(input: { title?: string; name?: string; description?: string; category?: string }): string[] {
   const text = [input.title, input.name, input.category, input.description]
     .filter(Boolean)
