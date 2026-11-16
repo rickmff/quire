@@ -7,16 +7,12 @@ import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
-import { SearchIcon } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { deal } from "@/lib/deal";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
 
 const PAGE = 48;
-// Radix Select has no empty value, so "no filter" gets its own.
-const ALL = "__all";
 
 export function Gallery({
   items,
@@ -48,44 +44,19 @@ export function Gallery({
   intro?: boolean;
   onDeal?: (ms: number) => void;
 }) {
-  const [q, setQ] = useState("");
   const [trigger, setTrigger] = useState<string | null>(null);
-  const [library, setLibrary] = useState<string | null>(null);
-  const [type, setType] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
   const more = useRef<HTMLDivElement>(null);
 
   const libName = useMemo(() => new Map(libraries.map((l) => [l.id, l.name])), [libraries]);
   const nameOf = (i: GalleryItem) => i.site ?? libName.get(i.library) ?? i.library;
 
-  const filtered = useMemo(() => {
-    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-    return items.filter((i) => {
-      if (trigger && !i.triggers.includes(trigger)) return false;
-      if (library && i.library !== library) return false;
-      if (type && i.type !== type) return false;
-      if (!words.length) return true;
-      const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${nameOf(i)} ${i.tech.join(" ")}`.toLowerCase();
-      return words.every((w) => hay.includes(w));
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, trigger, library, type]);
-
-  const typeCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const i of items) m.set(i.type, (m.get(i.type) ?? 0) + 1);
-    return [...m].sort((a, b) => b[1] - a[1]);
-  }, [items]);
+  const filtered = useMemo(() => (trigger ? items.filter((i) => i.triggers.includes(trigger)) : items), [items, trigger]);
 
   const triggerCounts = useMemo(() => {
     const m = new Map<string, number>();
     for (const i of items) for (const t of i.triggers) m.set(t, (m.get(t) ?? 0) + 1);
     return m;
-  }, [items]);
-  const libCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const i of items) m.set(i.library, (m.get(i.library) ?? 0) + 1);
-    return [...m].sort((a, b) => b[1] - a[1]);
   }, [items]);
 
   // Starring moves a card to the top. Measure every card before the change,
@@ -133,8 +104,7 @@ export function Gallery({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intro, items, sections]);
 
-  useEffect(() => setShown(PAGE), [items, q, trigger, library, type]);
-  useEffect(() => setType(null), [items]);
+  useEffect(() => setShown(PAGE), [items, trigger]);
   useEffect(() => {
     const el = more.current;
     if (!el) return;
@@ -145,61 +115,13 @@ export function Gallery({
 
   return (
     <section ref={root}>
-      {/* Title, filters and interaction chips stay pinned under the top bar. */}
+      {/* Title and interaction chips stay pinned under the top bar. */}
       <div data-chrome style={{ "--d": "120ms" } as React.CSSProperties} className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
-      <div className="flex h-12 items-center justify-between gap-4">
+      <div className="flex h-12 items-center">
         <h1 className="flex items-baseline gap-2">
           <span className="font-medium">{title}</span>
           <span className="text-faint tabular-nums">{filtered.length || ""}</span>
         </h1>
-        <div className="flex items-center gap-1">
-          <label className="relative flex h-7 items-center rounded-md text-faint transition-colors focus-within:bg-field-focus focus-within:text-fg hover:bg-hover">
-            <SearchIcon className="pointer-events-none absolute left-2 size-3.5 opacity-70" aria-hidden />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Filter"
-              aria-label="Filter components"
-              className="h-7 w-24 bg-transparent pr-2 pl-7 text-[12px] text-fg outline-none transition-[width] duration-200 placeholder:text-faint focus:w-44"
-            />
-          </label>
-          {libCounts.length <= 1 && typeCounts.length > 1 && (
-            <Select value={type ?? ALL} onValueChange={(v) => setType(v === ALL ? null : v)}>
-              <SelectTrigger aria-label="Filter by type" className={type ? "text-fg" : undefined}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL} hint={items.length}>
-                  All types
-                </SelectItem>
-                <SelectSeparator />
-                {typeCounts.map(([id, n]) => (
-                  <SelectItem key={id} value={id} hint={n}>
-                    {typeById(id).name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          {libCounts.length > 1 && (
-            <Select value={library ?? ALL} onValueChange={(v) => setLibrary(v === ALL ? null : v)}>
-              <SelectTrigger aria-label="Filter by site" className={library ? "text-fg" : undefined}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL} hint={items.length}>
-                  All sites
-                </SelectItem>
-                <SelectSeparator />
-                {libCounts.map(([id, n]) => (
-                  <SelectItem key={id} value={id} hint={n}>
-                    {libName.get(id) ?? id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
       </div>
 
       {triggerCounts.size > 1 && (
@@ -219,7 +141,7 @@ export function Gallery({
       )}
       </div>
 
-      {sections && !q && !trigger && !library && !type ? (
+      {sections && !trigger ? (
         <div className="flex flex-col gap-12">
           {sections.map((sec) => (
             <section key={sec.key}>
