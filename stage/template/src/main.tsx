@@ -70,13 +70,9 @@ if (q.get("cursor")) {
 
 // The clip starts from the demo's first frame: __remount() mounts it again, so entrances,
 // counters and typing play from the start instead of having finished during loading.
-function Stage() {
+function Stage({ Demo }: { Demo: any }) {
   const [run, setRun] = useState(0);
   useEffect(() => { w.__remount = () => { w.__ready = false; setRun((n) => n + 1); }; }, []);
-  // v=<example>: another example of the component (variants.mjs); p=<json>: props picked in the
-  // gallery's variants menu, over the demo's own defaults.
-  const c = q.get("c") || "", v = q.get("v");
-  const Demo = demos[v ? `${c}~${v}` : c] ?? demos[c];
   let picked = {};
   try { picked = JSON.parse(q.get("p") || "{}"); } catch {}
   return (
@@ -84,8 +80,17 @@ function Stage() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+// v=<example>: another example of the component (install.mjs); p=<json>: props picked in the
+// gallery's variants menu, over the demo's own defaults.
+const c = q.get("c") || "", v = q.get("v");
+const load = (v && demos[`${c}~${v}`]) || demos[c];
+// The demo's module loads before the first render. A lazy component would suspend instead, and
+// React holds a revealed Suspense boundary back up to 300 ms, which the live card waits through.
+const pick = (m: any) => m.default ?? Object.values(m).find((x) => typeof x === "function");
+const render = (Demo: any) => createRoot(document.getElementById("root")!).render(
   <ThemeProvider attribute="class" forcedTheme={q.get("freetheme") ? undefined : theme} defaultTheme={theme} storageKey={`stage-theme-${theme}`} enableSystem={false}>
-    <div id="stage"><div id="subject"><Stage /></div></div>
+    <div id="stage"><div id="subject"><Stage Demo={Demo} /></div></div>
   </ThemeProvider>
 );
+if (load) load().then((m) => render(pick(m)), (e) => { w.__errors.push(String(e?.message || e)); render(() => { throw e; }); });
+else render(null);

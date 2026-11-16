@@ -1,0 +1,1 @@
+import{t as e}from"./animated-theme-toggler-0mmP3UGC.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`flex justify-center p-6`,children:(0,n.jsx)(e,{})})}export{r as default};

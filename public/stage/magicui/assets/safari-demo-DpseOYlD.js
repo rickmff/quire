@@ -1,1 +1,0 @@
-import{t as e}from"./safari-Ct2is-c_.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`w-[1203px]`,children:(0,n.jsx)(e,{url:`magicui.design`})})}export{r as default};

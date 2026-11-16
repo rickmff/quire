@@ -1,1 +1,0 @@
-import{t as e}from"./striped-pattern-ClFogFDi.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg border`,children:(0,n.jsx)(e,{className:`[mask-image:radial-gradient(300px_circle_at_center,white,transparent)]`})})}export{r as default};

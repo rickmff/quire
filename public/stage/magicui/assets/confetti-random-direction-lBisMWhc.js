@@ -1,0 +1,1 @@
+import{n as e}from"./confetti-CXFt8q4d.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`relative`,children:(0,n.jsx)(e,{options:{get angle(){return Math.random()*360}},children:`Random Confetti 🎉`})})}export{r as default};

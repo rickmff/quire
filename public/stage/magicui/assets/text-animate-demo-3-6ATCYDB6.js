@@ -1,0 +1,1 @@
+import{t as e}from"./text-animate-CWA28MP5.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(e,{animation:`slideUp`,by:`word`,children:`Slide up by word`})}export{r as default};

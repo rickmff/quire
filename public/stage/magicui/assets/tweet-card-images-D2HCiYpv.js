@@ -1,0 +1,1 @@
+import{t as e}from"./client-tweet-card-rCJS6G1r.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(e,{id:`1678577280489234432`,className:`shadow-2xl`})}export{r as default};

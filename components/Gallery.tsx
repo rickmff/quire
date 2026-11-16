@@ -299,11 +299,11 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
 // to fit, so it lines up with the clip under it. It fades in once the demo has mounted.
 // card: the frame runs in a gallery card, where nothing in it reaches the card.
 // picked: the variants chosen in the gear menu, which the stage page takes as v= and p=.
-function LiveDemo({ live, title, onEscape, card, picked }: { live: Live; title: string; onEscape?: () => void; card?: boolean; picked?: Picked }) {
+function LiveDemo({ live, title, onEscape, onReady, card, picked }: { live: Live; title: string; onEscape?: () => void; onReady?: () => void; card?: boolean; picked?: Picked }) {
   const dark = useDark();
   const base = (dark && live.srcDark) || live.src;
   const src = `${base}${card ? "&card=1" : ""}${variantQuery(live.variants, picked)}`;
-  return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} />;
+  return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} onReady={onReady} />;
 }
 
 // Variants: other examples of a component (v, Magic UI) or its docs controls (Animate UI props).
@@ -458,33 +458,60 @@ export function VariantsMenu({ groups, picked, onPick, onOpenChange, always }: {
   );
 }
 
-// A card runs its component live while the mouse rests on it, so it can be hovered, clicked,
+// A card runs its component live as soon as the mouse means it, so it can be hovered, clicked,
 // dragged and typed in right in the grid. The clip loops until then and comes back when the
 // mouse leaves. Only one card runs live at a time, so 160+ cards stay light.
+// Intent: the mouse enters slowly, slows down on the card, stops on it, or stays on it for
+// 300 ms. A pass across the grid is fast and starts nothing; a demo that has not shown yet when
+// the mouse leaves is dropped at once, so a pass never flashes one.
 // hold: the variants menu is open, so the demo stays live while the mouse is on the menu.
 // The enter and leave events are the page's own, not React's: the menu is a portal, outside the
 // card on the page but inside it in React, and leaving the card for the menu must count.
 let liveCard: (() => void) | undefined;
 type Point = { x: number; y: number };
+// The mouse's speed in px/ms, smoothed, from one listener for the whole page.
+const pointer = { x: 0, y: 0, t: 0, v: Infinity, on: false };
+function trackPointer() {
+  if (pointer.on) return;
+  pointer.on = true;
+  document.addEventListener("pointermove", (e) => {
+    const dt = e.timeStamp - pointer.t;
+    const d = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
+    // After a pause, the first move's distance is what it covered in about one frame.
+    pointer.v = dt > 100 ? d / 16 : dt > 0 ? pointer.v * 0.5 + (d / dt) * 0.5 : pointer.v;
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.t = e.timeStamp;
+  }, { passive: true, capture: true });
+}
+const SLOW = 0.35; // px/ms: slower than a pass across the grid
+const REST = 50; // ms without a move: the mouse stopped
+const DWELL = 300; // ms on the card: it is meant, however the mouse moves
 function useCardLive(enabled: boolean) {
   const [on, setOn] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const wait = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const state = useRef({ inside: false, held: false });
+  const dwell = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // shown: the demo is ready and on screen.
+  const state = useRef({ inside: false, held: false, shown: false });
   const [fns] = useState(() => {
-    const stop = () => setOn(false);
+    const stop = () => { state.current.shown = false; setOn(false); };
     const start = () => {
+      clearTimeout(wait.current);
+      clearTimeout(dwell.current);
       if (liveCard !== stop) liveCard?.();
       liveCard = stop;
       setOn(true);
     };
     const end = () => {
       clearTimeout(wait.current);
-      wait.current = setTimeout(() => {
+      clearTimeout(dwell.current);
+      const off = () => {
         if (state.current.held || state.current.inside) return;
         if (liveCard === stop) liveCard = undefined;
-        setOn(false);
-      }, 250);
+        stop();
+      };
+      // Not on screen yet: drop it now. On screen: a short grace, so a slip past the edge keeps it.
+      if (!state.current.shown) return off();
+      wait.current = setTimeout(off, 250);
     };
     // Near: on the card or within the variants ring around its corner.
     const near = (at: Point, m = 150) => {
@@ -505,13 +532,24 @@ function useCardLive(enabled: boolean) {
     const el = ref.current;
     if (!el || !enabled) return;
     const { start, end, stop, watch } = fns;
-    // A pass of the mouse across the grid does not start a demo; a short rest does.
+    trackPointer();
+    // Start now when the mouse comes in slowly; else when it slows down or stops on the card.
     const enter = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       state.current.inside = true;
       document.removeEventListener("pointermove", watch);
       clearTimeout(wait.current);
-      wait.current = setTimeout(start, 140);
+      clearTimeout(dwell.current);
+      // The page saw no move for a while (the mouse was over a live demo's frame): wait for one.
+      if (e.timeStamp - pointer.t < 100 && pointer.v < SLOW) return start();
+      wait.current = setTimeout(start, REST);
+      dwell.current = setTimeout(start, DWELL);
+    };
+    const move = (e: PointerEvent) => {
+      if (e.pointerType === "touch" || !state.current.inside || liveCard === stop) return;
+      clearTimeout(wait.current);
+      if (pointer.v < SLOW) return start();
+      wait.current = setTimeout(start, REST);
     };
     // A short grace, so a slip past the edge keeps the demo as it is.
     const leave = () => {
@@ -519,18 +557,23 @@ function useCardLive(enabled: boolean) {
       end();
     };
     el.addEventListener("pointerenter", enter);
+    el.addEventListener("pointermove", move, { passive: true });
     el.addEventListener("pointerleave", leave);
     return () => {
       el.removeEventListener("pointerenter", enter);
+      el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerleave", leave);
       document.removeEventListener("pointermove", watch);
       clearTimeout(wait.current);
+      clearTimeout(dwell.current);
       if (liveCard === stop) liveCard = undefined;
     };
   }, [enabled, fns]);
   return {
     on: enabled && on,
     ref,
+    // The demo is ready and fades in.
+    ready: () => { state.current.shown = true; },
     // at: where the mouse is when the menu closes.
     hold: (held: boolean, at?: Point) => {
       state.current.held = held;
@@ -543,18 +586,20 @@ function useCardLive(enabled: boolean) {
   };
 }
 
-function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void }) {
+function LiveFrame({ src, frame, view, title, onEscape, onReady }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void; onReady?: () => void }) {
   const box = useRef<HTMLDivElement>(null);
   const win = useRef<HTMLIFrameElement>(null);
   const [scale, setScale] = useState(0);
   const [ready, setReady] = useState(false);
   const [x, y, w] = frame;
-  const events = useRef({ onEscape });
-  events.current = { onEscape };
+  const events = useRef({ onEscape, onReady });
+  events.current = { onEscape, onReady };
 
-  useEffect(() => {
+  // Measured before paint, so the frame starts loading in the same commit as the box.
+  useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
+    setScale(el.clientWidth / w);
     const ro = new ResizeObserver(() => setScale(el.clientWidth / w));
     ro.observe(el);
     return () => ro.disconnect();
@@ -562,7 +607,7 @@ function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: 
   useEffect(() => {
     const on = (e: MessageEvent) => {
       if (e.origin !== location.origin || e.source !== win.current?.contentWindow || e.data?.source !== "quire-stage") return;
-      if (e.data.event === "ready") setReady(true);
+      if (e.data.event === "ready") { setReady(true); events.current.onReady?.(); }
       if (e.data.event === "escape") events.current.onEscape?.();
     };
     window.addEventListener("message", on);
@@ -570,7 +615,7 @@ function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: 
   }, []);
 
   return (
-    <div ref={box} className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+    <div ref={box} className={`absolute inset-0 overflow-hidden transition-opacity duration-150 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}>
       {scale > 0 && (
         <iframe
           ref={win}
@@ -611,7 +656,7 @@ function ComponentCard({
         {/* The preview runs the component live under the mouse; the corner icon opens the details. */}
         <div className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
-          {live.on && item.live && <LiveDemo live={item.live} title={item.title} card picked={picked} />}
+          {live.on && item.live && <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={live.ready} />}
         </div>
         {item.live?.variants && <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} onOpenChange={live.hold} />}
         <OpenDetails onClick={onOpen} />

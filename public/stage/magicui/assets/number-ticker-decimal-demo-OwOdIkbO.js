@@ -1,0 +1,1 @@
+import{t as e}from"./number-ticker-BJi8y8-e.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(e,{value:5.67,decimalPlaces:2,className:`text-8xl font-medium tracking-tighter whitespace-pre-wrap text-black dark:text-white`})}export{r as default};

@@ -1,1 +1,0 @@
-import{a as e,k as t,t as n}from"./MotionConfigContext-DNnJMMu3.js";import{a as r,c as i}from"./index-BzrXL0dO.js";var a=i(r(),1);function o(r){let i=t(()=>e(r)),{isStatic:o}=(0,a.useContext)(n);if(o){let[,e]=(0,a.useState)(r);(0,a.useEffect)(()=>i.on(`change`,e),[])}return i}export{o as t};

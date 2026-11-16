@@ -1,1 +1,0 @@
-import{t as e}from"./typing-animation-BoJ5o4Wk.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{words:[`Fast typing`,`Slow delete`],typeSpeed:50,deleteSpeed:150,pauseDelay:2e3,loop:!0})}export{r as default};

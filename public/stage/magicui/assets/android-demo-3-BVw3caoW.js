@@ -1,1 +1,0 @@
-import{t as e}from"./android-MlpD2QbC.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`relative`,children:(0,n.jsx)(e,{className:`size-full`,videoSrc:`https://videos.pexels.com/video-files/14993748/14993748-uhd_1296_2304_30fps.mp4`})})}export{r as default};

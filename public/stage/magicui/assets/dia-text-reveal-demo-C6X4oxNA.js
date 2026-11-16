@@ -1,1 +1,0 @@
-import{t as e}from"./dia-text-reveal-YABln7_w.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`flex min-h-64 items-center justify-center p-8`,children:(0,n.jsx)(e,{className:`text-4xl font-bold tracking-tight`,text:`Magic UI`,colors:[`#A97CF8`,`#F38CB8`,`#FDCC92`]})})}export{r as default};
