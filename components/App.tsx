@@ -953,6 +953,9 @@ function Sidebar(props: {
           onMouseLeave={settle}
           className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
         >
+          {/* First block: rows spaced like the gallery title and its chips row
+              (38px apart), and shifted so they share those lines. */}
+          <div className="contents md:flex md:flex-col md:gap-2.5 md:pt-1">
           {newCol !== null ? (
             <input
               autoFocus
@@ -980,6 +983,7 @@ function Sidebar(props: {
           )}
           <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
           <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
+          </div>
           {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
           {lib.collections.map((c) =>
             props.renaming === c.id ? (
