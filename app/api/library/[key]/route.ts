@@ -1,5 +1,6 @@
 import { cleanLibrary, KEY_RE, loadLibrary, saveLibrary } from "@/lib/sync";
 import { kv } from "@/lib/kv";
+import { rateLimited } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +16,8 @@ export async function GET(_: Request, { params }: Params) {
 }
 
 export async function PUT(req: Request, { params }: Params) {
+  const limited = rateLimited(req, "write");
+  if (limited) return limited;
   const { key } = await params;
   if (!KEY_RE.test(key)) return Response.json({ error: "bad-key" }, { status: 400 });
   if (!kv()) return Response.json({ error: "no-store" }, { status: 503 });
@@ -31,7 +34,8 @@ export async function PUT(req: Request, { params }: Params) {
   try {
     await saveLibrary(key, lib);
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 500 });
+    const tooLarge = (e as Error).message === "too-large";
+    return Response.json({ error: tooLarge ? "too-large" : "store-failed" }, { status: tooLarge ? 413 : 500 });
   }
   return Response.json({ ok: true, items: lib.items.length, sources: lib.sources.length, updatedAt: lib.updatedAt });
 }
