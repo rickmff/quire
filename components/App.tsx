@@ -77,12 +77,12 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), undo ? 4000 : 1600);
   }, []);
 
-  const removeBookmark = (id: string) => {
+  const removeBookmark = (id: string, msg = "Deleted") => {
     const idx = lib.bookmarks.findIndex((x) => x.id === id);
     const gone = lib.bookmarks[idx];
     if (!gone) return;
     update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== id) }));
-    flash("Deleted", () => {
+    flash(msg, () => {
       update((l) => {
         if (l.bookmarks.some((x) => x.id === gone.id)) return l;
         const next = [...l.bookmarks];
@@ -243,6 +243,13 @@ export default function App() {
       ],
     }));
     flash("Saved");
+  };
+
+  // The star on a card: saves the component, or removes the saved copy.
+  const toggleStar = (c: GalleryItem) => {
+    const id = c.saved ?? lib.bookmarks.find((b) => b.ref === c.id || b.url === c.docs)?.id;
+    if (id) removeBookmark(id, "Removed from Saved");
+    else saveFromCatalog(c);
   };
 
   const setFollowed = (next: Set<string>) => update((l) => ({ ...l, sources: [...next] }));
@@ -578,6 +585,7 @@ export default function App() {
               onSite={(key) => setView(`site:${key}`)}
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
+              onStar={toggleStar}
               empty={
                 <div className="mx-auto max-w-sm pt-20 text-center">
                   <p>Your library is empty.</p>

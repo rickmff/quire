@@ -20,6 +20,7 @@ export function Gallery({
   empty,
   sections,
   onSite,
+  onStar,
 }: {
   items: GalleryItem[];
   title: string;
@@ -29,6 +30,8 @@ export function Gallery({
   // Library view: one row of cards per library, each opening its own page.
   sections?: { key: string; name: string; items: GalleryItem[] }[];
   onSite?: (key: string) => void;
+  // Star on each card: saves the component to Saved, or removes it.
+  onStar?: (item: GalleryItem) => void;
 }) {
   const [q, setQ] = useState("");
   const [trigger, setTrigger] = useState<string | null>(null);
@@ -169,7 +172,7 @@ export function Gallery({
               <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {sec.items.slice(0, 4).map((i, n) => (
                   <div key={i.id} className={n === 3 ? "xl:hidden 2xl:block" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} />
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={onStar && (() => onStar(i))} />
                   </div>
                 ))}
               </div>
@@ -181,7 +184,7 @@ export function Gallery({
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} />
+            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={onStar && (() => onStar(i))} />
           ))}
         </div>
       )}
@@ -263,16 +266,48 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
   );
 }
 
-function ComponentCard({ item, site, onOpen }: { item: GalleryItem; site: string; onOpen: () => void }) {
+export function StarIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.75} strokeLinejoin="round" aria-hidden>
+      <path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z" />
+    </svg>
+  );
+}
+
+function ComponentCard({ item, site, onOpen, onStar }: { item: GalleryItem; site: string; onOpen: () => void; onStar?: () => void }) {
+  const starred = Boolean(item.saved);
   return (
     <article data-card={item.id} className="group pop">
-      <button
-        onClick={onOpen}
-        className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover text-left ring-1 ring-line ring-inset"
-        aria-label={`${item.title} from ${site}`}
-      >
-        <Preview item={item} site={site} />
-      </button>
+      <div className="relative">
+        <button
+          onClick={onOpen}
+          className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover text-left ring-1 ring-line ring-inset"
+          aria-label={`${item.title} from ${site}`}
+        >
+          <Preview item={item} site={site} />
+        </button>
+        {onStar && (
+          <button
+            type="button"
+            data-star
+            onClick={(e) => {
+              // The card opens on click; the star must not.
+              e.preventDefault();
+              e.stopPropagation();
+              onStar();
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-pressed={starred}
+            aria-label={starred ? `Remove ${item.title} from Saved` : `Save ${item.title}`}
+            title={starred ? "Remove from Saved" : "Save"}
+            className={`absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
+              starred ? "text-fg opacity-100" : "text-muted opacity-0 group-hover:opacity-100 hover:text-fg"
+            }`}
+          >
+            <StarIcon filled={starred} />
+          </button>
+        )}
+      </div>
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">
           <button onClick={onOpen} className="truncate text-left first-letter:uppercase">
@@ -282,7 +317,6 @@ function ComponentCard({ item, site, onOpen }: { item: GalleryItem; site: string
         </div>
         <p className="mt-0.5 truncate text-[12px] text-faint">
           {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
-          {item.saved && <span> · saved</span>}
         </p>
       </div>
     </article>
