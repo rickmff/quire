@@ -3,17 +3,7 @@
   --edge: rgb(0 0 0 / 0.07);
   --foil: 0.55;
   --floor: rgb(0 0 0 / 0.1);
-  /* Soft holographic washes, in the quire's foil hues, under the canvas. */
-  --wash-a: rgb(255 154 213 / 0.16);
-  --wash-b: rgb(154 196 255 / 0.2);
-  --wash-c: rgb(211 154 255 / 0.12);
-  --ink: linear-gradient(100deg, #b3438a, #7a54e8 50%, #2f7fd0);
   position: relative;
-  background:
-    radial-gradient(60% 50% at 12% 0%, var(--wash-a), transparent 70%),
-    radial-gradient(55% 55% at 100% 100%, var(--wash-b), transparent 70%),
-    radial-gradient(40% 40% at 50% 45%, var(--wash-c), transparent 75%),
-    var(--bg);
   height: 100dvh;
   overflow: hidden;
   display: grid;
@@ -26,10 +16,6 @@
     --edge: rgb(255 255 255 / 0.09);
     --foil: 0.42;
     --floor: rgb(170 150 255 / 0.12);
-    --wash-a: rgb(255 154 213 / 0.1);
-    --wash-b: rgb(110 150 255 / 0.15);
-    --wash-c: rgb(170 130 255 / 0.1);
-    --ink: linear-gradient(100deg, #ffa8dc, #d3a4ff 50%, #9ac4ff);
   }
 }
 .bar { position: relative; z-index: 1; pointer-events: none; display: flex; align-items: center; justify-content: space-between; color: var(--muted); }
