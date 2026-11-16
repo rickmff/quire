@@ -294,13 +294,55 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
 
 // The component itself, running on the Quire stage (public/stage/, built by stage/build.sh)
 // in a frame on this site's own origin. The frame lays the demo out at the size it was
-// captured at (live.view) and shows the part the stills show (live.frame), scaled to fit.
-// It fades in over the still once the demo has mounted.
-// Cards do not run it: their clips loop on their own and show the interaction already.
-function LiveDemo({ live, title, onEscape }: { live: Live; title: string; onEscape?: () => void }) {
+// captured at (live.view) and shows the part the stills and clips show (live.frame), scaled
+// to fit, so it lines up with the clip under it. It fades in once the demo has mounted.
+// card: the frame runs in a gallery card, where nothing in it reaches the card.
+function LiveDemo({ live, title, onEscape, card }: { live: Live; title: string; onEscape?: () => void; card?: boolean }) {
   const dark = useDark();
-  const src = (dark && live.srcDark) || live.src;
+  const base = (dark && live.srcDark) || live.src;
+  const src = card ? `${base}&card=1` : base;
   return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} />;
+}
+
+// A card runs its component live while the mouse rests on it, so it can be hovered, clicked,
+// dragged and typed in right in the grid. The clip loops until then and comes back when the
+// mouse leaves. Only one card runs live at a time, so 160+ cards stay light.
+let liveCard: (() => void) | undefined;
+function useCardLive(enabled: boolean) {
+  const [on, setOn] = useState(false);
+  const wait = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const stop = useRef(() => setOn(false)).current;
+  useEffect(
+    () => () => {
+      clearTimeout(wait.current);
+      if (liveCard === stop) liveCard = undefined;
+    },
+    [stop],
+  );
+  if (!enabled) return { on: false, handlers: {} };
+  return {
+    on,
+    handlers: {
+      // A pass of the mouse across the grid does not start a demo; a short rest does.
+      onPointerEnter: (e: React.PointerEvent) => {
+        if (e.pointerType === "touch") return;
+        clearTimeout(wait.current);
+        wait.current = setTimeout(() => {
+          if (liveCard !== stop) liveCard?.();
+          liveCard = stop;
+          setOn(true);
+        }, 140);
+      },
+      // A short grace, so a slip past the edge or onto the star keeps the demo as it is.
+      onPointerLeave: () => {
+        clearTimeout(wait.current);
+        wait.current = setTimeout(() => {
+          if (liveCard === stop) liveCard = undefined;
+          setOn(false);
+        }, 250);
+      },
+    },
+  };
 }
 
 function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void }) {
@@ -363,12 +405,14 @@ function ComponentCard({
   const starred = Boolean(item.saved);
   // Plays the pop and glint once, right after the user stars the card.
   const [pop, setPop] = useState(false);
+  const live = useCardLive(Boolean(item.live));
   return (
     <article data-card={item.id} className="group pop">
-      <div className="relative">
-        {/* The preview is only a picture; the corner icon opens the details. */}
-        <div className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
+      <div className="relative" {...live.handlers}>
+        {/* The preview runs the component live under the mouse; the corner icon opens the details. */}
+        <div className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
+          {live.on && item.live && <LiveDemo live={item.live} title={item.title} card />}
         </div>
         <OpenDetails onClick={onOpen} />
         {onStar && (
