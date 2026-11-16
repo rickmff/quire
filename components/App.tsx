@@ -895,26 +895,7 @@ function Sidebar(props: {
               {sites.map((x) => (
                 <div key={x.key} className="contents">
                   <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
-                  {activeSite === x.key && (
-                    <div className="hidden md:contents">
-                      {x.items.map((i) => (
-                        <button
-                          key={i.id}
-                          data-row
-                          aria-current={openId === i.id ? "page" : undefined}
-                          onClick={() => openItem(i)}
-                          className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
-                        >
-                          <span className="w-[26px] shrink-0">
-                            <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
-                          </span>
-                          <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
-                            {i.title}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  {activeSite === x.key && <SiteGroups items={x.items} openItem={openItem} openId={openId} />}
                 </div>
               ))}
             </>
@@ -942,6 +923,105 @@ function Sidebar(props: {
         </div>
       </div>
     </aside>
+  );
+}
+
+// Large families split into their types, so no group runs past a screen.
+const SPLIT_AT = 15;
+const FAMILY_LABEL: Record<string, string> = {
+  Input: "Inputs",
+  Overlay: "Overlays",
+  Section: "Sections",
+  Effect: "Effects",
+};
+const TYPE_LABEL: Record<string, string> = {
+  "text-effect": "Text effects",
+  background: "Backgrounds",
+  cursor: "Cursors",
+  button: "Buttons",
+  card: "Cards",
+};
+
+function groupItems(items: GalleryItem[]) {
+  const byFamily = new Map<string, GalleryItem[]>();
+  for (const i of items) {
+    const f = typeById(i.type).family;
+    byFamily.set(f, [...(byFamily.get(f) ?? []), i]);
+  }
+  const groups: { key: string; name: string; items: GalleryItem[] }[] = [];
+  for (const [family, list] of byFamily) {
+    if (list.length <= SPLIT_AT || family === OTHER.family) {
+      groups.push({ key: family, name: FAMILY_LABEL[family] ?? family, items: list });
+      continue;
+    }
+    const byType = new Map<string, GalleryItem[]>();
+    for (const i of list) byType.set(i.type, [...(byType.get(i.type) ?? []), i]);
+    for (const [t, l] of byType) groups.push({ key: `${family}/${t}`, name: TYPE_LABEL[t] ?? typeById(t).name, items: l });
+  }
+  // Biggest groups first; "Other" always last.
+  return groups.sort((a, b) => Number(a.key === OTHER.family) - Number(b.key === OTHER.family) || b.items.length - a.items.length || a.name.localeCompare(b.name));
+}
+
+function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openItem: (item: GalleryItem) => void; openId?: string }) {
+  const groups = useMemo(() => groupItems(items), [items]);
+  const [open, setOpen] = useState<Set<string>>(() => new Set());
+  // The group that holds the open component opens with it.
+  useEffect(() => {
+    const g = groups.find((g) => g.items.some((i) => i.id === openId));
+    if (g) setOpen((s) => (s.has(g.key) ? s : new Set(s).add(g.key)));
+  }, [groups, openId]);
+  const toggle = (k: string) =>
+    setOpen((s) => {
+      const n = new Set(s);
+      if (!n.delete(k)) n.add(k);
+      return n;
+    });
+
+  return (
+    <div className="hidden md:contents">
+      {groups.map((g) => {
+        const expanded = open.has(g.key);
+        return (
+          <div key={g.key} className="contents">
+            <button
+              data-row
+              aria-expanded={expanded}
+              onClick={() => toggle(g.key)}
+              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+            >
+              <span className="flex w-[26px] shrink-0 items-center">
+                <svg
+                  viewBox="0 0 8 8"
+                  className={`size-2 text-faint transition-transform duration-200 group-hover:text-muted ${expanded ? "rotate-90" : ""}`}
+                  aria-hidden
+                >
+                  <path d="M2.5 1.5 5.5 4l-3 2.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1 truncate">{g.name}</span>
+              <span className="text-[11px] tabular-nums text-faint">{g.items.length}</span>
+            </button>
+            {expanded &&
+              g.items.map((i) => (
+                <button
+                  key={i.id}
+                  data-row
+                  aria-current={openId === i.id ? "page" : undefined}
+                  onClick={() => openItem(i)}
+                  className="group flex h-6 shrink-0 items-center gap-2 pl-6 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
+                >
+                  <span className="w-[26px] shrink-0">
+                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
+                  </span>
+                  <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
+                    {i.title}
+                  </span>
+                </button>
+              ))}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
