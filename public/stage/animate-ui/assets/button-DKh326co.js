@@ -1,1 +1,0 @@
-import{a as e,t}from"./index-pvdpJsYC.js";import{t as n}from"./react-oeFkHJz6.js";import{t as r}from"./slot-CFemB4Bg.js";e();var i=t();function a({hoverScale:e=1.05,tapScale:t=.95,asChild:a=!1,...o}){let s=a?r:n.button;return(0,i.jsx)(s,{whileTap:{scale:t},whileHover:{scale:e},...o})}export{a as t};

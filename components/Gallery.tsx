@@ -189,7 +189,13 @@ function useDark() {
 
 function useReducedMotion() {
   const [reduce, setReduce] = useState(false);
-  useEffect(() => setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches), []);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduce(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   return reduce;
 }
 
@@ -201,10 +207,36 @@ export function Preview({ item, site, large, still }: { item: GalleryItem; site:
   return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
 }
 
+// Card clips loop on their own while they are on screen (or about to be), and pause off
+// screen, so only the cards in view decode at a time. One observer serves every card.
+// With reduced motion a clip plays only while the mouse is over it.
+const onScreen = new Map<Element, (visible: boolean) => void>();
+let screenObserver: IntersectionObserver | undefined;
+function watchOnScreen(el: Element, cb: (visible: boolean) => void) {
+  screenObserver ??= new IntersectionObserver((entries) => entries.forEach((e) => onScreen.get(e.target)?.(e.isIntersecting)), { rootMargin: "200px 0px" });
+  onScreen.set(el, cb);
+  screenObserver.observe(el);
+  return () => {
+    onScreen.delete(el);
+    screenObserver?.unobserve(el);
+  };
+}
+
 function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; site: string; large?: boolean; image?: string; video?: string }) {
   const [img, setImg] = useState(Boolean(image));
   const [vid, setVid] = useState(Boolean(video));
   const ref = useRef<HTMLVideoElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || large) return;
+    if (reduce) return el.pause();
+    return watchOnScreen(el, (visible) => {
+      if (visible) el.play().catch(() => {});
+      else el.pause();
+    });
+  }, [vid, large, reduce]);
 
   if (vid && video)
     return (
@@ -216,9 +248,9 @@ function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; 
         loop
         playsInline
         preload="none"
-        autoPlay={large}
-        onMouseEnter={() => ref.current?.play().catch(() => {})}
-        onMouseLeave={() => !large && ref.current?.pause()}
+        autoPlay={large && !reduce}
+        onMouseEnter={reduce ? () => ref.current?.play().catch(() => {}) : undefined}
+        onMouseLeave={reduce && !large ? () => ref.current?.pause() : undefined}
         onError={() => setVid(false)}
         className="size-full object-cover"
       />

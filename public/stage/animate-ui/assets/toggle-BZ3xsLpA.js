@@ -1,1 +1,0 @@
-import{r as e,t}from"./toggle-8hv0zGPH.js";import{t as n}from"./index-pvdpJsYC.js";var r=n();function i({variant:n,size:i}){return(0,r.jsx)(t,{"aria-label":`Toggle italic`,variant:n,size:i,children:(0,r.jsx)(e,{})})}export{i as RadixToggleDemo};

@@ -16,7 +16,8 @@ For each library it:
 4. Frames what is on screen (by pixels, so glows and portals count), pads it to
    16:10 and shrinks components that do not fit.
 5. Saves a 1600×1000 WebP per theme from a 4x screenshot, and an MP4 clip at
-   30 fps when the component moves. The clip replays the pose on a timeline.
+   30 fps when the component moves. The clip plays the component's interaction:
+   a drawn pointer hovers, clicks, drags or types on a timeline (see Clips).
 
 ## Run it
 
@@ -60,8 +61,10 @@ the stage:
   card that runs it; the gallery does not use this today).
 
 The detail panel runs the demo with hover, click and keyboard, and has a
-Restart button. Cards do not run it: their clips loop on screen and already show
-the interaction.
+Restart button. Cards do not run it: their clips loop and already show the
+interaction. A card clip plays while the card is on screen or within 200px of
+it, and pauses off screen (one shared `IntersectionObserver`). With reduced
+motion, a clip plays only while the mouse is over it.
 
 Demos that use shiki get a build with only the grammars and themes they use
 (`template/src/shims/shiki.ts`). Files demos load from the docs site's root
@@ -80,7 +83,63 @@ Demos that use shiki get a build with only the grammars and themes they use
 | `box` | draw a bordered, clipped panel around the stage box (scroll areas) |
 | `zoom` | fixed zoom instead of the automatic fit |
 | `min`, `pad` | smallest frame width (default 320) and padding around the content (default 1.28) |
-| `video` | `{seconds, lead, force, steps: [{at: ms, hover|move|click|type|press, pos}]}` |
+| `freetheme` | let the demo change the theme (theme togglers); the stage forces the URL's theme otherwise |
+| `video` | options and steps for the clip (see Clips) |
+
+## Clips
+
+`video.mjs` records each clip at the capture viewport (1280x800) and crops it to
+the still's frame. Before the first frame it remounts the demo (`__remount()` on
+the stage), so entrance animations play from their start. When a pose has
+pointer steps, the stage draws a pointer (`cursor=<px>`, scaled to the frame)
+that follows the mouse and shows a ring on each press.
+
+`video` takes:
+
+| Key | Meaning |
+| --- | --- |
+| `seconds` | clip length (default: last step + 1.8 s, at least 4 s) |
+| `lead` | ms to wait after the remount, before the clip starts |
+| `force` | keep the clip even if it barely moves |
+| `remount` | `false` keeps the demo as loaded instead of remounting it |
+| `cursor` | `false` hides the pointer, `true` shows it without pointer steps |
+| `start` | where the pointer starts, `[fx, fy]` (default `[0.82, 1.15]`, below the frame) |
+| `slow` | record in slow motion by this factor (see below) |
+| `pingpong` | play the clip forward then back, so a slow drift loops without a jump |
+| `steps` | `[{at: ms, ...action}]` on the clip's clock |
+
+Steps run on the clip's clock: a glide or a scroll ends on time even when screenshots
+slow the browser down (`DEBUG=1` prints when each step starts). When a step scrolls or runs a script, each frame is cut from a
+shot of the whole viewport, so a page that scrolls stays in place in the clip.
+
+Points are `[fx, fy]` relative to the frame (`[0, 0]` top left, `[1, 1]`
+bottom right), or a selector with `pos` (`[0.5, 0.5]` is its center) and `nth`.
+The pointer glides between points with an ease, in `ms` (default 650).
+
+| Action | Meaning |
+| --- | --- |
+| `hover` | glide to a selector or point |
+| `to` | glide to a point |
+| `path` | glide through a list of points in `ms` (default 1800) |
+| `click`, `rightclick`, `dblclick` | glide to the target and press; `true` presses where the pointer is |
+| `drag` | `{from, to}`: press at `from`, glide to `to`, release |
+| `down`, `up` | press or release the mouse button |
+| `scroll` | wheel by this many px over `ms` |
+| `type`, `press` | type text, press a key |
+| `eval` | run a script in the page |
+| `leave` | glide out of the frame and hide the pointer |
+
+When Chrome cannot paint a demo at 18 fps here (heavy WebGL or canvas), the clip
+is recorded again in slow motion: timers, animation frames, `Date`,
+`performance.now()` and CSS or Web Animations run k times slower (k up to 12),
+and frames are resampled to 30 fps on the clip's clock. A clip that is still
+too slow, or that does not move, is skipped and keeps the last good file.
+
+Cards loop these clips, so each stays light: a clip over 600 KB (photos,
+full-frame gradients) is encoded again at 960x600 and a higher CRF.
+
+Video embeds (YouTube) do not load on the capture machine, so a clip shows their
+player as a black box. The live demo plays them.
 
 ## Demos the library does not ship
 
@@ -103,4 +162,13 @@ Copy the resulting `mirror/` folder (files plus `manifest.json`) next to
 
 Some demo URLs are dead at their origin too (a replaced avatar, a removed icon).
 The stage hides an image that fails to load, so the preview shows an empty slot
-instead of a broken-image icon with its alt text.
+instead of a broken-image icon with its alt text. For a dead image the demo
+cannot do without, map its URL in `mirror/manifest.json` to a stand-in from the
+library itself. The Animate UI avatar on X
+(`pbs.twimg.com/profile_images/1950218390741618688/...`) is dead; its stand-in is
+the library's `apps/v1/apps/www/public/apple-touch-icon.png`, saved as
+`mirror/animate-ui-icon.png`:
+
+```json
+"https://pbs.twimg.com/profile_images/1950218390741618688/72447Y7e_400x400.jpg": { "file": "animate-ui-icon.png", "type": "image/png" }
+```

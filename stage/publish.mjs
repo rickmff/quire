@@ -33,6 +33,7 @@ for (const lib of libs) {
       if (cfg.h) q.set("h", cfg.h);
       if (cfg.fill) q.set("fill", "1");
       if (cfg.box) q.set("box", "1");
+      if (cfg.freetheme) q.set("freetheme", "1");
       if (r.zoom && r.zoom !== 1) q.set("zoom", r.zoom);
       q.set("live", "1");
       const f = r.frame;

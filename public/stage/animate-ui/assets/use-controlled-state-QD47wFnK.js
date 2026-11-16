@@ -1,1 +1,0 @@
-import{a as e,c as t}from"./index-pvdpJsYC.js";var n=t(e(),1);function r(e){let{value:t,defaultValue:r,onChange:i}=e,[a,o]=n.useState(t===void 0?r:t);return n.useEffect(()=>{t!==void 0&&o(t)},[t]),[a,n.useCallback((e,...t)=>{o(e),i?.(e,...t)},[i])]}export{r as t};

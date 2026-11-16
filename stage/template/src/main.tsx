@@ -1,5 +1,5 @@
 import "./index.css";
-import { Component, Suspense, useEffect } from "react";
+import { Component, Suspense, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { demos, props } from "./demos";
 import { ThemeProvider } from "next-themes";
@@ -55,11 +55,32 @@ if (live) {
   }
 }
 
-const Demo = demos[q.get("c") || ""];
+// cursor=<px>: draw a pointer where the mouse is, so a clip shows the hover or click that drives
+// it. The page's own cursor is not in a screenshot.
+if (q.get("cursor")) {
+  const size = Number(q.get("cursor"));
+  const c = document.createElement("div");
+  c.id = "stage-cursor";
+  c.innerHTML = `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><path d="M5 2.5v17.2l4.3-4.1 2.9 6.6 3-1.3-2.9-6.5h6.1z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg><i></i>`;
+  document.body.appendChild(c);
+  addEventListener("pointermove", (e) => { c.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; c.style.opacity = "1"; }, true);
+  addEventListener("pointerdown", () => { c.classList.remove("press"); void c.offsetWidth; c.classList.add("press", "down"); }, true);
+  addEventListener("pointerup", () => c.classList.remove("down"), true);
+}
+
+// The clip starts from the demo's first frame: __remount() mounts it again, so entrances,
+// counters and typing play from the start instead of having finished during loading.
+function Stage() {
+  const [run, setRun] = useState(0);
+  useEffect(() => { w.__remount = () => { w.__ready = false; setRun((n) => n + 1); }; }, []);
+  const Demo = demos[q.get("c") || ""];
+  return (
+    <Boundary key={run}><Suspense fallback={null}>{Demo ? <><Demo {...(props[q.get("c") || ""] ?? {})} /><Ready /></> : <p>unknown component</p>}</Suspense></Boundary>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider attribute="class" forcedTheme={theme} defaultTheme={theme} storageKey={`stage-theme-${theme}`} enableSystem={false}>
-    <div id="stage"><div id="subject">
-      <Boundary><Suspense fallback={null}>{Demo ? <><Demo {...(props[q.get("c") || ""] ?? {})} /><Ready /></> : <p>unknown component</p>}</Suspense></Boundary>
-    </div></div>
+  <ThemeProvider attribute="class" forcedTheme={q.get("freetheme") ? undefined : theme} defaultTheme={theme} storageKey={`stage-theme-${theme}`} enableSystem={false}>
+    <div id="stage"><div id="subject"><Stage /></div></div>
   </ThemeProvider>
 );

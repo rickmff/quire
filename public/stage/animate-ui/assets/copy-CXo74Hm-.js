@@ -1,1 +1,0 @@
-import{t as e}from"./copy-DnZbihLC.js";import{t}from"./index-pvdpJsYC.js";var n=t();function r({variant:t,size:r}){return(0,n.jsx)(e,{variant:t,size:r,content:`Hello world!`})}export{r as default};

@@ -182,8 +182,10 @@
  "magicui/animated-theme-toggler": {
   "image": "/previews/magicui/animated-theme-toggler.webp",
   "imageDark": "/previews/magicui/animated-theme-toggler-dark.webp",
+  "video": "/previews/magicui/animated-theme-toggler.mp4",
+  "videoDark": "/previews/magicui/animated-theme-toggler-dark.mp4",
   "live": {
-   "src": "/stage/magicui/index.html?c=animated-theme-toggler&theme=light&live=1",
+   "src": "/stage/magicui/index.html?c=animated-theme-toggler&theme=light&freetheme=1&live=1",
    "frame": [
     480,
     300,
@@ -194,7 +196,7 @@
     1280,
     800
    ],
-   "srcDark": "/stage/magicui/index.html?c=animated-theme-toggler&theme=dark&live=1",
+   "srcDark": "/stage/magicui/index.html?c=animated-theme-toggler&theme=dark&freetheme=1&live=1",
    "frameDark": [
     480,
     300,
@@ -382,6 +384,8 @@
  "magicui/code-comparison": {
   "image": "/previews/magicui/code-comparison.webp",
   "imageDark": "/previews/magicui/code-comparison-dark.webp",
+  "video": "/previews/magicui/code-comparison.mp4",
+  "videoDark": "/previews/magicui/code-comparison-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=code-comparison&theme=light&live=1",
    "frame": [
@@ -510,6 +514,8 @@
  "magicui/dither-field": {
   "image": "/previews/magicui/dither-field.webp",
   "imageDark": "/previews/magicui/dither-field-dark.webp",
+  "video": "/previews/magicui/dither-field.mp4",
+  "videoDark": "/previews/magicui/dither-field-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=dither-field&theme=light&live=1",
    "frame": [
@@ -608,6 +614,8 @@
  "magicui/file-tree": {
   "image": "/previews/magicui/file-tree.webp",
   "imageDark": "/previews/magicui/file-tree-dark.webp",
+  "video": "/previews/magicui/file-tree.mp4",
+  "videoDark": "/previews/magicui/file-tree-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=file-tree&theme=light&live=1",
    "frame": [
@@ -684,6 +692,8 @@
  "magicui/glare-hover": {
   "image": "/previews/magicui/glare-hover.webp",
   "imageDark": "/previews/magicui/glare-hover-dark.webp",
+  "video": "/previews/magicui/glare-hover.mp4",
+  "videoDark": "/previews/magicui/glare-hover-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=glare-hover&theme=light&live=1",
    "frame": [
@@ -784,6 +794,8 @@
  "magicui/hero-video-dialog": {
   "image": "/previews/magicui/hero-video-dialog.webp",
   "imageDark": "/previews/magicui/hero-video-dialog-dark.webp",
+  "video": "/previews/magicui/hero-video-dialog.mp4",
+  "videoDark": "/previews/magicui/hero-video-dialog-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=hero-video-dialog&theme=light&live=1",
    "frame": [
@@ -832,6 +844,8 @@
  "magicui/highlighter": {
   "image": "/previews/magicui/highlighter.webp",
   "imageDark": "/previews/magicui/highlighter-dark.webp",
+  "video": "/previews/magicui/highlighter.mp4",
+  "videoDark": "/previews/magicui/highlighter-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=highlighter&theme=light&live=1",
    "frame": [
@@ -908,6 +922,8 @@
  "magicui/interactive-grid-pattern": {
   "image": "/previews/magicui/interactive-grid-pattern.webp",
   "imageDark": "/previews/magicui/interactive-grid-pattern-dark.webp",
+  "video": "/previews/magicui/interactive-grid-pattern.mp4",
+  "videoDark": "/previews/magicui/interactive-grid-pattern-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=interactive-grid-pattern&theme=light&live=1",
    "frame": [
@@ -982,6 +998,8 @@
  "magicui/kinetic-text": {
   "image": "/previews/magicui/kinetic-text.webp",
   "imageDark": "/previews/magicui/kinetic-text-dark.webp",
+  "video": "/previews/magicui/kinetic-text.mp4",
+  "videoDark": "/previews/magicui/kinetic-text-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=kinetic-text&theme=light&live=1",
    "frame": [
@@ -1006,6 +1024,8 @@
  "magicui/lens": {
   "image": "/previews/magicui/lens.webp",
   "imageDark": "/previews/magicui/lens-dark.webp",
+  "video": "/previews/magicui/lens.mp4",
+  "videoDark": "/previews/magicui/lens-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=lens&theme=light&live=1",
    "frame": [
@@ -1030,6 +1050,8 @@
  "magicui/light-rays": {
   "image": "/previews/magicui/light-rays.webp",
   "imageDark": "/previews/magicui/light-rays-dark.webp",
+  "video": "/previews/magicui/light-rays.mp4",
+  "videoDark": "/previews/magicui/light-rays-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=light-rays&theme=light&live=1",
    "frame": [
@@ -1364,6 +1386,8 @@
  "magicui/progressive-blur": {
   "image": "/previews/magicui/progressive-blur.webp",
   "imageDark": "/previews/magicui/progressive-blur-dark.webp",
+  "video": "/previews/magicui/progressive-blur.mp4",
+  "videoDark": "/previews/magicui/progressive-blur-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=progressive-blur&theme=light&live=1",
    "frame": [
@@ -1388,6 +1412,8 @@
  "magicui/pulsating-button": {
   "image": "/previews/magicui/pulsating-button.webp",
   "imageDark": "/previews/magicui/pulsating-button-dark.webp",
+  "video": "/previews/magicui/pulsating-button.mp4",
+  "videoDark": "/previews/magicui/pulsating-button-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=pulsating-button&theme=light&live=1",
    "frame": [
@@ -1438,6 +1464,8 @@
  "magicui/retro-grid": {
   "image": "/previews/magicui/retro-grid.webp",
   "imageDark": "/previews/magicui/retro-grid-dark.webp",
+  "video": "/previews/magicui/retro-grid.mp4",
+  "videoDark": "/previews/magicui/retro-grid-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=retro-grid&theme=light&live=1",
    "frame": [
@@ -1488,6 +1516,8 @@
  "magicui/ripple-button": {
   "image": "/previews/magicui/ripple-button.webp",
   "imageDark": "/previews/magicui/ripple-button-dark.webp",
+  "video": "/previews/magicui/ripple-button.mp4",
+  "videoDark": "/previews/magicui/ripple-button-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=ripple-button&theme=light&live=1",
    "frame": [
@@ -1562,6 +1592,8 @@
  "magicui/scroll-progress": {
   "image": "/previews/magicui/scroll-progress.webp",
   "imageDark": "/previews/magicui/scroll-progress-dark.webp",
+  "video": "/previews/magicui/scroll-progress.mp4",
+  "videoDark": "/previews/magicui/scroll-progress-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=scroll-progress&theme=light&live=1",
    "frame": [
@@ -1792,6 +1824,8 @@
  "magicui/text-3d-flip": {
   "image": "/previews/magicui/text-3d-flip.webp",
   "imageDark": "/previews/magicui/text-3d-flip-dark.webp",
+  "video": "/previews/magicui/text-3d-flip.mp4",
+  "videoDark": "/previews/magicui/text-3d-flip-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=text-3d-flip&theme=light&live=1",
    "frame": [
@@ -1842,6 +1876,8 @@
  "magicui/text-reveal": {
   "image": "/previews/magicui/text-reveal.webp",
   "imageDark": "/previews/magicui/text-reveal-dark.webp",
+  "video": "/previews/magicui/text-reveal.mp4",
+  "videoDark": "/previews/magicui/text-reveal-dark.mp4",
   "live": {
    "src": "/stage/magicui/index.html?c=text-reveal&theme=light&live=1",
    "frame": [
@@ -1994,6 +2030,8 @@
  "animate-ui/components-animate-avatar-group": {
   "image": "/previews/animate-ui/components-animate-avatar-group.webp",
   "imageDark": "/previews/animate-ui/components-animate-avatar-group-dark.webp",
+  "video": "/previews/animate-ui/components-animate-avatar-group.mp4",
+  "videoDark": "/previews/animate-ui/components-animate-avatar-group-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-animate-avatar-group&theme=light&live=1",
    "frame": [
@@ -2122,6 +2160,8 @@
  "animate-ui/components-backgrounds-bubble": {
   "image": "/previews/animate-ui/components-backgrounds-bubble.webp",
   "imageDark": "/previews/animate-ui/components-backgrounds-bubble-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-bubble.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-bubble-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-backgrounds-bubble&theme=light&fill=1&live=1",
    "frame": [
@@ -2172,6 +2212,8 @@
  "animate-ui/components-backgrounds-gradient": {
   "image": "/previews/animate-ui/components-backgrounds-gradient.webp",
   "imageDark": "/previews/animate-ui/components-backgrounds-gradient-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-gradient.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-gradient-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-backgrounds-gradient&theme=light&fill=1&live=1",
    "frame": [
@@ -2222,6 +2264,8 @@
  "animate-ui/components-backgrounds-hexagon": {
   "image": "/previews/animate-ui/components-backgrounds-hexagon.webp",
   "imageDark": "/previews/animate-ui/components-backgrounds-hexagon-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-hexagon.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-hexagon-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-backgrounds-hexagon&theme=light&fill=1&live=1",
    "frame": [
@@ -2246,6 +2290,8 @@
  "animate-ui/components-backgrounds-hole": {
   "image": "/previews/animate-ui/components-backgrounds-hole.webp",
   "imageDark": "/previews/animate-ui/components-backgrounds-hole-dark.webp",
+  "video": "/previews/animate-ui/components-backgrounds-hole.mp4",
+  "videoDark": "/previews/animate-ui/components-backgrounds-hole-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-backgrounds-hole&theme=light&fill=1&live=1",
    "frame": [
@@ -2348,6 +2394,8 @@
  "animate-ui/components-base-radio": {
   "image": "/previews/animate-ui/components-base-radio.webp",
   "imageDark": "/previews/animate-ui/components-base-radio-dark.webp",
+  "video": "/previews/animate-ui/components-base-radio.mp4",
+  "videoDark": "/previews/animate-ui/components-base-radio-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-base-radio&theme=light&live=1",
    "frame": [
@@ -2372,6 +2420,8 @@
  "animate-ui/components-buttons-button": {
   "image": "/previews/animate-ui/components-buttons-button.webp",
   "imageDark": "/previews/animate-ui/components-buttons-button-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-button.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-button-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-buttons-button&theme=light&live=1",
    "frame": [
@@ -2552,8 +2602,10 @@
  "animate-ui/components-buttons-theme-toggler": {
   "image": "/previews/animate-ui/components-buttons-theme-toggler.webp",
   "imageDark": "/previews/animate-ui/components-buttons-theme-toggler-dark.webp",
+  "video": "/previews/animate-ui/components-buttons-theme-toggler.mp4",
+  "videoDark": "/previews/animate-ui/components-buttons-theme-toggler-dark.mp4",
   "live": {
-   "src": "/stage/animate-ui/index.html?c=components-buttons-theme-toggler&theme=light&live=1",
+   "src": "/stage/animate-ui/index.html?c=components-buttons-theme-toggler&theme=light&freetheme=1&live=1",
    "frame": [
     480,
     300.3,
@@ -2564,7 +2616,7 @@
     1280,
     800
    ],
-   "srcDark": "/stage/animate-ui/index.html?c=components-buttons-theme-toggler&theme=dark&live=1",
+   "srcDark": "/stage/animate-ui/index.html?c=components-buttons-theme-toggler&theme=dark&freetheme=1&live=1",
    "frameDark": [
     480,
     300,
@@ -2576,6 +2628,8 @@
  "animate-ui/components-community-flip-card": {
   "image": "/previews/animate-ui/components-community-flip-card.webp",
   "imageDark": "/previews/animate-ui/components-community-flip-card-dark.webp",
+  "video": "/previews/animate-ui/components-community-flip-card.mp4",
+  "videoDark": "/previews/animate-ui/components-community-flip-card-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-flip-card&theme=light&live=1",
    "frame": [
@@ -2600,6 +2654,8 @@
  "animate-ui/components-community-management-bar": {
   "image": "/previews/animate-ui/components-community-management-bar.webp",
   "imageDark": "/previews/animate-ui/components-community-management-bar-dark.webp",
+  "video": "/previews/animate-ui/components-community-management-bar.mp4",
+  "videoDark": "/previews/animate-ui/components-community-management-bar-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-management-bar&theme=light&live=1",
    "frame": [
@@ -2624,6 +2680,8 @@
  "animate-ui/components-community-motion-carousel": {
   "image": "/previews/animate-ui/components-community-motion-carousel.webp",
   "imageDark": "/previews/animate-ui/components-community-motion-carousel-dark.webp",
+  "video": "/previews/animate-ui/components-community-motion-carousel.mp4",
+  "videoDark": "/previews/animate-ui/components-community-motion-carousel-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-motion-carousel&theme=light&live=1",
    "frame": [
@@ -2648,6 +2706,8 @@
  "animate-ui/components-community-notification-list": {
   "image": "/previews/animate-ui/components-community-notification-list.webp",
   "imageDark": "/previews/animate-ui/components-community-notification-list-dark.webp",
+  "video": "/previews/animate-ui/components-community-notification-list.mp4",
+  "videoDark": "/previews/animate-ui/components-community-notification-list-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-notification-list&theme=light&live=1",
    "frame": [
@@ -2672,6 +2732,8 @@
  "animate-ui/components-community-pin-list": {
   "image": "/previews/animate-ui/components-community-pin-list.webp",
   "imageDark": "/previews/animate-ui/components-community-pin-list-dark.webp",
+  "video": "/previews/animate-ui/components-community-pin-list.mp4",
+  "videoDark": "/previews/animate-ui/components-community-pin-list-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-pin-list&theme=light&live=1",
    "frame": [
@@ -2696,6 +2758,8 @@
  "animate-ui/components-community-playful-todolist": {
   "image": "/previews/animate-ui/components-community-playful-todolist.webp",
   "imageDark": "/previews/animate-ui/components-community-playful-todolist-dark.webp",
+  "video": "/previews/animate-ui/components-community-playful-todolist.mp4",
+  "videoDark": "/previews/animate-ui/components-community-playful-todolist-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-playful-todolist&theme=light&live=1",
    "frame": [
@@ -2772,6 +2836,8 @@
  "animate-ui/components-community-radial-nav": {
   "image": "/previews/animate-ui/components-community-radial-nav.webp",
   "imageDark": "/previews/animate-ui/components-community-radial-nav-dark.webp",
+  "video": "/previews/animate-ui/components-community-radial-nav.mp4",
+  "videoDark": "/previews/animate-ui/components-community-radial-nav-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-radial-nav&theme=light&live=1",
    "frame": [
@@ -2796,6 +2862,8 @@
  "animate-ui/components-community-share-button": {
   "image": "/previews/animate-ui/components-community-share-button.webp",
   "imageDark": "/previews/animate-ui/components-community-share-button-dark.webp",
+  "video": "/previews/animate-ui/components-community-share-button.mp4",
+  "videoDark": "/previews/animate-ui/components-community-share-button-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-share-button&theme=light&live=1",
    "frame": [
@@ -2820,6 +2888,8 @@
  "animate-ui/components-community-user-presence-avatar": {
   "image": "/previews/animate-ui/components-community-user-presence-avatar.webp",
   "imageDark": "/previews/animate-ui/components-community-user-presence-avatar-dark.webp",
+  "video": "/previews/animate-ui/components-community-user-presence-avatar.mp4",
+  "videoDark": "/previews/animate-ui/components-community-user-presence-avatar-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-community-user-presence-avatar&theme=light&live=1",
    "frame": [
@@ -2974,6 +3044,8 @@
  "animate-ui/components-radix-files": {
   "image": "/previews/animate-ui/components-radix-files.webp",
   "imageDark": "/previews/animate-ui/components-radix-files-dark.webp",
+  "video": "/previews/animate-ui/components-radix-files.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-files-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-files&theme=light&live=1",
    "frame": [
@@ -3102,6 +3174,8 @@
  "animate-ui/components-radix-radio-group": {
   "image": "/previews/animate-ui/components-radix-radio-group.webp",
   "imageDark": "/previews/animate-ui/components-radix-radio-group-dark.webp",
+  "video": "/previews/animate-ui/components-radix-radio-group.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-radio-group-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-radio-group&theme=light&live=1",
    "frame": [
@@ -3152,6 +3226,8 @@
  "animate-ui/components-radix-sidebar": {
   "image": "/previews/animate-ui/components-radix-sidebar.webp",
   "imageDark": "/previews/animate-ui/components-radix-sidebar-dark.webp",
+  "video": "/previews/animate-ui/components-radix-sidebar.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-sidebar-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-sidebar&theme=light&fill=1&live=1",
    "frame": [
@@ -3202,6 +3278,8 @@
  "animate-ui/components-radix-tabs": {
   "image": "/previews/animate-ui/components-radix-tabs.webp",
   "imageDark": "/previews/animate-ui/components-radix-tabs-dark.webp",
+  "video": "/previews/animate-ui/components-radix-tabs.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-tabs-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-tabs&theme=light&live=1",
    "frame": [
@@ -3252,6 +3330,8 @@
  "animate-ui/components-radix-toggle-group": {
   "image": "/previews/animate-ui/components-radix-toggle-group.webp",
   "imageDark": "/previews/animate-ui/components-radix-toggle-group-dark.webp",
+  "video": "/previews/animate-ui/components-radix-toggle-group.mp4",
+  "videoDark": "/previews/animate-ui/components-radix-toggle-group-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=components-radix-toggle-group&theme=light&live=1",
    "frame": [
@@ -3380,6 +3460,8 @@
  "animate-ui/primitives-animate-pinned-list": {
   "image": "/previews/animate-ui/primitives-animate-pinned-list.webp",
   "imageDark": "/previews/animate-ui/primitives-animate-pinned-list-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-pinned-list.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-pinned-list-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-animate-pinned-list&theme=light&live=1",
    "frame": [
@@ -3404,6 +3486,8 @@
  "animate-ui/primitives-animate-scroll-progress": {
   "image": "/previews/animate-ui/primitives-animate-scroll-progress.webp",
   "imageDark": "/previews/animate-ui/primitives-animate-scroll-progress-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-scroll-progress.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-scroll-progress-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-animate-scroll-progress&theme=light&w=560&h=340&box=1&live=1",
    "frame": [
@@ -3428,6 +3512,8 @@
  "animate-ui/primitives-animate-slot": {
   "image": "/previews/animate-ui/primitives-animate-slot.webp",
   "imageDark": "/previews/animate-ui/primitives-animate-slot-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-slot.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-slot-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-animate-slot&theme=light&live=1",
    "frame": [
@@ -3452,13 +3538,15 @@
  "animate-ui/primitives-animate-spring": {
   "image": "/previews/animate-ui/primitives-animate-spring.webp",
   "imageDark": "/previews/animate-ui/primitives-animate-spring-dark.webp",
+  "video": "/previews/animate-ui/primitives-animate-spring.mp4",
+  "videoDark": "/previews/animate-ui/primitives-animate-spring-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-animate-spring&theme=light&live=1",
    "frame": [
-    0,
-    0,
-    1280,
-    800
+    340,
+    212.5,
+    600,
+    375
    ],
    "view": [
     1280,
@@ -3466,10 +3554,10 @@
    ],
    "srcDark": "/stage/animate-ui/index.html?c=primitives-animate-spring&theme=dark&live=1",
    "frameDark": [
-    0,
-    0,
-    1280,
-    800
+    340,
+    212.5,
+    600,
+    375
    ]
   }
  },
@@ -3528,6 +3616,8 @@
  "animate-ui/primitives-effects-auto-height": {
   "image": "/previews/animate-ui/primitives-effects-auto-height.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-auto-height-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-auto-height.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-auto-height-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-auto-height&theme=light&live=1",
    "frame": [
@@ -3552,6 +3642,8 @@
  "animate-ui/primitives-effects-blur": {
   "image": "/previews/animate-ui/primitives-effects-blur.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-blur-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-blur.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-blur-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-blur&theme=light&live=1",
    "frame": [
@@ -3576,6 +3668,8 @@
  "animate-ui/primitives-effects-click": {
   "image": "/previews/animate-ui/primitives-effects-click.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-click-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-click.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-click-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-click&theme=light&live=1",
    "frame": [
@@ -3626,6 +3720,8 @@
  "animate-ui/primitives-effects-fade": {
   "image": "/previews/animate-ui/primitives-effects-fade.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-fade-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-fade.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-fade-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-fade&theme=light&live=1",
    "frame": [
@@ -3650,6 +3746,8 @@
  "animate-ui/primitives-effects-highlight": {
   "image": "/previews/animate-ui/primitives-effects-highlight.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-highlight-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-highlight.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-highlight-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-highlight&theme=light&live=1",
    "frame": [
@@ -3674,6 +3772,8 @@
  "animate-ui/primitives-effects-image-zoom": {
   "image": "/previews/animate-ui/primitives-effects-image-zoom.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-image-zoom-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-image-zoom.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-image-zoom-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-image-zoom&theme=light&live=1",
    "frame": [
@@ -3698,6 +3798,8 @@
  "animate-ui/primitives-effects-magnetic": {
   "image": "/previews/animate-ui/primitives-effects-magnetic.webp",
   "imageDark": "/previews/animate-ui/primitives-effects-magnetic-dark.webp",
+  "video": "/previews/animate-ui/primitives-effects-magnetic.mp4",
+  "videoDark": "/previews/animate-ui/primitives-effects-magnetic-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-effects-magnetic&theme=light&live=1",
    "frame": [
@@ -3930,6 +4032,8 @@
  "animate-ui/primitives-texts-gradient": {
   "image": "/previews/animate-ui/primitives-texts-gradient.webp",
   "imageDark": "/previews/animate-ui/primitives-texts-gradient-dark.webp",
+  "video": "/previews/animate-ui/primitives-texts-gradient.mp4",
+  "videoDark": "/previews/animate-ui/primitives-texts-gradient-dark.mp4",
   "live": {
    "src": "/stage/animate-ui/index.html?c=primitives-texts-gradient&theme=light&live=1",
    "frame": [
