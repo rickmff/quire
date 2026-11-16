@@ -2,6 +2,7 @@
 
 import { Command } from "cmdk";
 import SocialLinks from "@/components/SocialLinks";
+import { PlusIcon as Plus, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   type Bookmark,
@@ -116,6 +117,11 @@ export default function App() {
       .catch(() => {});
   }, []);
   const [input, setInput] = useState("");
+  // The top bar's input either searches the current view or adds a link
+  // (a component or a whole library). Search is the default.
+  const [barMode, setBarMode] = useState<"search" | "add">("search");
+  const query = barMode === "search" ? input.trim().toLowerCase() : "";
+  const words = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
@@ -201,8 +207,9 @@ export default function App() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPalette((p) => !p);
-      } else if (e.key === "/" && !typing) {
+      } else if ((e.key === "/" || e.key === "+") && !typing) {
         e.preventDefault();
+        setBarMode(e.key === "/" ? "search" : "add");
         inputRef.current?.focus();
       } else if (e.key === "Escape" && typing) {
         (e.target as HTMLElement).blur();
@@ -262,11 +269,20 @@ export default function App() {
     const t = typeView(view);
     const s = siteView(view);
     const g = groupView(view);
-    if (s && g) return groupItems(galleryItems.filter((i) => siteKey(i) === s)).find((x) => x.key === g)?.items ?? [];
-    if (s) return galleryItems.filter((i) => siteKey(i) === s);
-    if (t) return galleryItems.filter((i) => i.type === t);
-    return galleryItems.filter((i) => i.saved);
-  }, [galleryItems, view]);
+    const inView =
+      s && g
+        ? (groupItems(galleryItems.filter((i) => siteKey(i) === s)).find((x) => x.key === g)?.items ?? [])
+        : s
+          ? galleryItems.filter((i) => siteKey(i) === s)
+          : t
+            ? galleryItems.filter((i) => i.type === t)
+            : galleryItems.filter((i) => i.saved);
+    if (!words.length) return inView;
+    return inView.filter((i) => {
+      const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${i.site ?? i.library} ${typeById(i.type).name} ${i.tech.join(" ")}`.toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
+  }, [galleryItems, view, words]);
 
   // Library first: every site in the library, with its own components.
   const sites = useMemo(() => {
@@ -362,9 +378,13 @@ export default function App() {
   };
 
   const visible = useMemo(() => {
-    const inView = selectView(lib, view).items;
-    return libFilter ? inView.filter((b) => b.library === libFilter) : inView;
-  }, [lib, view, libFilter]);
+    const inView = selectView(lib, view).items.filter((b) => !libFilter || b.library === libFilter);
+    if (!words.length) return inView;
+    return inView.filter((b) => {
+      const hay = `${b.title} ${b.url} ${b.library} ${b.description ?? ""} ${b.note ?? ""}`.toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
+  }, [lib, view, libFilter, words]);
 
   const importedSites = useMemo(() => {
     const m = new Map<string, number>();
@@ -609,33 +629,90 @@ export default function App() {
             className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
               e.preventDefault();
+              // Search filters as you type; Enter adds only a link.
+              if (barMode === "search" && !normalizeUrl(input)) return;
               add(input);
               setInput("");
             }}
           >
-            <div className="flex h-9 w-full items-center gap-2.5 rounded-lg bg-field px-3 transition-colors focus-within:bg-field-focus">
-            <PlusIcon />
+            <div className="flex h-9 w-full items-center gap-2 rounded-lg bg-field pr-2 pl-1 transition-colors focus-within:bg-field-focus">
+            <div role="radiogroup" aria-label="What the bar does" className="flex shrink-0 items-center gap-px rounded-md p-0.5">
+              {(
+                [
+                  ["search", "Search this view", "/", SearchIcon],
+                  ["add", "Add a component or library", "+", Plus],
+                ] as const
+              ).map(([m, label, key, Icon]) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={barMode === m}
+                  aria-label={label}
+                  title={`${label}  ${key}`}
+                  onClick={() => {
+                    setBarMode(m);
+                    inputRef.current?.focus();
+                  }}
+                  className={`grid size-7 place-items-center rounded-[5px] transition-[background-color,color,box-shadow] ${
+                    barMode === m ? "bg-panel text-fg shadow-sm ring-1 ring-line" : "text-faint hover:text-muted"
+                  }`}
+                >
+                  <Icon className="size-3.5" strokeWidth={1.75} aria-hidden />
+                </button>
+              ))}
+            </div>
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste a link"
-              className="h-full w-full bg-transparent outline-none placeholder:text-faint"
-              aria-label="Component link"
+              onKeyDown={(e) => {
+                // Escape clears first, then leaves the field.
+                if (e.key === "Escape" && input) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setInput("");
+                }
+              }}
+              placeholder={barMode === "search" ? `Search ${viewName}` : "Paste a component or library link"}
+              className="h-full w-full bg-transparent pl-1 outline-none placeholder:text-faint"
+              aria-label={barMode === "search" ? "Search components" : "Component or library link"}
               autoComplete="off"
               spellCheck={false}
             />
-            {input.trim() && (
+            {input.trim() && (barMode === "add" || normalizeUrl(input)) && (
+              <>
+                <button
+                  type="submit"
+                  title="Add this link as a component"
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                >
+                  Add component <span className="text-faint">↵</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    startImport(input);
+                    setInput("");
+                  }}
+                  title="Find every component on this library and sort them by type"
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                >
+                  Import library
+                </button>
+              </>
+            )}
+            {barMode === "search" && input && !normalizeUrl(input) && (
               <button
                 type="button"
                 onClick={() => {
-                  startImport(input);
                   setInput("");
+                  inputRef.current?.focus();
                 }}
-                title="Find every component on this site and sort them by type"
-                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
+                aria-label="Clear search"
               >
-                Import site
+                Clear
               </button>
             )}
             <button
@@ -658,7 +735,7 @@ export default function App() {
             <Gallery
               items={galleryView}
               title={viewName}
-              sections={view === "starred" && starredSites.length > 1 ? starredSites : undefined}
+              sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
               onSite={(key) => setView(`site:${key}`)}
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
@@ -683,7 +760,9 @@ export default function App() {
               intro={intro === "deal"}
               onDeal={onDeal}
               empty={
-                view === "starred" ? (
+                words.length ? (
+                  <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
+                ) : view === "starred" ? (
                   <p className="mx-auto max-w-sm pt-20 text-center text-muted">
                     Nothing starred yet. Open a library below and tap the star on a component.
                   </p>
