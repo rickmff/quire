@@ -41,13 +41,16 @@ function PreviewMedia({
   const [img, setImg] = useState(Boolean(image));
   const [vid, setVid] = useState(Boolean(video));
   const ref = useRef<HTMLVideoElement>(null);
+  const [near, setNear] = useState(Boolean(large));
   const reduce = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
     if (!el || large) return;
-    if (reduce) return el.pause();
+    if (reduce) el.pause();
     return watchOnScreen(el, (visible) => {
+      if (visible) setNear(true);
+      if (reduce) return;
       if (visible) el.play().catch(() => {});
       else el.pause();
     });
@@ -58,7 +61,7 @@ function PreviewMedia({
       <video
         ref={ref}
         src={video}
-        poster={img ? image : undefined}
+        poster={img && near ? image : undefined}
         muted
         loop
         playsInline
