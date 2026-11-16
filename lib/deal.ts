@@ -89,6 +89,8 @@ export function foilSheet(dark: boolean, i: number): { el: HTMLElement; wheel: H
 const HANDOFF = "quire:handoff";
 const OVERLAY = "quire-handoff";
 const PILE = 6;
+// The hero's sheets are 2 by 1.5 world units (HALF in the shader).
+const SHEET = 0.75;
 type Handoff = { x: number; y: number; w: number; at: number };
 const pileRot = (i: number) => (((i * 37) % 7) - 3) * 0.9;
 
@@ -113,9 +115,9 @@ export function handOff(stage: HTMLElement): number {
   Object.assign(pile.style, {
     position: "absolute",
     left: `${x - w / 2}px`,
-    top: `${y - (w * 10) / 32}px`,
+    top: `${y - (w * SHEET) / 2}px`,
     width: `${w}px`,
-    aspectRatio: "16 / 10",
+    aspectRatio: `1 / ${SHEET}`,
   });
   for (let i = PILE - 1; i >= 0; i--) {
     const sheet = foilSheet(dark, i).el;
@@ -180,13 +182,20 @@ export function deal(root: HTMLElement): number {
   const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const n = cards.length;
 
-  if (handoff) requestAnimationFrame(() => dropOverlay());
+  // The dealt pile is drawn exactly where the landing's pile is, so the
+  // landing's copy can go at once (a fade here would show two piles).
+  if (handoff) document.getElementById(OVERLAY)?.remove();
 
   cards.forEach((card, i) => {
     const face = card.firstElementChild as HTMLElement | null;
     const meta = card.lastElementChild as HTMLElement | null;
     if (!face) return;
-    const r = face.getBoundingClientRect();
+    // The preview box is the sheet: size and centre come from it, not from
+    // the whole face, which is a little taller.
+    const sheet = (face.firstElementChild as HTMLElement | null) ?? face;
+    const r = sheet.getBoundingClientRect();
+    const fr = face.getBoundingClientRect();
+    face.style.transformOrigin = `${r.left - fr.left + r.width / 2}px ${r.top - fr.top + r.height / 2}px`;
     const dx = cx - (r.left + r.width / 2);
     // Lower cards sit a hair lower in the pile, each a little turned.
     const dy = cy - (r.top + r.height / 2) + i * 1.5;
@@ -195,7 +204,9 @@ export function deal(root: HTMLElement): number {
     const total = start + FLIGHT;
     // Coming from the landing, the pile is the hero's, at its size; it is
     // already on screen, so there is no fade in.
-    const size = handoff ? handoff.w / r.width : 0.82;
+    // From the landing the pile keeps the hero's 4:3 sheets and reshapes to
+    // the card in flight.
+    const size = handoff ? `${handoff.w / r.width}, ${(handoff.w * SHEET) / r.height}` : ".82";
     const pile = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${size})`;
     const from = handoff ? { opacity: i < PILE ? 1 : 0, transform: pile } : { opacity: 0, transform: `${pile} translateY(10px)` };
 
@@ -213,7 +224,7 @@ export function deal(root: HTMLElement): number {
 
     // The foil covers the card while it travels and clears as it lands.
     const { el: foil, wheel, sweep } = foilSheet(dark, i);
-    face.appendChild(foil);
+    sheet.appendChild(foil);
     // It starts to clear late in the flight, so the card face shows as it lands.
     const end = total + 160;
     const clear = (start + FLIGHT * 0.65) / end;
@@ -242,10 +253,14 @@ export function deal(root: HTMLElement): number {
     Promise.all([fly.finished, label?.finished]).then(
       () => {
         face.style.zIndex = "";
+        face.style.transformOrigin = "";
         fly.cancel();
         label?.cancel();
       },
-      () => (face.style.zIndex = ""),
+      () => {
+        face.style.zIndex = "";
+        face.style.transformOrigin = "";
+      },
     );
   });
 
