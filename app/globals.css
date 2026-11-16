@@ -121,17 +121,34 @@ textarea:focus-visible { outline: none; }
     --btn-edge: transparent;
     --btn-lip: transparent;
     --btn-drop: 0 0 #0000;
-    position: relative;
+    --btn-edge-hover: var(--btn-edge);
+    --btn-drop-hover: var(--btn-drop);
+    --btn-sheen: transparent;
+    position: relative; isolation: isolate; overflow: hidden;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     height: 30px; padding: 0 12px; border-radius: 8px;
     font-weight: 500; white-space: nowrap; cursor: pointer; user-select: none;
     color: var(--btn-fg);
     background: var(--btn-bg);
     box-shadow: inset 0 1px 0 var(--btn-lip), 0 0 0 1px var(--btn-edge), var(--btn-drop);
-    transition: background 140ms ease-out, color 140ms ease-out, box-shadow 140ms ease-out, transform 90ms ease-out, opacity 140ms;
+    transition: background 140ms ease-out, color 140ms ease-out, box-shadow 140ms ease-out, transform 180ms cubic-bezier(.2,.8,.2,1), opacity 140ms;
   }
-  .btn:hover { color: var(--btn-fg-hover); background: var(--btn-bg-hover); }
-  .btn:active { transform: translateY(0.5px) scale(0.985); }
+  /* Hover: the button lifts a pixel, its shadow deepens and a soft sheen
+     sweeps across. Pressing sets it back down. */
+  .btn::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, var(--btn-sheen) 50%, transparent 65%);
+    transform: translateX(-110%);
+  }
+  .btn:hover {
+    color: var(--btn-fg-hover); background: var(--btn-bg-hover); transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 var(--btn-lip), 0 0 0 1px var(--btn-edge-hover), var(--btn-drop-hover);
+  }
+  .btn:hover::after { transform: translateX(110%); transition: transform 650ms cubic-bezier(.4,0,.2,1); }
+  .btn:active {
+    transform: translateY(0.5px) scale(0.985); transition-duration: 80ms;
+    box-shadow: inset 0 1px 0 var(--btn-lip), 0 0 0 1px var(--btn-edge), var(--btn-drop);
+  }
   .btn:focus-visible {
     outline: none;
     box-shadow: inset 0 1px 0 var(--btn-lip), 0 0 0 1px var(--btn-edge), 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in srgb, var(--accent) 55%, transparent);
@@ -139,7 +156,9 @@ textarea:focus-visible { outline: none; }
   .btn:disabled, .btn[aria-disabled="true"] {
     cursor: default; transform: none; opacity: 0.45;
     background: var(--btn-bg); color: var(--btn-fg);
+    box-shadow: inset 0 1px 0 var(--btn-lip), 0 0 0 1px var(--btn-edge), var(--btn-drop);
   }
+  .btn:disabled::after, .btn[aria-disabled="true"]::after { display: none; }
   .btn-sm { height: 26px; padding: 0 10px; border-radius: 7px; }
   .btn-lg { height: 32px; padding: 0 15px; border-radius: 9px; }
 
@@ -152,6 +171,8 @@ textarea:focus-visible { outline: none; }
     --btn-edge: #0a0a0a;
     --btn-lip: rgb(255 255 255 / 0.16);
     --btn-drop: 0 1px 2px rgb(0 0 0 / 0.16), 0 3px 8px -3px rgb(0 0 0 / 0.28);
+    --btn-drop-hover: 0 2px 4px rgb(0 0 0 / 0.16), 0 8px 18px -6px rgb(0 0 0 / 0.4);
+    --btn-sheen: rgb(255 255 255 / 0.14);
   }
   .btn-primary:active { --btn-drop: 0 0 1px rgb(0 0 0 / 0.2); --btn-lip: rgb(255 255 255 / 0.08); }
 
@@ -164,6 +185,9 @@ textarea:focus-visible { outline: none; }
     --btn-edge: rgb(0 0 0 / 0.09);
     --btn-lip: rgb(255 255 255 / 0.9);
     --btn-drop: 0 1px 2px rgb(0 0 0 / 0.05);
+    --btn-edge-hover: rgb(0 0 0 / 0.15);
+    --btn-drop-hover: 0 2px 4px rgb(0 0 0 / 0.05), 0 6px 14px -6px rgb(0 0 0 / 0.16);
+    --btn-sheen: rgb(0 0 0 / 0.025);
   }
   .btn-secondary:active { --btn-drop: 0 0 #0000; --btn-bg: #f2f2f2; --btn-bg-hover: #f2f2f2; }
 
@@ -177,6 +201,8 @@ textarea:focus-visible { outline: none; }
       --btn-edge: rgb(255 255 255 / 0.06);
       --btn-lip: rgb(255 255 255 / 0.7);
       --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.6);
+      --btn-drop-hover: inset 0 -1px 0 rgb(0 0 0 / 0.08), 0 2px 4px rgb(0 0 0 / 0.6), 0 6px 20px -6px rgb(255 255 255 / 0.22);
+      --btn-sheen: rgb(255 255 255 / 0.9);
     }
     .btn-primary:active { --btn-drop: inset 0 -1px 0 rgb(0 0 0 / 0.08), 0 0 1px rgb(0 0 0 / 0.6); --btn-bg: #e2e2e2; --btn-bg-hover: #e2e2e2; }
     .btn-secondary {
@@ -185,12 +211,16 @@ textarea:focus-visible { outline: none; }
       --btn-edge: rgb(255 255 255 / 0.09);
       --btn-lip: rgb(255 255 255 / 0.07);
       --btn-drop: 0 1px 2px rgb(0 0 0 / 0.4);
+      --btn-edge-hover: rgb(255 255 255 / 0.17);
+      --btn-drop-hover: 0 2px 4px rgb(0 0 0 / 0.5), 0 8px 18px -6px rgb(0 0 0 / 0.7);
+      --btn-sheen: rgb(255 255 255 / 0.06);
     }
     .btn-secondary:active { --btn-bg: rgb(255 255 255 / 0.03); --btn-bg-hover: rgb(255 255 255 / 0.03); }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .btn { transition: none; }
-    .btn:active { transform: none; }
+    .btn:hover, .btn:active { transform: none; }
+    .btn::after { display: none; }
   }
 }
