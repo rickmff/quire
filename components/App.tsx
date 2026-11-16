@@ -29,6 +29,7 @@ import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 import { agentText } from "@/lib/agentText";
 
 // "starred" = the starred components (saved bookmarks, pasted links too),
+// "libraries" = every library's components together, sorted by category,
 // "type:<id>" = one component type across the library, "sites", "agents",
 // else a collection id. The old "library" and "all" (Saved) views open Starred.
 type View = "starred" | null | string;
@@ -38,8 +39,8 @@ const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? 
 // one category of that library (a sidebar group, see groupItems).
 const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
 const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
-const PAGES = new Set(["starred", "sites", "agents"]);
-const isGallery = (v: View) => v === "starred" || typeView(v) !== null || siteView(v) !== null;
+const PAGES = new Set(["starred", "libraries", "sites", "agents"]);
+const isGallery = (v: View) => v === "starred" || v === "libraries" || typeView(v) !== null || siteView(v) !== null;
 // Curated components group by library id; your own links by the site they came from.
 const siteKey = (i: { library: string; site?: string }) =>
   i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -270,7 +271,10 @@ export default function App() {
           ? galleryItems.filter((i) => siteKey(i) === s)
           : t
             ? galleryItems.filter((i) => i.type === t)
-            : galleryItems.filter((i) => i.saved);
+            : view === "libraries"
+              ? // Category by category, in the sidebar's group order; starred first within each.
+                groupItems(galleryItems).flatMap((g) => g.items)
+              : galleryItems.filter((i) => i.saved);
     if (!words.length) return inView;
     return inView.filter((i) => {
       const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${i.site ?? i.library} ${typeById(i.type).name} ${i.tech.join(" ")}`.toLowerCase();
@@ -459,7 +463,9 @@ export default function App() {
   const viewName =
     view === "starred"
       ? "Starred"
-      : viewType
+      : view === "libraries"
+        ? "All libraries"
+        : viewType
             ? typeById(viewType).name
             : siteView(view)
               ? [
@@ -470,7 +476,7 @@ export default function App() {
                   .join(" · ")
               : (current?.name ?? "Starred");
   // Starred holds every saved bookmark, which the store calls "all".
-  const exportView = view === "starred" ? "all" : view;
+  const exportView = view === "starred" || view === "libraries" ? "all" : view;
 
   const setType = (bookmarkId: string, type: string) =>
     update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.id === bookmarkId ? { ...b, type } : b)) }));
@@ -1137,6 +1143,7 @@ function Sidebar(props: {
             <>
               <div className="hidden h-4 md:block" />
               <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
+              <NavItem id="libraries" name="All libraries" count={sites.reduce((n, x) => n + x.items.length, 0)} {...props} />
               {sites.map((x, i) => {
                 const dragging = drag?.key === x.key;
                 return (
@@ -1498,10 +1505,12 @@ function NavItem({
   const [over, setOver] = useState(false);
   const active = view === id;
   const droppable = !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
+  // A click on the library already open goes back to all libraries.
+  const deselect = active && typeof id === "string" && id.startsWith("site:");
   return (
     <Tip label={onRename ? "Double-click to rename" : undefined} side="right">
     <button
-      onClick={() => setView(id)}
+      onClick={() => setView(deselect ? "libraries" : id)}
       onDoubleClick={onRename}
       onDragOver={(e) => {
         if (!droppable) return;
