@@ -201,7 +201,11 @@ export function deal(root: HTMLElement): number {
   // landing's copy can go at once (a fade here would show two piles).
   if (handoff) document.getElementById(OVERLAY)?.remove();
 
+  // Every clock of the deal, held until the new page has been painted.
+  const clocks: Animation[] = [];
   cards.forEach((card, i) => {
+    // The card's own entrance (a CSS fade on the article) would hide the pile.
+    for (const a of card.getAnimations()) a.cancel();
     const face = card.firstElementChild as HTMLElement | null;
     const meta = card.lastElementChild as HTMLElement | null;
     if (!face) return;
@@ -258,8 +262,8 @@ export function deal(root: HTMLElement): number {
       ],
       { duration: end, easing: "linear", fill: "both" },
     );
-    wheel.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(70deg)" }], { duration: end, easing: "ease-in-out", fill: "both" });
-    sweep.animate([{ transform: "translateX(-60%)" }, { transform: "translateX(60%)" }], {
+    const turn = wheel.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(70deg)" }], { duration: end, easing: "ease-in-out", fill: "both" });
+    const glint = sweep.animate([{ transform: "translateX(-60%)" }, { transform: "translateX(60%)" }], {
       duration: FLIGHT * 0.8,
       delay: start,
       easing: EASE,
@@ -274,6 +278,8 @@ export function deal(root: HTMLElement): number {
           { duration: 320, delay: total - 120, easing: EASE, fill: "both" },
         )
       : null;
+    clocks.push(fly, sheen, turn, glint);
+    if (label) clocks.push(label);
 
     Promise.all([fly.finished, label?.finished]).then(
       () => {
@@ -288,6 +294,12 @@ export function deal(root: HTMLElement): number {
       },
     );
   });
+
+  // The first frame of a new page is a long one (layout, images). Show the
+  // pile through it, standing still, and start the clocks once it is painted,
+  // so no card jumps at the start of its flight.
+  for (const a of clocks) a.pause();
+  requestAnimationFrame(() => requestAnimationFrame(() => clocks.forEach((a) => a.play())));
 
   return (handoff ? FIRST_HANDED : FIRST) + (n - 1) * STAGGER + FLIGHT * 0.6;
 }
