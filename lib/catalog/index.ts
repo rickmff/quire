@@ -48,7 +48,11 @@ function terms(q: string) {
   }
   return [...out];
 }
-const STOP = new Set("a an the and or for with to of in on my me i want need make build some that this like page site ui component components".split(" "));
+const STOP = new Set(
+  "a an the and or for with to of in on my me i want need make build some that this like page site ui component components".split(
+    " ",
+  ),
+);
 
 function haystack(c: CatalogComponent) {
   return {
@@ -111,7 +115,9 @@ export function facets(items: CatalogComponent[]) {
       .map((t) => ({ id: t.id, name: t.name, family: t.family, count: types.get(t.id)! })),
     triggers: TRIGGERS.filter((t) => trig.has(t.id)).map((t) => ({ id: t.id, name: t.name, count: trig.get(t.id)! })),
     tech: [...tech].sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ id, count })),
-    libraries: [...libs].sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ id, name: libraryById.get(id)?.name ?? id, count })),
+    libraries: [...libs]
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, count]) => ({ id, name: libraryById.get(id)?.name ?? id, count })),
   };
 }
 

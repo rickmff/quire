@@ -22,9 +22,16 @@ const PUBLIC = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\
 const CONCURRENCY = Number(process.env.CONCURRENCY || 2);
 if (!TOKEN) throw new Error("Set CAPTURE_TOKEN");
 
-const R2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"].every((k) => process.env[k])
+const R2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"].every(
+  (k) => process.env[k],
+)
   ? {
-      client: new AwsClient({ accessKeyId: process.env.R2_ACCESS_KEY_ID, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY, service: "s3", region: "auto" }),
+      client: new AwsClient({
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+        service: "s3",
+        region: "auto",
+      }),
       endpoint: `${process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`}/${process.env.R2_BUCKET}`,
       public: process.env.R2_PUBLIC_URL.replace(/\/$/, ""),
     }
@@ -57,7 +64,15 @@ const NOISE = /cookie|consent|gdpr|newsletter|intercom|crisp|chat-widget|announc
 function privateIp(ip) {
   if (ip.includes(":")) return /^(::1|fc|fd|fe80|::ffff:127\.)/i.test(ip);
   const [a, b] = ip.split(".").map(Number);
-  return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127);
+  return (
+    a === 10 ||
+    a === 127 ||
+    a === 0 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    (a === 100 && b >= 64 && b <= 127)
+  );
 }
 async function publicUrl(raw) {
   let u;
@@ -74,7 +89,8 @@ async function publicUrl(raw) {
 }
 
 let browser;
-const getBrowser = async () => (browser?.isConnected() ? browser : (browser = await chromium.launch({ args: ["--no-sandbox"] })));
+const getBrowser = async () =>
+  browser?.isConnected() ? browser : (browser = await chromium.launch({ args: ["--no-sandbox"] }));
 
 let running = 0;
 const queue = [];
@@ -83,10 +99,17 @@ const free = () => (queue.length ? queue.shift()() : running--);
 
 async function capture(url, withVideo, width = 1280) {
   const height = Math.round((width * 10) / 16);
-  const id = createHash("sha1").update(width === 1280 ? url : `${url}#${width}`).digest("hex").slice(0, 16);
+  const id = createHash("sha1")
+    .update(width === 1280 ? url : `${url}#${width}`)
+    .digest("hex")
+    .slice(0, 16);
   const image = join(MEDIA, `${id}.webp`);
   const video = join(MEDIA, `${id}.webm`);
-  const have = async (p) => stat(p).then(() => true, () => false);
+  const have = async (p) =>
+    stat(p).then(
+      () => true,
+      () => false,
+    );
   if ((await have(image)) && (!withVideo || (await have(video)))) return out(id, withVideo);
 
   const tmp = join(MEDIA, `.tmp-${id}`);
@@ -100,10 +123,16 @@ async function capture(url, withVideo, width = 1280) {
   });
   const page = await ctx.newPage();
   try {
-    await page.route("**/*", (r) => (/\.(woff2?|ttf)$/.test(r.request().url()) || !NOISE.test(r.request().url()) ? r.continue() : r.abort()));
-    const res = await page.goto(url, { waitUntil: "networkidle", timeout: 25000 }).catch(() => page.waitForLoadState("domcontentloaded").then(() => null));
+    await page.route("**/*", (r) =>
+      /\.(woff2?|ttf)$/.test(r.request().url()) || !NOISE.test(r.request().url()) ? r.continue() : r.abort(),
+    );
+    const res = await page
+      .goto(url, { waitUntil: "networkidle", timeout: 25000 })
+      .catch(() => page.waitForLoadState("domcontentloaded").then(() => null));
     if (res && res.status() >= 400) throw new Error(`page returned ${res.status()}`);
-    await page.addStyleTag({ content: `[class*="cookie" i],[id*="cookie" i],[class*="consent" i]{display:none!important}` }).catch(() => {});
+    await page
+      .addStyleTag({ content: `[class*="cookie" i],[id*="cookie" i],[class*="consent" i]{display:none!important}` })
+      .catch(() => {});
     await page.waitForTimeout(1200);
 
     let target = null;
@@ -123,7 +152,10 @@ async function capture(url, withVideo, width = 1280) {
       const steps = 24;
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
-        await page.mouse.move(box.x + box.width * (0.15 + 0.7 * t), box.y + box.height * (0.5 + 0.25 * Math.sin(t * Math.PI * 2)));
+        await page.mouse.move(
+          box.x + box.width * (0.15 + 0.7 * t),
+          box.y + box.height * (0.5 + 0.25 * Math.sin(t * Math.PI * 2)),
+        );
         await page.waitForTimeout(90);
       }
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2).catch(() => {});
@@ -133,10 +165,18 @@ async function capture(url, withVideo, width = 1280) {
     const png = target ? await target.el.screenshot({ timeout: 8000 }) : await page.screenshot();
     const { channels } = await sharp(png).stats();
     if (channels.slice(0, 3).every((c) => c.stdev < 2)) throw new Error("blank page");
-    await sharp(png).resize({ width, height, fit: "cover", position: "centre" }).webp({ quality: width < 1280 ? 72 : 78 }).toFile(image);
+    await sharp(png)
+      .resize({ width, height, fit: "cover", position: "centre" })
+      .webp({ quality: width < 1280 ? 72 : 78 })
+      .toFile(image);
   } finally {
     await page.close().catch(() => {});
-    const vid = withVideo ? await page.video()?.path().catch(() => null) : null;
+    const vid = withVideo
+      ? await page
+          .video()
+          ?.path()
+          .catch(() => null)
+      : null;
     await ctx.close().catch(() => {});
     if (vid) await rename(vid, video).catch(() => {});
     await rm(tmp, { recursive: true, force: true }).catch(() => {});
@@ -148,7 +188,10 @@ async function capture(url, withVideo, width = 1280) {
   return out(id, withVideo);
 }
 const base = () => (R2 ? `${R2.public}/previews` : `${PUBLIC}/media`);
-const out = (id, withVideo) => ({ image: `${base()}/${id}.webp`, ...(withVideo ? { video: `${base()}/${id}.webm` } : {}) });
+const out = (id, withVideo) => ({
+  image: `${base()}/${id}.webp`,
+  ...(withVideo ? { video: `${base()}/${id}.webm` } : {}),
+});
 
 const TYPES = { ".webp": "image/webp", ".webm": "video/webm" };
 const send = (res, status, body, headers = {}) => {
@@ -158,13 +201,17 @@ const send = (res, status, body, headers = {}) => {
 
 createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
-  if (req.method === "GET" && path === "/health") return send(res, 200, { ok: true, storage: R2 ? "r2" : "disk", running, queued: queue.length });
+  if (req.method === "GET" && path === "/health")
+    return send(res, 200, { ok: true, storage: R2 ? "r2" : "disk", running, queued: queue.length });
   if (req.method === "GET" && path.startsWith("/media/")) {
     const file = path.slice(7);
     if (!/^[a-f0-9]{16}\.(webp|webm)$/.test(file)) return send(res, 404, { error: "not-found" });
     try {
       const body = await readFile(join(MEDIA, file));
-      return send(res, 200, body, { "content-type": TYPES[extname(file)], "cache-control": "public, max-age=31536000, immutable" });
+      return send(res, 200, body, {
+        "content-type": TYPES[extname(file)],
+        "cache-control": "public, max-age=31536000, immutable",
+      });
     } catch {
       return send(res, 404, { error: "not-found" });
     }

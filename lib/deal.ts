@@ -11,13 +11,17 @@ function foilStops(dark: boolean, steps = 24): string {
   const out: string[] = [];
   for (let k = 0; k <= steps; k++) {
     const h = k / steps;
-    const rgb = [0, 1 / 3, 2 / 3].map((o) => Math.round(Math.min(shade(0.8 + 0.2 * Math.cos(TAU * (h - o)), dark), 1) * 255));
+    const rgb = [0, 1 / 3, 2 / 3].map((o) =>
+      Math.round(Math.min(shade(0.8 + 0.2 * Math.cos(TAU * (h - o)), dark), 1) * 255),
+    );
     out.push(`rgb(${rgb.join(" ")}) ${(h * 100).toFixed(1)}%`);
   }
   return out.join(", ");
 }
 const glow = (a: number) =>
-  [0, 0.33, 0.67, 1].map((r) => `rgb(255 255 255 / ${(a * Math.exp(-((r * 1.56) ** 2) / 0.55)).toFixed(3)}) ${r * 100}%`).join(", ");
+  [0, 0.33, 0.67, 1]
+    .map((r) => `rgb(255 255 255 / ${(a * Math.exp(-((r * 1.56) ** 2) / 0.55)).toFixed(3)}) ${r * 100}%`)
+    .join(", ");
 function centre(dark: boolean): string {
   const v = Math.round(shade(0.95, dark) * 255);
   return `rgb(${v} ${v} ${v})`;
@@ -25,7 +29,11 @@ function centre(dark: boolean): string {
 
 export type FoilAt = { from: number; cx: number; cy: number };
 
-export function foilSheet(dark: boolean, i: number, at?: FoilAt): { el: HTMLElement; wheel: HTMLElement; sweep: HTMLElement } {
+export function foilSheet(
+  dark: boolean,
+  i: number,
+  at?: FoilAt,
+): { el: HTMLElement; wheel: HTMLElement; sweep: HTMLElement } {
   const { from = i * 0.061 * 360, cx = 50, cy = 50 } = at ?? {};
   const el = document.createElement("div");
   el.setAttribute("aria-hidden", "true");
@@ -128,7 +136,10 @@ export function handOff(stage: HTMLElement): number {
 function dropOverlay() {
   const el = document.getElementById(OVERLAY);
   if (!el) return;
-  el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" }).finished.then(() => el.remove(), () => el.remove());
+  el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" }).finished.then(
+    () => el.remove(),
+    () => el.remove(),
+  );
 }
 
 function takeHandoff(): Handoff | null {
@@ -213,21 +224,32 @@ export function deal(root: HTMLElement): number {
       ],
       { duration: end, easing: "linear", fill: "both" },
     );
-    const turn = wheel.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(70deg)" }], { duration: end, easing: "ease-in-out", fill: "both" });
+    const turn = wheel.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(70deg)" }], {
+      duration: end,
+      easing: "ease-in-out",
+      fill: "both",
+    });
     const glint = sweep.animate([{ transform: "translateX(-60%)" }, { transform: "translateX(60%)" }], {
       duration: FLIGHT * 0.8,
       delay: start,
       easing: EASE,
       fill: "both",
     });
-    sheen.finished.then(() => foil.remove(), () => foil.remove());
+    sheen.finished.then(
+      () => foil.remove(),
+      () => foil.remove(),
+    );
 
-    const label = meta && meta !== face
-      ? meta.animate(
-          [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }],
-          { duration: 320, delay: total - 120, easing: EASE, fill: "both" },
-        )
-      : null;
+    const label =
+      meta && meta !== face
+        ? meta.animate(
+            [
+              { opacity: 0, transform: "translateY(4px)" },
+              { opacity: 1, transform: "none" },
+            ],
+            { duration: 320, delay: total - 120, easing: EASE, fill: "both" },
+          )
+        : null;
     clocks.push(fly, sheen, turn, glint);
     if (label) clocks.push(label);
 

@@ -26,7 +26,10 @@ export default function ImportDialog({
 }) {
   const [url, setUrl] = useState(initialUrl);
   const [status, setStatus] = useState<
-    { kind: "empty" } | { kind: "loading" } | { kind: "error"; message: string } | { kind: "found"; result: ImportResult }
+    | { kind: "empty" }
+    | { kind: "loading" }
+    | { kind: "error"; message: string }
+    | { kind: "found"; result: ImportResult }
   >({ kind: "empty" });
   const result = status.kind === "found" ? status.result : null;
   const [items, setItems] = useState<(ImportItem & { on: boolean })[]>([]);
@@ -121,7 +124,10 @@ export default function ImportDialog({
                     const it = items[i];
                     const saved = savedUrls.has(it.url);
                     return (
-                      <label key={it.url} className="flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-1.5 hover:bg-hover">
+                      <label
+                        key={it.url}
+                        className="flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-1.5 hover:bg-hover"
+                      >
                         <input
                           type="checkbox"
                           checked={it.on}
@@ -134,7 +140,9 @@ export default function ImportDialog({
                             {it.title}
                             {saved && " · saved"}
                           </span>
-                          {it.description && <span className="block truncate text-[12px] text-faint">{it.description}</span>}
+                          {it.description && (
+                            <span className="block truncate text-[12px] text-faint">{it.description}</span>
+                          )}
                         </span>
                         <select
                           value={it.type}

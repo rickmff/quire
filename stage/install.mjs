@@ -35,26 +35,46 @@ async function load(reg, name) {
 
 async function shadcnUi(name) {
   const cache = join(SCRATCH, "shadcn-src", name + ".tsx");
-  let text, kind = "ui";
+  let text,
+    kind = "ui";
   if (existsSync(cache)) text = readFileSync(cache, "utf8");
   else {
     let r = await fetch(`${RAW}/shadcn-ui/ui/HEAD/apps/v4/registry/new-york-v4/ui/${name}.tsx`);
-    if (!r.ok) { r = await fetch(`${RAW}/shadcn-ui/ui/HEAD/apps/v4/registry/new-york-v4/hooks/${name}.ts`); kind = "hook"; }
+    if (!r.ok) {
+      r = await fetch(`${RAW}/shadcn-ui/ui/HEAD/apps/v4/registry/new-york-v4/hooks/${name}.ts`);
+      kind = "hook";
+    }
     if (!r.ok) return null;
     text = await r.text();
     mkdirSync(dirname(cache), { recursive: true });
     writeFileSync(cache, text);
   }
-  text = text.replace(/@\/registry\/new-york-v4\/ui\//g, "@/components/ui/").replace(/@\/registry\/new-york-v4\/(lib|hooks)\//g, "@/$1/");
+  text = text
+    .replace(/@\/registry\/new-york-v4\/ui\//g, "@/components/ui/")
+    .replace(/@\/registry\/new-york-v4\/(lib|hooks)\//g, "@/$1/");
   const regDeps = [...text.matchAll(/from "@\/components\/ui\/([\w-]+)"/g)].map((m) => m[1]);
-  const npm = [...text.matchAll(/from "([^"@.][^"]*|@[^/"]+\/[^/"]+)[^"]*"/g)].map((m) => m[1]).filter((d) => !/^(react|react-dom|cn)$/.test(d) && !d.startsWith("@/"));
-  return { name, dependencies: npm, registryDependencies: regDeps, files: [kind === "hook" || /^use-/.test(name) ? { path: `hooks/${name}.ts`, type: "registry:hook", content: text } : { path: `ui/${name}.tsx`, type: "registry:ui", content: text }] };
+  const npm = [...text.matchAll(/from "([^"@.][^"]*|@[^/"]+\/[^/"]+)[^"]*"/g)]
+    .map((m) => m[1])
+    .filter((d) => !/^(react|react-dom|cn)$/.test(d) && !d.startsWith("@/"));
+  return {
+    name,
+    dependencies: npm,
+    registryDependencies: regDeps,
+    files: [
+      kind === "hook" || /^use-/.test(name)
+        ? { path: `hooks/${name}.ts`, type: "registry:hook", content: text }
+        : { path: `ui/${name}.tsx`, type: "registry:ui", content: text },
+    ],
+  };
 }
 
 function ref(dep, from) {
   if (/^https?:/.test(dep)) {
     const u = new URL(dep);
-    const n = u.pathname.split("/").pop().replace(/\.json$/, "");
+    const n = u.pathname
+      .split("/")
+      .pop()
+      .replace(/\.json$/, "");
     if (/magicui/.test(u.host)) return ["magicui", n];
     if (/animate-ui/.test(u.host)) return ["animate-ui", n];
     return ["shadcn", n];
@@ -76,14 +96,49 @@ function dest(reg, f) {
   return `components/ui/${base}`;
 }
 
-const NAMES = { btt: "Bottom to top", ttb: "Top to bottom", ltr: "Left to right", rtl: "Right to left", xs: "Extra small", sm: "Small", md: "Medium", lg: "Large", "icon-sm": "Icon small", "icon-lg": "Icon large", svg: "SVG", cta: "CTA", "3d": "3D" };
-const words = (k) => NAMES[String(k).toLowerCase()] ?? String(k).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/-/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+const NAMES = {
+  btt: "Bottom to top",
+  ttb: "Top to bottom",
+  ltr: "Left to right",
+  rtl: "Right to left",
+  xs: "Extra small",
+  sm: "Small",
+  md: "Medium",
+  lg: "Large",
+  "icon-sm": "Icon small",
+  "icon-lg": "Icon large",
+  svg: "SVG",
+  cta: "CTA",
+  "3d": "3D",
+};
+const words = (k) =>
+  NAMES[String(k).toLowerCase()] ??
+  String(k)
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/-/g, " ")
+    .toLowerCase()
+    .replace(/^\w/, (c) => c.toUpperCase());
 function variantsOf(item) {
   const groups = [];
   for (const props of Object.values(item.meta?.demoProps ?? {}))
     for (const [k, v] of Object.entries(props)) {
-      if (v?.options && Object.keys(v.options).length > 1) groups.push({ key: k, label: words(k), value: v.value, options: Object.entries(v.options).map(([l, val]) => ({ value: val, label: words(l) })) });
-      else if (typeof v?.value === "boolean") groups.push({ key: k, label: words(k), value: v.value, options: [{ value: true, label: "On" }, { value: false, label: "Off" }] });
+      if (v?.options && Object.keys(v.options).length > 1)
+        groups.push({
+          key: k,
+          label: words(k),
+          value: v.value,
+          options: Object.entries(v.options).map(([l, val]) => ({ value: val, label: words(l) })),
+        });
+      else if (typeof v?.value === "boolean")
+        groups.push({
+          key: k,
+          label: words(k),
+          value: v.value,
+          options: [
+            { value: true, label: "On" },
+            { value: false, label: "Off" },
+          ],
+        });
     }
   return groups.length ? { variants: groups } : {};
 }
@@ -114,8 +169,11 @@ export async function install(lib, app, names) {
     if (seen.has(key)) return seen.get(key);
     seen.set(key, null);
     let item = reg === "shadcn" ? await shadcnUi(name) : await load(reg, name);
-    if (!item && fallback) item = await load(fallback, name), reg = fallback;
-    if (!item) { missing.push(key); return false; }
+    if (!item && fallback) ((item = await load(fallback, name)), (reg = fallback));
+    if (!item) {
+      missing.push(key);
+      return false;
+    }
     for (const d of item.dependencies ?? []) deps.add(d);
     for (const d of item.registryDependencies ?? []) {
       const [r, n] = ref(d);
@@ -133,7 +191,11 @@ export async function install(lib, app, names) {
     return item;
   }
 
-  const ALIAS = { "magicui/bento-grid": "bento-demo", "magicui/backlight": "backlight-svg-demo", "magicui/client-tweet-card": "tweet-card-demo" };
+  const ALIAS = {
+    "magicui/bento-grid": "bento-demo",
+    "magicui/backlight": "backlight-svg-demo",
+    "magicui/client-tweet-card": "tweet-card-demo",
+  };
   const demos = [];
   for (const name of names) {
     const custom = join(dirname(new URL(import.meta.url).pathname), "custom", lib, `${name}.tsx`);
@@ -144,17 +206,28 @@ export async function install(lib, app, names) {
       demos.push({ name, demo: `custom/${name}`, file: `custom/${name}.tsx`, props: {} });
       continue;
     }
-    const cands = ALIAS[`${lib}/${name}`] ? [ALIAS[`${lib}/${name}`]] : lib === "magicui" ? [`${name}-demo`, `${name}-demo-1`, `${name}-demo-2`, name] : [`demo-${name}`, name];
+    const cands = ALIAS[`${lib}/${name}`]
+      ? [ALIAS[`${lib}/${name}`]]
+      : lib === "magicui"
+        ? [`${name}-demo`, `${name}-demo-1`, `${name}-demo-2`, name]
+        : [`demo-${name}`, name];
     let found = null;
     for (const c of cands) {
       const it = await load(lib, c);
-      if (it && it.files?.some((f) => f.content)) { found = c; break; }
+      if (it && it.files?.some((f) => f.content)) {
+        found = c;
+        break;
+      }
     }
-    if (!found) { demos.push({ name, demo: null }); continue; }
+    if (!found) {
+      demos.push({ name, demo: null });
+      continue;
+    }
     const item = await add(lib, found);
     const main = item.files.find((f) => f.content && /\.(t|j)sx$/.test(f.path)) ?? item.files[0];
     const props = {};
-    for (const group of Object.values(item.meta?.demoProps ?? {})) for (const [k, v] of Object.entries(group)) props[k] = v?.value;
+    for (const group of Object.values(item.meta?.demoProps ?? {}))
+      for (const [k, v] of Object.entries(group)) props[k] = v?.value;
     demos.push({ name, demo: found, file: dest(lib, main), props, ...variantsOf(item) });
   }
 
@@ -163,7 +236,11 @@ export async function install(lib, app, names) {
     const examples = index.items.filter((i) => i.type === "registry:example").map((i) => i.name);
     for (const d of demos) {
       if (!d.demo || d.file.startsWith("custom/")) continue;
-      const mine = examples.filter((e) => (e === d.name || e.startsWith(d.name + "-")) && !names.some((m) => m.length > d.name.length && (e === m || e.startsWith(m + "-"))));
+      const mine = examples.filter(
+        (e) =>
+          (e === d.name || e.startsWith(d.name + "-")) &&
+          !names.some((m) => m.length > d.name.length && (e === m || e.startsWith(m + "-"))),
+      );
       if (mine.length < 2 || !mine.includes(d.demo)) continue;
       const options = [{ value: "", label: exampleLabel(d.name, d.demo) }];
       d.examples = {};
@@ -180,24 +257,37 @@ export async function install(lib, app, names) {
   }
 
   const { readdirSync, statSync } = await import("node:fs");
-  const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
+  const walk = (d) =>
+    readdirSync(d).flatMap((f) => {
+      const p = join(d, f);
+      return statSync(p).isDirectory() ? walk(p) : [p];
+    });
   for (let round = 0; round < 4; round++) {
     let added = 0;
     for (const file of walk(join(app, "src")).filter((f) => /\.(t|j)sx?$/.test(f))) {
       const text = readFileSync(file, "utf8");
       for (const m of text.matchAll(/from\s+["']@\/(components\/ui|hooks)\/([\w-]+)["']/g)) {
         const base = join(app, "src", m[1], m[2]);
-        if (![".tsx", ".ts", ".jsx", ".js"].some((e) => existsSync(base + e))) { await add("shadcn", m[2], lib); added++; }
+        if (![".tsx", ".ts", ".jsx", ".js"].some((e) => existsSync(base + e))) {
+          await add("shadcn", m[2], lib);
+          added++;
+        }
       }
       for (const m of text.matchAll(/from\s+["']@\/([\w./-]+)["']/g)) {
         const rel = m[1];
         const base = join(app, "src", rel);
         if ([".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts"].some((e) => existsSync(base + e))) continue;
         const roots = DOCS[lib];
-        found: for (const root of roots) for (const ext of [".tsx", ".ts", "/index.tsx", "/index.ts"]) {
-          const r = await fetch(`${RAW}/${root}/${rel}${ext}`);
-          if (r.ok) { mkdirSync(dirname(base + ext), { recursive: true }); writeFileSync(base + ext, await r.text()); added++; break found; }
-        }
+        found: for (const root of roots)
+          for (const ext of [".tsx", ".ts", "/index.tsx", "/index.ts"]) {
+            const r = await fetch(`${RAW}/${root}/${rel}${ext}`);
+            if (r.ok) {
+              mkdirSync(dirname(base + ext), { recursive: true });
+              writeFileSync(base + ext, await r.text());
+              added++;
+              break found;
+            }
+          }
       }
       for (const m of text.matchAll(/from\s+["']((?:@[\w.-]+\/)?[\w.-]+)(?:\/[^"']*)?["']/g)) {
         const pkg = m[1];
@@ -208,7 +298,8 @@ export async function install(lib, app, names) {
   }
 
   let src = `export const demos: Record<string, () => Promise<any>> = {\n`;
-  const entry = (key, file) => `  ${JSON.stringify(key)}: () => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}),\n`;
+  const entry = (key, file) =>
+    `  ${JSON.stringify(key)}: () => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}),\n`;
   for (const d of demos) if (d.demo) src += entry(d.name, d.file);
   for (const d of demos) for (const [e, file] of Object.entries(d.examples ?? {})) src += entry(`${d.name}~${e}`, file);
   src += "};\n";
@@ -216,13 +307,26 @@ export async function install(lib, app, names) {
   writeFileSync(join(app, "src/demos.tsx"), src);
 
   const assets = new Set();
-  const scan = (dir) => { for (const e of readdirSync(dir, { withFileTypes: true })) { const f = join(dir, e.name); if (e.isDirectory()) scan(f); else if (/\.(t|j)sx?$/.test(e.name)) for (const m of readFileSync(f, "utf8").matchAll(/["'`](\/[\w./-]+\.(?:png|jpe?g|webp|gif|svg|avif|mp4|webm))["'`]/g)) assets.add(m[1]); } };
+  const scan = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const f = join(dir, e.name);
+      if (e.isDirectory()) scan(f);
+      else if (/\.(t|j)sx?$/.test(e.name))
+        for (const m of readFileSync(f, "utf8").matchAll(
+          /["'`](\/[\w./-]+\.(?:png|jpe?g|webp|gif|svg|avif|mp4|webm))["'`]/g,
+        ))
+          assets.add(m[1]);
+    }
+  };
   scan(join(app, "src"));
   for (const a of assets) {
     const out = join(app, "public", a);
     if (existsSync(out)) continue;
     const r = await fetch(`${RAW}/${DOCS[lib][0]}/public${a}`);
-    if (!r.ok) { missing.push("asset " + a); continue; }
+    if (!r.ok) {
+      missing.push("asset " + a);
+      continue;
+    }
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, Buffer.from(await r.arrayBuffer()));
   }
@@ -235,7 +339,9 @@ export async function install(lib, app, names) {
   writeFileSync(join(app, "src/registry.css"), extra);
   writeFileSync(join(app, "deps.json"), JSON.stringify([...deps].sort(), null, 1));
   writeFileSync(join(app, "demos.json"), JSON.stringify(demos, null, 1));
-  console.log(`${lib}: ${demos.filter((d) => d.demo).length}/${names.length} demos, ${deps.size} npm deps, missing: ${missing.join(", ") || "none"}`);
+  console.log(
+    `${lib}: ${demos.filter((d) => d.demo).length}/${names.length} demos, ${deps.size} npm deps, missing: ${missing.join(", ") || "none"}`,
+  );
 }
 
 if (process.argv[2]) {

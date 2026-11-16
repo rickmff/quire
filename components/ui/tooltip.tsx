@@ -9,7 +9,14 @@ function TooltipProvider({
   skipDelayDuration = 250,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration} skipDelayDuration={skipDelayDuration} {...props} />;
+  return (
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delayDuration={delayDuration}
+      skipDelayDuration={skipDelayDuration}
+      {...props}
+    />
+  );
 }
 
 function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
@@ -62,7 +69,9 @@ function Tip({
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent side={side}>
         <span>{label}</span>
-        {shortcut && <kbd className="rounded-[3px] bg-bg/15 px-1 font-sans text-[10px] leading-4 opacity-80">{shortcut}</kbd>}
+        {shortcut && (
+          <kbd className="rounded-[3px] bg-bg/15 px-1 font-sans text-[10px] leading-4 opacity-80">{shortcut}</kbd>
+        )}
       </TooltipContent>
     </Tooltip>
   );

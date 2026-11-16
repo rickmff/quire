@@ -13,13 +13,15 @@ function place(sizes: Size[], r: number) {
   const n = sizes.length;
   return sizes.map(({ w, h }, i) => {
     const a = -Math.PI / 2 + (i / n) * 2 * Math.PI;
-    const cos = Math.cos(a), sin = Math.sin(a);
+    const cos = Math.cos(a),
+      sin = Math.sin(a);
     return { x: r * cos + (w / 2) * cos, y: r * sin + (h / 2) * sin };
   });
 }
 
 function stack(sizes: Size[]) {
-  const n = sizes.length, right = Math.ceil(n / 2);
+  const n = sizes.length,
+    right = Math.ceil(n / 2);
   const row = Math.max(...sizes.map((s) => s.h)) + GAP;
   const r = Math.max(MIN_R, (right * row) / 2);
   return sizes.map(({ w }, i) => {

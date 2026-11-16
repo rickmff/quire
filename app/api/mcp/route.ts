@@ -8,7 +8,8 @@ const MAX_BODY = 256 * 1024;
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, OPTIONS",
-  "access-control-allow-headers": "content-type, accept, mcp-session-id, mcp-protocol-version, x-quire-key, authorization",
+  "access-control-allow-headers":
+    "content-type, accept, mcp-session-id, mcp-protocol-version, x-quire-key, authorization",
 };
 
 const json = (body: unknown, status = 200) =>
@@ -22,7 +23,8 @@ function keyFrom(req: Request) {
 
 export async function POST(req: Request) {
   const raw = await req.text();
-  if (raw.length > MAX_BODY) return json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Body too large" } }, 413);
+  if (raw.length > MAX_BODY)
+    return json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Body too large" } }, 413);
   let body: any;
   try {
     body = JSON.parse(raw);

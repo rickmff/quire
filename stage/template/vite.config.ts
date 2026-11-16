@@ -10,7 +10,9 @@ function publicBase(): Plugin {
   const files = existsSync(r("./public")) ? readdirSync(r("./public")) : [];
   return {
     name: "public-base",
-    configResolved(c) { base = c.base; },
+    configResolved(c) {
+      base = c.base;
+    },
     transform(code, id) {
       if (base === "/" || id.includes("node_modules") || !files.length) return;
       let out = code;

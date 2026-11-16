@@ -15,7 +15,14 @@ for (const lib of libs) {
   mkdirSync(dir, { recursive: true });
   const report = existsSync(join(out, "report.json")) ? JSON.parse(readFileSync(join(out, "report.json"), "utf8")) : {};
   const built = existsSync(join(root, "public/stage", lib, "index.html"));
-  const variants = Object.fromEntries((existsSync(join(`app-${lib}`, "demos.json")) ? JSON.parse(readFileSync(join(`app-${lib}`, "demos.json"), "utf8")) : []).filter((d) => d.variants).map((d) => [d.name, d.variants]));
+  const variants = Object.fromEntries(
+    (existsSync(join(`app-${lib}`, "demos.json"))
+      ? JSON.parse(readFileSync(join(`app-${lib}`, "demos.json"), "utf8"))
+      : []
+    )
+      .filter((d) => d.variants)
+      .map((d) => [d.name, d.variants]),
+  );
   if (!built) console.log(`no live demos for ${lib}: run ./build.sh ${root} ${lib} first`);
   for (const c of data.components.filter((c) => c.library === lib)) {
     const s = {};
@@ -34,9 +41,15 @@ for (const lib of libs) {
       const f = r.frame;
       return { src: `/stage/${lib}/index.html?${q}`, frame: [f.x, f.y, f.width, f.height].map(round) };
     };
-    for (const [theme, suffix] of [["light", ""], ["dark", "-dark"]]) {
+    for (const [theme, suffix] of [
+      ["light", ""],
+      ["dark", "-dark"],
+    ]) {
       const img = join(out, `${c.name}-${theme}.webp`);
-      if (existsSync(img)) { copyFileSync(img, join(dir, `${c.name}${suffix}.webp`)); s[theme === "light" ? "image" : "imageDark"] = `/previews/${lib}/${c.name}${suffix}.webp`; }
+      if (existsSync(img)) {
+        copyFileSync(img, join(dir, `${c.name}${suffix}.webp`));
+        s[theme === "light" ? "image" : "imageDark"] = `/previews/${lib}/${c.name}${suffix}.webp`;
+      }
     }
     const vids = ["light", "dark"].map((t) => join(out, `${c.name}-${t}.mp4`));
     if (vids.every(existsSync)) {
@@ -48,16 +61,27 @@ for (const lib of libs) {
     const [light, dark] = [page("light"), page("dark")];
     if (light) {
       s.live = { src: light.src, frame: light.frame, view: VIEW };
-      if (dark) { s.live.srcDark = dark.src; s.live.frameDark = dark.frame; }
+      if (dark) {
+        s.live.srcDark = dark.src;
+        s.live.frameDark = dark.frame;
+      }
       if (variants[c.name]) s.live.variants = variants[c.name];
     }
-    if (s.image) shots[c.id] = s; else { delete shots[c.id]; console.log("no preview:", c.id); }
+    if (s.image) shots[c.id] = s;
+    else {
+      delete shots[c.id];
+      console.log("no preview:", c.id);
+    }
   }
 }
 writeFileSync(STAGE, JSON.stringify(shots, null, 1) + "\n");
 for (const c of data.components) {
   const s = shots[c.id];
-  delete c.preview; delete c.previewDark; delete c.video; delete c.videoDark; delete c.live;
+  delete c.preview;
+  delete c.previewDark;
+  delete c.video;
+  delete c.videoDark;
+  delete c.live;
   if (!s) continue;
   c.preview = s.image;
   if (s.imageDark) c.previewDark = s.imageDark;

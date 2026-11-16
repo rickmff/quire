@@ -4,11 +4,15 @@ import { isIP } from "node:net";
 function isPrivate(ip: string) {
   if (ip.includes(":")) {
     const v = ip.toLowerCase();
-    return v === "::1" || v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe80") || v.startsWith("::ffff:127.");
+    return (
+      v === "::1" || v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe80") || v.startsWith("::ffff:127.")
+    );
   }
   const [a, b] = ip.split(".").map(Number);
   return (
-    a === 10 || a === 127 || a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    a === 0 ||
     (a === 169 && b === 254) ||
     (a === 172 && b >= 16 && b <= 31) ||
     (a === 192 && b === 168) ||
@@ -27,9 +31,7 @@ export async function safeUrl(raw: string): Promise<URL | null> {
   if (u.hostname === "localhost") return null;
   if (process.env.QUIRE_SKIP_DNS_CHECK === "1") return u;
   try {
-    const addrs = isIP(u.hostname)
-      ? [{ address: u.hostname }]
-      : await lookup(u.hostname, { all: true });
+    const addrs = isIP(u.hostname) ? [{ address: u.hostname }] : await lookup(u.hostname, { all: true });
     if (addrs.some((a) => isPrivate(a.address))) return null;
   } catch {
     return null;

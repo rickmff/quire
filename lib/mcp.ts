@@ -33,7 +33,9 @@ function full(c: CatalogComponent, base: string) {
     ...(c.category ? { siteCategory: c.category } : {}),
     ...(c.dependencies?.length ? { dependencies: c.dependencies } : {}),
     ...(c.preview ? { preview: c.preview.startsWith("/") ? `${base}${c.preview}` : c.preview } : {}),
-    ...(c.previewDark ? { previewDark: c.previewDark.startsWith("/") ? `${base}${c.previewDark}` : c.previewDark } : {}),
+    ...(c.previewDark
+      ? { previewDark: c.previewDark.startsWith("/") ? `${base}${c.previewDark}` : c.previewDark }
+      : {}),
     ...(c.live ? { liveDemo: `${base}${c.live.src}` } : {}),
     sourceAvailable: Boolean(c.item || (c.repo && c.files?.length)),
   };
@@ -42,8 +44,14 @@ function full(c: CatalogComponent, base: string) {
 const str = { type: "string" } as const;
 const filterProps = {
   type: { type: "string", description: "Component type id from get_filters, e.g. button, navbar, text-effect." },
-  trigger: { type: "string", description: "Motion trigger id: hover, click, scroll, cursor, drag, typing, entrance, loop, state." },
-  tech: { type: "string", description: "Animation tech: Motion, GSAP, Three.js, WebGL, Lottie, React Spring, Matter.js." },
+  trigger: {
+    type: "string",
+    description: "Motion trigger id: hover, click, scroll, cursor, drag, typing, entrance, loop, state.",
+  },
+  tech: {
+    type: "string",
+    description: "Animation tech: Motion, GSAP, Three.js, WebGL, Lottie, React Spring, Matter.js.",
+  },
   library: { type: "string", description: "Library id or name from list_libraries." },
 };
 
@@ -54,7 +62,10 @@ const TOOLS = [
       "Start here. Give a plain-language brief (what you are building and the feel you want). Returns the component types it reads from the brief, the best real references for each, and motion rules. Then call get_component_source on the ones you use.",
     inputSchema: {
       type: "object",
-      properties: { brief: { ...str, description: "e.g. 'pricing page with a playful toggle and a hover effect on cards'" }, perType: { type: "number" } },
+      properties: {
+        brief: { ...str, description: "e.g. 'pricing page with a playful toggle and a hover effect on cards'" },
+        perType: { type: "number" },
+      },
       required: ["brief"],
     },
   },
@@ -63,22 +74,32 @@ const TOOLS = [
     description: "Search components, micro-interactions and animations by words and filters. Returns compact cards.",
     inputSchema: {
       type: "object",
-      properties: { query: { ...str, description: "Words, e.g. 'magnetic button', 'text scramble', 'dock'." }, ...filterProps, limit: { type: "number", description: "Max 50, default 12." } },
+      properties: {
+        query: { ...str, description: "Words, e.g. 'magnetic button', 'text scramble', 'dock'." },
+        ...filterProps,
+        limit: { type: "number", description: "Max 50, default 12." },
+      },
     },
   },
   {
     name: "get_component",
     description: "Full record of one component: description, motion, tech, dependencies, docs link, install command.",
-    inputSchema: { type: "object", properties: { id: { ...str, description: "Component id, e.g. magicui/magic-card." } }, required: ["id"] },
+    inputSchema: {
+      type: "object",
+      properties: { id: { ...str, description: "Component id, e.g. magicui/magic-card." } },
+      required: ["id"],
+    },
   },
   {
     name: "get_component_source",
-    description: "The real source code of a component, read from its library's registry or GitHub repo. Use it to adapt the interaction, not to copy blindly.",
+    description:
+      "The real source code of a component, read from its library's registry or GitHub repo. Use it to adapt the interaction, not to copy blindly.",
     inputSchema: { type: "object", properties: { id: str }, required: ["id"] },
   },
   {
     name: "get_filters",
-    description: "Every valid filter value with counts: types (grouped by family), motion triggers, tech and libraries.",
+    description:
+      "Every valid filter value with counts: types (grouped by family), motion triggers, tech and libraries.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -100,7 +121,8 @@ async function callTool(name: string, args: any, ctx: Ctx) {
   switch (name) {
     case "recommend": {
       const brief = String(args?.brief ?? "").slice(0, 500);
-      if (!brief.trim()) return text("Pass a brief, e.g. 'landing hero with an animated headline and a glowing button'.", true);
+      if (!brief.trim())
+        return text("Pass a brief, e.g. 'landing hero with an animated headline and a glowing button'.", true);
       const per = Math.max(1, Math.min(Number(args?.perType) || 4, 8));
       const read = readBrief(brief);
       const trigger = read.triggers[0];
@@ -138,8 +160,22 @@ async function callTool(name: string, args: any, ctx: Ctx) {
       const c = find(String(args?.id ?? ""));
       if (!c) return text(`No component ${args?.id}.`, true);
       const src = await readSource(c);
-      if (!src) return text({ id: c.id, docs: c.docs, install: c.install, note: "Source not readable from here. Open the docs link or run the install command." });
-      return text({ id: c.id, title: c.title, library: libraryName(c), from: src.from, install: c.install, dependencies: src.dependencies ?? c.dependencies, files: src.files });
+      if (!src)
+        return text({
+          id: c.id,
+          docs: c.docs,
+          install: c.install,
+          note: "Source not readable from here. Open the docs link or run the install command.",
+        });
+      return text({
+        id: c.id,
+        title: c.title,
+        library: libraryName(c),
+        from: src.from,
+        install: c.install,
+        dependencies: src.dependencies ?? c.dependencies,
+        files: src.files,
+      });
     }
     case "get_filters":
       return text(facets(items));
@@ -150,7 +186,9 @@ async function callTool(name: string, args: any, ctx: Ctx) {
       return text(
         [...count].map(([id, n]) => {
           const l = libraries.find((x) => x.id === id);
-          return l ? { id, name: l.name, url: l.url, about: l.blurb, components: n, followed: own ? own.has(id) : true } : { id, name: id, components: n, personal: true };
+          return l
+            ? { id, name: l.name, url: l.url, about: l.blurb, components: n, followed: own ? own.has(id) : true }
+            : { id, name: id, components: n, personal: true };
         }),
       );
     }
@@ -170,13 +208,22 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
         protocolVersion: VERSIONS.includes(asked) ? asked : VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "quire", title: "Quire", version: "0.2.0" },
-        instructions: INSTRUCTIONS + (ctx.user ? " You are reading the user's personal library." : " You are reading the curated starter library."),
+        instructions:
+          INSTRUCTIONS +
+          (ctx.user
+            ? " You are reading the user's personal library."
+            : " You are reading the curated starter library."),
       });
     }
     case "ping":
       return reply({});
     case "tools/list":
-      return reply({ tools: TOOLS.map((t) => ({ ...t, annotations: { readOnlyHint: true, openWorldHint: t.name === "get_component_source" } })) });
+      return reply({
+        tools: TOOLS.map((t) => ({
+          ...t,
+          annotations: { readOnlyHint: true, openWorldHint: t.name === "get_component_source" },
+        })),
+      });
     case "tools/call": {
       const out = await callTool(msg.params?.name, msg.params?.arguments ?? {}, ctx);
       return out ? reply(out) : fail(-32602, `Unknown tool ${msg.params?.name}`);

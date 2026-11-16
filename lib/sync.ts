@@ -20,7 +20,13 @@ export async function loadLibrary(key: string | null | undefined): Promise<Synce
 }
 
 const s = (v: unknown, max = 300) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined);
-const arr = (v: unknown, max = 20) => (Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, max).map((x) => x.slice(0, 80)) : []);
+const arr = (v: unknown, max = 20) =>
+  Array.isArray(v)
+    ? v
+        .filter((x) => typeof x === "string")
+        .slice(0, max)
+        .map((x) => x.slice(0, 80))
+    : [];
 const url = (v: unknown) => {
   const x = s(v, 600);
   return x && /^https?:\/\//.test(x) ? x : undefined;
@@ -34,26 +40,28 @@ export function cleanLibrary(input: any): SyncedLibrary | null {
     const title = s(i?.title, 160);
     const docs = url(i?.docs);
     if (!id || !title || !docs) return [];
-    return [{
-      id,
-      library: s(i.library, 80) ?? "mine",
-      name: s(i.name, 120) ?? id,
-      title,
-      description: s(i.description, 600),
-      category: s(i.category, 80),
-      type: s(i.type, 40) ?? "other",
-      triggers: arr(i.triggers, 4),
-      tech: arr(i.tech, 6),
-      dependencies: arr(i.dependencies, 30),
-      docs,
-      item: url(i.item),
-      install: s(i.install, 300),
-      repo: s(i.repo, 120),
-      files: arr(i.files, 10),
-      preview: url(i.preview),
-      note: s(i.note, 1000),
-      site: s(i.site, 80),
-    }];
+    return [
+      {
+        id,
+        library: s(i.library, 80) ?? "mine",
+        name: s(i.name, 120) ?? id,
+        title,
+        description: s(i.description, 600),
+        category: s(i.category, 80),
+        type: s(i.type, 40) ?? "other",
+        triggers: arr(i.triggers, 4),
+        tech: arr(i.tech, 6),
+        dependencies: arr(i.dependencies, 30),
+        docs,
+        item: url(i.item),
+        install: s(i.install, 300),
+        repo: s(i.repo, 120),
+        files: arr(i.files, 10),
+        preview: url(i.preview),
+        note: s(i.note, 1000),
+        site: s(i.site, 80),
+      },
+    ];
   });
   return {
     version: 1,

@@ -41,8 +41,7 @@ export type Library = {
 const KEY = "quire:v1";
 const EMPTY: Library = { version: 1, bookmarks: [], collections: [] };
 
-export const uid = () =>
-  Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+export const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
 
 export function readLibrary(): Library {
   try {
@@ -62,7 +61,10 @@ export function writeLibrary(lib: Library) {
   } catch {}
 }
 
-export type Meta = Omit<Bookmark, "id" | "collectionId" | "createdAt" | "note" | "type" | "category" | "registry" | "dependencies" | "ref" | "video">;
+export type Meta = Omit<
+  Bookmark,
+  "id" | "collectionId" | "createdAt" | "note" | "type" | "category" | "registry" | "dependencies" | "ref" | "video"
+>;
 
 export async function fetchMeta(url: string): Promise<Meta> {
   const res = await fetch(`/api/meta?url=${encodeURIComponent(url)}`);

@@ -34,7 +34,8 @@ type View = "starred" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
 const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
-const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
+const groupView = (v: View) =>
+  typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null;
 const PAGES = new Set(["starred", "libraries", "sites", "agents"]);
 const isGallery = (v: View) => v === "starred" || v === "libraries" || typeView(v) !== null || siteView(v) !== null;
 
@@ -100,13 +101,18 @@ export default function App() {
     const main = mainRef.current;
     if (!main || intro.phase !== "done" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const vh = window.innerHeight;
-    const els = [...main.querySelectorAll<HTMLElement>("h1, section > button[data-chrome], [data-grid] > *")].filter((el) => {
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.top < vh && r.bottom > 0;
-    });
+    const els = [...main.querySelectorAll<HTMLElement>("h1, section > button[data-chrome], [data-grid] > *")].filter(
+      (el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.top < vh && r.bottom > 0;
+      },
+    );
     els.forEach((el, i) =>
       el.animate(
-        [{ opacity: 0, transform: "translateY(8px) scale(.985)", filter: "blur(2px)" }, { opacity: 1, transform: "none", filter: "none" }],
+        [
+          { opacity: 0, transform: "translateY(8px) scale(.985)", filter: "blur(2px)" },
+          { opacity: 1, transform: "none", filter: "none" },
+        ],
         { duration: 360, delay: Math.min(i, 10) * 28, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" },
       ),
     );
@@ -239,7 +245,10 @@ export default function App() {
       update((l) => (l.mode ? l : { ...l, mode: "curated", sources: l.sources ?? catalog.libraries.map((x) => x.id) }));
   }, [ready, catalog, fresh, update]);
 
-  const byDocs = useMemo(() => new Map((catalog?.components ?? []).map((c) => [c.docs.replace(/\/$/, ""), c])), [catalog]);
+  const byDocs = useMemo(
+    () => new Map((catalog?.components ?? []).map((c) => [c.docs.replace(/\/$/, ""), c])),
+    [catalog],
+  );
 
   const galleryItems = useMemo<GalleryItem[]>(() => {
     const saved = lib.bookmarks.map((b) => {
@@ -247,7 +256,12 @@ export default function App() {
       const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
       return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
     });
-    const page = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase();
+    const page = (u: string) =>
+      u
+        .replace(/^https?:\/\/(www\.)?/, "")
+        .replace(/[#?].*$/, "")
+        .replace(/\/$/, "")
+        .toLowerCase();
     const ids = new Set<string>();
     const pages = new Set<string>();
     const unique = saved.filter((s) => {
@@ -279,7 +293,8 @@ export default function App() {
               : galleryItems.filter((i) => i.saved);
     if (!words.length) return inView;
     return inView.filter((i) => {
-      const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${i.site ?? i.library} ${typeById(i.type).name} ${i.tech.join(" ")}`.toLowerCase();
+      const hay =
+        `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${i.site ?? i.library} ${typeById(i.type).name} ${i.tech.join(" ")}`.toLowerCase();
       return words.every((w) => hay.includes(w));
     });
   }, [galleryItems, view, words]);
@@ -293,7 +308,12 @@ export default function App() {
     const m = new Map<string, { key: string; name: string; items: GalleryItem[] }>();
     for (const i of galleryItems) {
       const key = siteKey(i);
-      if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
+      if (!m.has(key))
+        m.set(key, {
+          key,
+          name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library,
+          items: [],
+        });
       m.get(key)!.items.push(i);
     }
     const rank = new Map((lib.siteOrder ?? []).map((k, i) => [k, i]));
@@ -348,7 +368,11 @@ export default function App() {
     const host = u.hostname.replace(/^www\./, "");
     const site = catalog.libraries.find((l) => {
       const lu = new URL(l.url);
-      return lu.hostname.replace(/^www\./, "") === host && (u.pathname.replace(/\/$/, "") === lu.pathname.replace(/\/$/, "") || /^\/(docs\/?)?(components\/?)?$/.test(u.pathname));
+      return (
+        lu.hostname.replace(/^www\./, "") === host &&
+        (u.pathname.replace(/\/$/, "") === lu.pathname.replace(/\/$/, "") ||
+          /^\/(docs\/?)?(components\/?)?$/.test(u.pathname))
+      );
     });
     if (!site) return false;
     if (!followed.has(site.id)) {
@@ -424,8 +448,10 @@ export default function App() {
       else if (e.key === "ArrowUp" || e.key === "k") move(-cols);
       else if (e.key === "Escape") setSel(-1);
       else if (cur && e.key === "Enter") window.open(cur.url, "_blank", "noopener");
-      else if (cur && e.key === "c") document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-copy]`)?.click();
-      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-star]`)?.click();
+      else if (cur && e.key === "c")
+        document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-copy]`)?.click();
+      else if (cur && (e.key === "Backspace" || e.key === "Delete"))
+        document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-star]`)?.click();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -453,15 +479,15 @@ export default function App() {
       : view === "libraries"
         ? "All libraries"
         : viewType
-            ? typeById(viewType).name
-            : siteView(view)
-              ? [
-                  sites.find((x) => x.key === siteView(view))?.name ?? "Library",
-                  groupView(view) && groupLabel(groupView(view)!),
-                ]
-                  .filter(Boolean)
-                  .join(" · ")
-              : (current?.name ?? "Starred");
+          ? typeById(viewType).name
+          : siteView(view)
+            ? [
+                sites.find((x) => x.key === siteView(view))?.name ?? "Library",
+                groupView(view) && groupLabel(groupView(view)!),
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : (current?.name ?? "Starred");
   const exportView = view === "starred" || view === "libraries" ? "all" : view;
 
   const setType = (bookmarkId: string, type: string) =>
@@ -516,10 +542,17 @@ export default function App() {
     if (!(await getStatus()).capture) return;
     for (const url of urls) {
       try {
-        const r = await fetch("/api/capture", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+        const r = await fetch("/api/capture", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
         if (!r.ok) continue;
         const { image, video } = await r.json();
-        update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.url === url && !b.image ? { ...b, image, video } : b)) }));
+        update((l) => ({
+          ...l,
+          bookmarks: l.bookmarks.map((b) => (b.url === url && !b.image ? { ...b, image, video } : b)),
+        }));
       } catch {}
     }
   };
@@ -559,7 +592,9 @@ export default function App() {
         return {
           ...l,
           collections,
-          bookmarks: l.bookmarks.map((b) => (members.has(b.id) && b.collectionId === null ? { ...b, collectionId: gone.id } : b)),
+          bookmarks: l.bookmarks.map((b) =>
+            members.has(b.id) && b.collectionId === null ? { ...b, collectionId: gone.id } : b,
+          ),
         };
       });
       setToast(null);
@@ -592,11 +627,17 @@ export default function App() {
   const copyForAgent = (b: Bookmark) => {
     const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
     const i = hit ?? toComponent(b);
-    copy(agentText(i, i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library), "Copied for your agent");
+    copy(
+      agentText(i, i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library),
+      "Copied for your agent",
+    );
   };
 
   const copyInstall = () => {
-    const cmds = visible.map((b) => b.install).filter(Boolean).join("\n");
+    const cmds = visible
+      .map((b) => b.install)
+      .filter(Boolean)
+      .join("\n");
     if (!cmds) return flash("No install commands here");
     copy(cmds, "Install commands copied");
   };
@@ -626,7 +667,11 @@ export default function App() {
       />
 
       <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-10">
-        <header data-chrome style={{ "--d": "60ms" } as React.CSSProperties} className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
+        <header
+          data-chrome
+          style={{ "--d": "60ms" } as React.CSSProperties}
+          className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0"
+        >
           <form
             className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
@@ -637,94 +682,98 @@ export default function App() {
             }}
           >
             <div className="flex h-9 w-full items-center gap-2 rounded-lg bg-field pr-2 pl-1 transition-colors focus-within:bg-field-focus">
-            <div role="radiogroup" aria-label="What the bar does" className="flex shrink-0 items-center gap-px rounded-md p-0.5">
-              {(
-                [
-                  ["search", "Search this view", "/", SearchIcon],
-                  ["add", "Add a component or library", "+", Plus],
-                ] as const
-              ).map(([m, label, key, Icon]) => (
-                <Tip key={m} label={label} shortcut={key}>
+              <div
+                role="radiogroup"
+                aria-label="What the bar does"
+                className="flex shrink-0 items-center gap-px rounded-md p-0.5"
+              >
+                {(
+                  [
+                    ["search", "Search this view", "/", SearchIcon],
+                    ["add", "Add a component or library", "+", Plus],
+                  ] as const
+                ).map(([m, label, key, Icon]) => (
+                  <Tip key={m} label={label} shortcut={key}>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={barMode === m}
+                      aria-label={label}
+                      onClick={() => {
+                        setBarMode(m);
+                        inputRef.current?.focus();
+                      }}
+                      className={`grid size-7 place-items-center rounded-[5px] transition-[background-color,color,box-shadow] ${
+                        barMode === m ? "bg-panel text-fg shadow-sm ring-1 ring-line" : "text-faint hover:text-muted"
+                      }`}
+                    >
+                      <Icon className="size-3.5" strokeWidth={1.75} aria-hidden />
+                    </button>
+                  </Tip>
+                ))}
+              </div>
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape" && input) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setInput("");
+                  }
+                }}
+                placeholder={barMode === "search" ? `Search ${viewName}` : "Paste a component or library link"}
+                className="h-full w-full bg-transparent pl-1 outline-none placeholder:text-faint"
+                aria-label={barMode === "search" ? "Search components" : "Component or library link"}
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {input.trim() && (barMode === "add" || normalizeUrl(input)) && (
+                <>
+                  <Tip label="Add this link as a component">
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                    >
+                      Add component <span className="text-faint">↵</span>
+                    </button>
+                  </Tip>
+                  <Tip label="Find every component in this library and sort them by type">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        startImport(input);
+                        setInput("");
+                      }}
+                      className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                    >
+                      Import library
+                    </button>
+                  </Tip>
+                </>
+              )}
+              {barMode === "search" && input && !normalizeUrl(input) && (
                 <button
                   type="button"
-                  role="radio"
-                  aria-checked={barMode === m}
-                  aria-label={label}
                   onClick={() => {
-                    setBarMode(m);
+                    setInput("");
                     inputRef.current?.focus();
                   }}
-                  className={`grid size-7 place-items-center rounded-[5px] transition-[background-color,color,box-shadow] ${
-                    barMode === m ? "bg-panel text-fg shadow-sm ring-1 ring-line" : "text-faint hover:text-muted"
-                  }`}
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
+                  aria-label="Clear search"
                 >
-                  <Icon className="size-3.5" strokeWidth={1.75} aria-hidden />
+                  Clear
                 </button>
-                </Tip>
-              ))}
-            </div>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape" && input) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setInput("");
-                }
-              }}
-              placeholder={barMode === "search" ? `Search ${viewName}` : "Paste a component or library link"}
-              className="h-full w-full bg-transparent pl-1 outline-none placeholder:text-faint"
-              aria-label={barMode === "search" ? "Search components" : "Component or library link"}
-              autoComplete="off"
-              spellCheck={false}
-            />
-            {input.trim() && (barMode === "add" || normalizeUrl(input)) && (
-              <>
-                <Tip label="Add this link as a component">
-                <button
-                  type="submit"
-                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
-                >
-                  Add component <span className="text-faint">↵</span>
-                </button>
-                </Tip>
-                <Tip label="Find every component in this library and sort them by type">
-                <button
-                  type="button"
-                  onClick={() => {
-                    startImport(input);
-                    setInput("");
-                  }}
-                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
-                >
-                  Import library
-                </button>
-                </Tip>
-              </>
-            )}
-            {barMode === "search" && input && !normalizeUrl(input) && (
+              )}
               <button
                 type="button"
-                onClick={() => {
-                  setInput("");
-                  inputRef.current?.focus();
-                }}
+                onClick={() => setPalette(true)}
                 className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
-                aria-label="Clear search"
+                aria-label="Open command menu"
               >
-                Clear
+                ⌘K
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setPalette(true)}
-              className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
-              aria-label="Open command menu"
-            >
-              ⌘K
-            </button>
             </div>
             <SocialLinks className="hidden md:flex" />
           </form>
@@ -732,46 +781,48 @@ export default function App() {
 
         {isGallery(view) ? (
           <Gallery
-              items={galleryView}
-              title={viewName}
-              sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
-              onSite={(key) => setView(`site:${key}`)}
-              libraries={catalog?.libraries ?? []}
-              onOpen={setOpen}
-              onStar={toggleStar}
-              tools={(i) => {
-                const b = i.saved ? lib.bookmarks.find((x) => x.id === i.saved) : undefined;
-                return b ? (
-                  <StarredTools
-                    b={b}
-                    lib={lib}
-                    onMove={(cid) => {
-                      moveTo(b.id, cid);
-                      flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
-                    }}
-                    onType={(t) => setType(b.id, t)}
-                    onNote={(note) => update((l) => ({ ...l, bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)) }))}
-                    onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
-                  />
-                ) : null;
-              }}
-              intro={intro.phase === "wait" && Boolean(catalog)}
-              onDeal={intro.dealt}
-              onAgent={(text) => copy(text, "Copied for your agent")}
-              empty={
-                !catalog ? (
-                  <div />
-                ) : words.length ? (
-                  <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
-                ) : view === "starred" ? (
-                  <p className="mx-auto max-w-sm pt-20 text-center text-muted">
-                    Nothing starred yet. Open a library below and tap the star on a component.
-                  </p>
-                ) : (
-                  <div />
-                )
-              }
-            />
+            items={galleryView}
+            title={viewName}
+            sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
+            onSite={(key) => setView(`site:${key}`)}
+            libraries={catalog?.libraries ?? []}
+            onOpen={setOpen}
+            onStar={toggleStar}
+            tools={(i) => {
+              const b = i.saved ? lib.bookmarks.find((x) => x.id === i.saved) : undefined;
+              return b ? (
+                <StarredTools
+                  b={b}
+                  lib={lib}
+                  onMove={(cid) => {
+                    moveTo(b.id, cid);
+                    flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
+                  }}
+                  onType={(t) => setType(b.id, t)}
+                  onNote={(note) =>
+                    update((l) => ({ ...l, bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)) }))
+                  }
+                  onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                />
+              ) : null;
+            }}
+            intro={intro.phase === "wait" && Boolean(catalog)}
+            onDeal={intro.dealt}
+            onAgent={(text) => copy(text, "Copied for your agent")}
+            empty={
+              !catalog ? (
+                <div />
+              ) : words.length ? (
+                <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
+              ) : view === "starred" ? (
+                <p className="mx-auto max-w-sm pt-20 text-center text-muted">
+                  Nothing starred yet. Open a library below and tap the star on a component.
+                </p>
+              ) : (
+                <div />
+              )
+            }
+          />
         ) : view === "sites" ? (
           <Sources
             libraries={catalog?.libraries ?? []}
@@ -796,53 +847,56 @@ export default function App() {
             copy={copy}
           />
         ) : (
-        <>
-        <div className="flex h-12 items-center justify-between">
-          <h1 className="flex items-baseline gap-2">
-            <span className="font-medium">{viewName}</span>
-            <span className="text-faint tabular-nums">{visible.length || ""}</span>
-          </h1>
-          {libFilter && (
-            <Tip label="Clear filter">
-            <button onClick={() => setLibFilter(null)} className="text-[12px] text-muted transition hover:text-fg">
-              {libFilter} <span className="text-faint">×</span>
-            </button>
-            </Tip>
-          )}
-        </div>
+          <>
+            <div className="flex h-12 items-center justify-between">
+              <h1 className="flex items-baseline gap-2">
+                <span className="font-medium">{viewName}</span>
+                <span className="text-faint tabular-nums">{visible.length || ""}</span>
+              </h1>
+              {libFilter && (
+                <Tip label="Clear filter">
+                  <button
+                    onClick={() => setLibFilter(null)}
+                    className="text-[12px] text-muted transition hover:text-fg"
+                  >
+                    {libFilter} <span className="text-faint">×</span>
+                  </button>
+                </Tip>
+              )}
+            </div>
 
-        {ready && lib.bookmarks.length === 0 ? (
-          <Empty onAdd={(u) => add(`https://${u}`)} />
-        ) : ready && visible.length === 0 ? (
-          <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
-        ) : (
-          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
-            {visible.map((b) => (
-              <Card
-                key={b.id}
-                b={b}
-                lib={lib}
-                selected={visible[sel]?.id === b.id}
-                onMove={(cid) => {
-                  moveTo(b.id, cid);
-                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
-                }}
-                onUnstar={() => removeBookmark(b.id)}
-                onType={(t) => setType(b.id, t)}
-                onNote={(note) =>
-                  update((l) => ({
-                    ...l,
-                    bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)),
-                  }))
-                }
-                onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
-                onAgent={() => copyForAgent(b)}
-                onOpen={() => setOpen(itemFor(b))}
-              />
-            ))}
-          </div>
-        )}
-        </>
+            {ready && lib.bookmarks.length === 0 ? (
+              <Empty onAdd={(u) => add(`https://${u}`)} />
+            ) : ready && visible.length === 0 ? (
+              <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
+            ) : (
+              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
+                {visible.map((b) => (
+                  <Card
+                    key={b.id}
+                    b={b}
+                    lib={lib}
+                    selected={visible[sel]?.id === b.id}
+                    onMove={(cid) => {
+                      moveTo(b.id, cid);
+                      flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
+                    }}
+                    onUnstar={() => removeBookmark(b.id)}
+                    onType={(t) => setType(b.id, t)}
+                    onNote={(note) =>
+                      update((l) => ({
+                        ...l,
+                        bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)),
+                      }))
+                    }
+                    onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                    onAgent={() => copyForAgent(b)}
+                    onOpen={() => setOpen(itemFor(b))}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
 
@@ -908,7 +962,9 @@ export default function App() {
             {[
               { id: "starred", name: "Starred" },
               ...lib.collections,
-              ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
+              ...[...TYPES, OTHER]
+                .filter((t) => counts[`type:${t.id}`])
+                .map((t) => ({ id: `type:${t.id}`, name: t.name })),
             ].map((c) => (
               <Command.Item
                 key={c.id}
@@ -923,7 +979,12 @@ export default function App() {
           {libraries.length > 1 && (
             <Command.Group heading="Filter by library">
               {libraries.map((name) => (
-                <Command.Item key={name} value={`filter library ${name}`} onSelect={run(() => setLibFilter(name))} className={itemCls}>
+                <Command.Item
+                  key={name}
+                  value={`filter library ${name}`}
+                  onSelect={run(() => setLibFilter(name))}
+                  className={itemCls}
+                >
                   {name}
                   {libFilter === name && <span className="ml-auto text-faint">on</span>}
                 </Command.Item>
@@ -931,7 +992,10 @@ export default function App() {
             </Command.Group>
           )}
           <Command.Group heading={`Agent · ${viewName}`}>
-            <Command.Item onSelect={run(() => copy(exportMarkdown(lib, exportView), "Copied for your agent"))} className={itemCls}>
+            <Command.Item
+              onSelect={run(() => copy(exportMarkdown(lib, exportView), "Copied for your agent"))}
+              className={itemCls}
+            >
               Copy as Markdown for an AI agent
             </Command.Item>
             <Command.Item onSelect={run(() => copy(exportJSON(lib, exportView), "Copied as JSON"))} className={itemCls}>
@@ -1029,7 +1093,10 @@ function Sidebar(props: {
 }) {
   const { lib, view, setView, counts, edit, setEdit, sites, openItem, openId } = props;
   const activeSite = siteView(view);
-  const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(sites.map((x) => x.key), props.reorderSites);
+  const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(
+    sites.map((x) => x.key),
+    props.reorderSites,
+  );
 
   const ruler = useRef<HTMLElement>(null);
   const grow = (e: React.MouseEvent) => {
@@ -1039,7 +1106,8 @@ function Sidebar(props: {
       el.style.setProperty("--grow", String(Math.max(0, 1 - d / 3).toFixed(2)));
     }
   };
-  const settle = () => ruler.current?.querySelectorAll<HTMLElement>("[data-row]").forEach((el) => el.style.removeProperty("--grow"));
+  const settle = () =>
+    ruler.current?.querySelectorAll<HTMLElement>("[data-row]").forEach((el) => el.style.removeProperty("--grow"));
   useEffect(() => {
     ruler.current?.querySelector("[aria-current=page]")?.scrollIntoView({ block: "nearest" });
   }, [view]);
@@ -1060,32 +1128,32 @@ function Sidebar(props: {
           className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
         >
           <div className="contents md:flex md:flex-col md:gap-2.5 md:pt-1">
-          {edit?.kind === "new" ? (
-            <input
-              autoFocus
-              value={edit.name}
-              onChange={(e) => setEdit({ kind: "new", name: e.target.value })}
-              onBlur={() => props.createCollection(edit.name)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") props.createCollection(edit.name);
-                if (e.key === "Escape") setEdit(null);
-              }}
-              placeholder="Name"
-              className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint md:ml-[34px]"
-            />
-          ) : (
-            <button
-              data-row
-              onClick={() => setEdit({ kind: "new", name: "" })}
-              className="group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:rounded-none md:px-0"
-            >
-              <span className="hidden w-[26px] shrink-0 md:block">
-                <span data-tick className="block h-px bg-faint group-hover:bg-muted" />
-              </span>
-              New collection
-            </button>
-          )}
-          <NavItem id="starred" name="Starred" count={counts.starred ?? 0} {...props} />
+            {edit?.kind === "new" ? (
+              <input
+                autoFocus
+                value={edit.name}
+                onChange={(e) => setEdit({ kind: "new", name: e.target.value })}
+                onBlur={() => props.createCollection(edit.name)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") props.createCollection(edit.name);
+                  if (e.key === "Escape") setEdit(null);
+                }}
+                placeholder="Name"
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus placeholder:text-faint md:ml-[34px]"
+              />
+            ) : (
+              <button
+                data-row
+                onClick={() => setEdit({ kind: "new", name: "" })}
+                className="group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:rounded-none md:px-0"
+              >
+                <span className="hidden w-[26px] shrink-0 md:block">
+                  <span data-tick className="block h-px bg-faint group-hover:bg-muted" />
+                </span>
+                New collection
+              </button>
+            )}
+            <NavItem id="starred" name="Starred" count={counts.starred ?? 0} {...props} />
           </div>
           {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
           {lib.collections.map((c) =>
@@ -1102,14 +1170,27 @@ function Sidebar(props: {
                 className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
               />
             ) : (
-              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => setEdit({ kind: "rename", id: c.id })} onDelete={() => props.deleteCollection(c.id)} {...props} />
+              <NavItem
+                key={c.id}
+                id={c.id}
+                name={c.name}
+                count={counts[c.id] ?? 0}
+                onRename={() => setEdit({ kind: "rename", id: c.id })}
+                onDelete={() => props.deleteCollection(c.id)}
+                {...props}
+              />
             ),
           )}
           {sites.length > 0 && (
             <>
               <div className="hidden h-4 md:block" />
               <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
-              <NavItem id="libraries" name="All libraries" count={sites.reduce((n, x) => n + x.items.length, 0)} {...props} />
+              <NavItem
+                id="libraries"
+                name="All libraries"
+                count={sites.reduce((n, x) => n + x.items.length, 0)}
+                {...props}
+              />
               {sites.map((x, i) => {
                 const dragging = drag?.key === x.key;
                 return (
@@ -1120,7 +1201,11 @@ function Sidebar(props: {
                     onClickCapture={onClickCapture}
                     style={drag ? { transform: `translateY(${dragging ? drag.dy : shiftFor(drag, i)}px)` } : undefined}
                     className={`contents md:relative md:flex md:shrink-0 md:flex-col ${
-                      !drag ? "" : dragging ? `z-10 ${drag.settling ? "transition-transform duration-150 ease-out" : ""}` : "transition-transform duration-200 ease-out"
+                      !drag
+                        ? ""
+                        : dragging
+                          ? `z-10 ${drag.settling ? "transition-transform duration-150 ease-out" : ""}`
+                          : "transition-transform duration-200 ease-out"
                     }`}
                   >
                     {dragging && (
@@ -1280,12 +1365,26 @@ function groupItems(items: GalleryItem[]) {
     }
     const byType = new Map<string, GalleryItem[]>();
     for (const i of list) byType.set(i.type, [...(byType.get(i.type) ?? []), i]);
-    for (const [t, l] of byType) groups.push({ key: `${family}/${t}`, name: TYPE_LABEL[t] ?? typeById(t).name, items: l });
+    for (const [t, l] of byType)
+      groups.push({ key: `${family}/${t}`, name: TYPE_LABEL[t] ?? typeById(t).name, items: l });
   }
-  return groups.sort((a, b) => Number(a.key === OTHER.family) - Number(b.key === OTHER.family) || b.items.length - a.items.length || a.name.localeCompare(b.name));
+  return groups.sort(
+    (a, b) =>
+      Number(a.key === OTHER.family) - Number(b.key === OTHER.family) ||
+      b.items.length - a.items.length ||
+      a.name.localeCompare(b.name),
+  );
 }
 
-function Collapse({ open, className = "grid", children }: { open: boolean; className?: string; children: React.ReactNode }) {
+function Collapse({
+  open,
+  className = "grid",
+  children,
+}: {
+  open: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div
       inert={!open}
@@ -1352,7 +1451,14 @@ function SiteGroups({
                   className={`size-2 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-90" : ""}`}
                   aria-hidden
                 >
-                  <path d="M2.5 1.5 5.5 4l-3 2.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M2.5 1.5 5.5 4l-3 2.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </span>
               <span className="min-w-0 flex-1 truncate">{g.name}</span>
@@ -1456,57 +1562,61 @@ function NavItem({
   const deselect = active && typeof id === "string" && id.startsWith("site:");
   return (
     <Tip label={onRename ? "Double-click to rename" : undefined} side="right">
-    <button
-      onClick={() => setView(deselect ? "libraries" : id)}
-      onDoubleClick={onRename}
-      onDragOver={(e) => {
-        if (!droppable) return;
-        e.preventDefault();
-        setOver(true);
-      }}
-      onDragLeave={() => setOver(false)}
-      onDrop={(e) => {
-        setOver(false);
-        const bid = e.dataTransfer.getData("text/bookmark-id");
-        if (bid && droppable) moveTo(bid, id);
-      }}
-      data-row
-      aria-current={active ? "page" : undefined}
-      className={`group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap transition md:rounded-none md:px-0 ${
-        active ? "bg-hover text-fg md:bg-transparent" : "text-muted hover:text-fg"
-      } ${over ? "bg-hover text-fg" : ""}`}
-    >
-      <span className="hidden w-[26px] shrink-0 md:block">
-        <span data-tick className={`block h-px ${active ? "" : "bg-faint group-hover:bg-muted"}`} />
-      </span>
-      <span data-label className="min-w-0 flex-1 truncate">{name}</span>
-      <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
-        {count || ""}
-      </span>
-      {onDelete && (
-        <Tip label="Remove collection">
-        <span
-          role="button"
-          tabIndex={0}
-          aria-label={`Remove collection “${name}”`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          onDoubleClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => {
-            if (e.key !== "Enter" && e.key !== " ") return;
-            e.preventDefault();
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="-my-1 grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 transition hover:bg-hover hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
-        >
-          <TrashIcon />
+      <button
+        onClick={() => setView(deselect ? "libraries" : id)}
+        onDoubleClick={onRename}
+        onDragOver={(e) => {
+          if (!droppable) return;
+          e.preventDefault();
+          setOver(true);
+        }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(e) => {
+          setOver(false);
+          const bid = e.dataTransfer.getData("text/bookmark-id");
+          if (bid && droppable) moveTo(bid, id);
+        }}
+        data-row
+        aria-current={active ? "page" : undefined}
+        className={`group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap transition md:rounded-none md:px-0 ${
+          active ? "bg-hover text-fg md:bg-transparent" : "text-muted hover:text-fg"
+        } ${over ? "bg-hover text-fg" : ""}`}
+      >
+        <span className="hidden w-[26px] shrink-0 md:block">
+          <span data-tick className={`block h-px ${active ? "" : "bg-faint group-hover:bg-muted"}`} />
         </span>
-        </Tip>
-      )}
-    </button>
+        <span data-label className="min-w-0 flex-1 truncate">
+          {name}
+        </span>
+        <span
+          className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}
+        >
+          {count || ""}
+        </span>
+        {onDelete && (
+          <Tip label="Remove collection">
+            <span
+              role="button"
+              tabIndex={0}
+              aria-label={`Remove collection “${name}”`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="-my-1 grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 transition hover:bg-hover hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+            >
+              <TrashIcon />
+            </span>
+          </Tip>
+        )}
+      </button>
     </Tip>
   );
 }
@@ -1548,7 +1658,9 @@ function Card({
       className="group pop"
     >
       <div className="relative">
-        <div className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}>
+        <div
+          className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}
+        >
           {b.image && imgOk ? (
             <img
               src={b.image}
@@ -1568,18 +1680,26 @@ function Card({
         <OpenDetails onClick={onOpen} />
 
         <Tip label="Remove from Starred">
-        <button
-          type="button"
-          data-star
-          onClick={onUnstar}
-          aria-pressed
-          aria-label={`Remove ${b.title} from Starred`}
-          className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg"
-        >
-          <StarIcon filled />
-        </button>
+          <button
+            type="button"
+            data-star
+            onClick={onUnstar}
+            aria-pressed
+            aria-label={`Remove ${b.title} from Starred`}
+            className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg"
+          >
+            <StarIcon filled />
+          </button>
         </Tip>
-        <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
+        <CardTools
+          b={b}
+          lib={lib}
+          onMove={onMove}
+          onType={onType}
+          onNote={() => setEditing(true)}
+          onCopy={onCopy}
+          className="top-2 right-11 z-10"
+        />
       </div>
 
       <div className="mt-3 px-0.5">
@@ -1597,12 +1717,12 @@ function Card({
 
         {b.install && (
           <Tip label="Copy install command">
-          <button
-            onClick={onCopy}
-            className="mt-1 block max-w-full truncate text-left font-mono text-[11px] text-faint transition hover:text-muted"
-          >
-            {b.install}
-          </button>
+            <button
+              onClick={onCopy}
+              className="mt-1 block max-w-full truncate text-left font-mono text-[11px] text-faint transition hover:text-muted"
+            >
+              {b.install}
+            </button>
           </Tip>
         )}
 
@@ -1652,7 +1772,9 @@ function CardTools({
   className: string;
 }) {
   return (
-    <div className={`absolute ${className} flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100`}>
+    <div
+      className={`absolute ${className} flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100`}
+    >
       <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
         <CopyIcon />
       </IconBtn>
@@ -1660,39 +1782,39 @@ function CardTools({
         <NoteIcon />
       </IconBtn>
       <Tip label="Move to collection">
-      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
-        <FolderIcon />
-        <select
-          value={b.collectionId ?? ""}
-          onChange={(e) => onMove(e.target.value || null)}
-          aria-label="Move to collection"
-          className="absolute inset-0 cursor-pointer opacity-0"
-        >
-          <option value="">No collection</option>
-          {lib.collections.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
+          <FolderIcon />
+          <select
+            value={b.collectionId ?? ""}
+            onChange={(e) => onMove(e.target.value || null)}
+            aria-label="Move to collection"
+            className="absolute inset-0 cursor-pointer opacity-0"
+          >
+            <option value="">No collection</option>
+            {lib.collections.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </Tip>
       <Tip label="Change type">
-      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
-        <TagIcon />
-        <select
-          value={typeOf(b)}
-          onChange={(e) => onType(e.target.value)}
-          aria-label="Component type"
-          className="absolute inset-0 cursor-pointer opacity-0"
-        >
-          {[...TYPES, OTHER].map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg">
+          <TagIcon />
+          <select
+            value={typeOf(b)}
+            onChange={(e) => onType(e.target.value)}
+            aria-label="Component type"
+            className="absolute inset-0 cursor-pointer opacity-0"
+          >
+            {[...TYPES, OTHER].map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </Tip>
     </div>
   );
@@ -1716,7 +1838,15 @@ function StarredTools({
   const [editing, setEditing] = useState(false);
   return (
     <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} className="contents">
-      <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
+      <CardTools
+        b={b}
+        lib={lib}
+        onMove={onMove}
+        onType={onType}
+        onNote={() => setEditing(true)}
+        onCopy={onCopy}
+        className="top-2 right-11 z-10"
+      />
       {editing && (
         <textarea
           autoFocus
@@ -1738,17 +1868,27 @@ function StarredTools({
   );
 }
 
-function IconBtn({ label, onClick, children, data }: { label: string; onClick: () => void; children: React.ReactNode; data?: string }) {
+function IconBtn({
+  label,
+  onClick,
+  children,
+  data,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  data?: string;
+}) {
   return (
     <Tip label={label}>
-    <button
-      onClick={onClick}
-      {...(data ? { [`data-${data}`]: "" } : {})}
-      aria-label={label}
-      className="grid size-6 place-items-center rounded text-muted transition hover:bg-hover hover:text-fg"
-    >
-      {children}
-    </button>
+      <button
+        onClick={onClick}
+        {...(data ? { [`data-${data}`]: "" } : {})}
+        aria-label={label}
+        className="grid size-6 place-items-center rounded text-muted transition hover:bg-hover hover:text-fg"
+      >
+        {children}
+      </button>
     </Tip>
   );
 }
@@ -1856,7 +1996,16 @@ function Favicon({ url }: { url: string }) {
     src = new URL("/favicon.ico", url).href;
   } catch {}
   if (!src || !ok) return null;
-  return <img src={src} alt="" width={20} height={20} onError={() => setOk(false)} className="size-5 rounded opacity-70 grayscale" />;
+  return (
+    <img
+      src={src}
+      alt=""
+      width={20}
+      height={20}
+      onError={() => setOk(false)}
+      className="size-5 rounded opacity-70 grayscale"
+    />
+  );
 }
 
 function mix<T extends { library: string; preview?: string }>(items: T[]): T[] {

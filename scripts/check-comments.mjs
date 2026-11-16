@@ -2,11 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 
-const SKIP = [
-  /^public\/stage\//,
-  /^public\/previews\//,
-  /(^|\/)package-lock\.json$/,
-];
+const SKIP = [/^public\/stage\//, /^public\/previews\//, /(^|\/)package-lock\.json$/];
 
 const ALLOWED = [
   /@ts-(expect-error|ignore|nocheck|check)\b/,
@@ -80,7 +76,7 @@ function blockComments(text, { line = false } = {}) {
 function markupComments(text) {
   const found = [];
   const re = /<!--[\s\S]*?-->/g;
-  for (let m; (m = re.exec(text)); ) found.push({ pos: m.index, body: m[0] });
+  for (let m; (m = re.exec(text));) found.push({ pos: m.index, body: m[0] });
   return found;
 }
 

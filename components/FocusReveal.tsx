@@ -7,7 +7,8 @@ type Part = { text: string; muted?: boolean };
 type Box = { x: number; y: number; w: number; h: number };
 
 const STEP = 230;
-const PAD_X = 6, PAD_Y = 3;
+const PAD_X = 6,
+  PAD_Y = 3;
 
 export default function FocusReveal({ parts, className }: { parts: Part[]; className?: string }) {
   const words = parts.flatMap((p) => p.text.split(" ").map((w) => ({ w, muted: !!p.muted })));
@@ -18,8 +19,13 @@ export default function FocusReveal({ parts, className }: { parts: Part[]; class
   const [still, setStill] = useState(false);
 
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setStill(true); setAt(words.length); return; }
-    let i = -1, timer = 0;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStill(true);
+      setAt(words.length);
+      return;
+    }
+    let i = -1,
+      timer = 0;
     const tick = () => {
       i++;
       setAt(i);
@@ -37,7 +43,13 @@ export default function FocusReveal({ parts, className }: { parts: Part[]; class
     if (!el) return;
     const place = () => {
       const w = el.querySelector<HTMLElement>(`[data-i="${focus}"]`);
-      if (w) setBox({ x: w.offsetLeft - PAD_X, y: w.offsetTop - PAD_Y, w: w.offsetWidth + PAD_X * 2, h: w.offsetHeight + PAD_Y * 2 });
+      if (w)
+        setBox({
+          x: w.offsetLeft - PAD_X,
+          y: w.offsetTop - PAD_Y,
+          w: w.offsetWidth + PAD_X * 2,
+          h: w.offsetHeight + PAD_Y * 2,
+        });
     };
     place();
     const ro = new ResizeObserver(place);
@@ -46,8 +58,15 @@ export default function FocusReveal({ parts, className }: { parts: Part[]; class
   }, [focus]);
 
   return (
-    <h1 ref={root} className={`${s.title} ${s.reveal} ${className ?? ""}`} aria-label={parts.map((p) => p.text).join(" ")} onPointerLeave={() => setHover(-1)}>
-      <noscript><style>{`[data-fr]{filter:none!important;opacity:1!important}`}</style></noscript>
+    <h1
+      ref={root}
+      className={`${s.title} ${s.reveal} ${className ?? ""}`}
+      aria-label={parts.map((p) => p.text).join(" ")}
+      onPointerLeave={() => setHover(-1)}
+    >
+      <noscript>
+        <style>{`[data-fr]{filter:none!important;opacity:1!important}`}</style>
+      </noscript>
       {words.map(({ w, muted }, i) => {
         const soft = done ? hover >= 0 && hover !== i && !still : i > at;
         return (
@@ -70,7 +89,10 @@ export default function FocusReveal({ parts, className }: { parts: Part[]; class
           className={`${s.frame} ${focus >= 0 && focus < words.length ? s.frameOn : ""}`}
           style={{ transform: `translate(${box.x}px, ${box.y}px)`, width: box.w, height: box.h }}
         >
-          <i /><i /><i /><i />
+          <i />
+          <i />
+          <i />
+          <i />
         </span>
       )}
     </h1>
