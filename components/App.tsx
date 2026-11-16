@@ -216,8 +216,11 @@ export default function App() {
       if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
       m.get(key)!.items.push(i);
     }
-    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [galleryItems, catalog]);
+    // The user's own order first (dragged in the sidebar), the rest by name.
+    const rank = new Map((lib.siteOrder ?? []).map((k, i) => [k, i]));
+    const at = (k: string) => rank.get(k) ?? Infinity;
+    return [...m.values()].sort((a, b) => at(a.key) - at(b.key) || a.name.localeCompare(b.name));
+  }, [galleryItems, catalog, lib.siteOrder]);
 
   const saveFromCatalog = (c: GalleryItem) => {
     if (lib.bookmarks.some((b) => b.ref === c.id || b.url === c.docs)) return flash("Already saved");
@@ -523,6 +526,7 @@ export default function App() {
         deleteCollection={setConfirmDel}
         moveTo={dropTo}
         sites={sites}
+        reorderSites={(keys) => update((l) => ({ ...l, siteOrder: keys }))}
         openItem={setOpen}
         openId={open?.id}
       />
@@ -860,11 +864,13 @@ function Sidebar(props: {
   deleteCollection: (id: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
   sites: { key: string; name: string; items: GalleryItem[] }[];
+  reorderSites: (keys: string[]) => void;
   openItem: (item: GalleryItem) => void;
   openId?: string;
 }) {
   const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
   const activeSite = siteView(view);
+  const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(sites.map((x) => x.key), props.reorderSites);
 
   // Ticks within ~3 rows of the pointer grow, nearest the most.
   const ruler = useRef<HTMLElement>(null);
@@ -938,12 +944,32 @@ function Sidebar(props: {
             <>
               <div className="hidden h-4 md:block" />
               <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
-              {sites.map((x) => (
-                <div key={x.key} className="contents">
-                  <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
-                  {activeSite === x.key && <SiteGroups items={x.items} openItem={openItem} openId={openId} />}
-                </div>
-              ))}
+              {sites.map((x, i) => {
+                const dragging = drag?.key === x.key;
+                return (
+                  <div
+                    key={x.key}
+                    ref={blockRef(x.key)}
+                    onPointerDown={(e) => onPointerDown(e, x.key)}
+                    onClickCapture={onClickCapture}
+                    style={drag ? { transform: `translateY(${dragging ? drag.dy : shiftFor(drag, i)}px)` } : undefined}
+                    className={`contents md:relative md:flex md:shrink-0 md:flex-col ${
+                      !drag ? "" : dragging ? `z-10 ${drag.settling ? "transition-transform duration-150 ease-out" : ""}` : "transition-transform duration-200 ease-out"
+                    }`}
+                  >
+                    {dragging && (
+                      <span
+                        aria-hidden
+                        className={`pointer-events-none absolute -inset-x-1.5 top-0 -z-10 hidden h-7 rounded-md bg-hover transition-[opacity,box-shadow] duration-150 md:block ${
+                          drag.settling ? "opacity-0" : "shadow-[0_8px_18px_-8px_rgb(0_0_0/0.45)]"
+                        }`}
+                      />
+                    )}
+                    <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
+                    {activeSite === x.key && <SiteGroups items={x.items} openItem={openItem} openId={openId} />}
+                  </div>
+                );
+              })}
             </>
           )}
         </nav>
@@ -955,6 +981,108 @@ function Sidebar(props: {
       </div>
     </aside>
   );
+}
+
+type SiteDrag = { key: string; from: number; to: number; dy: number; heights: number[]; settling?: boolean };
+
+// How far a library that is not being dragged slides to open the gap.
+function shiftFor(d: SiteDrag, i: number) {
+  const h = d.heights[d.from];
+  if (d.from < d.to && i > d.from && i <= d.to) return -h;
+  if (d.from > d.to && i >= d.to && i < d.from) return h;
+  return 0;
+}
+
+// Drag a library row up or down to change the order. A press that does not
+// move stays a plain click; a drag swallows the click that follows it.
+function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
+  const [drag, setDrag] = useState<SiteDrag | null>(null);
+  const blocks = useRef(new Map<string, HTMLDivElement>());
+  const swallow = useRef(false);
+  const busy = useRef(false);
+  const latest = useRef({ keys, onReorder });
+  latest.current = { keys, onReorder };
+
+  const blockRef = (key: string) => (el: HTMLDivElement | null) => {
+    if (el) blocks.current.set(key, el);
+    else blocks.current.delete(key);
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>, key: string) => {
+    if (e.button !== 0 || busy.current || !window.matchMedia("(min-width: 768px)").matches) return;
+    // Only the library row is a handle, not the groups under it.
+    if ((e.target as HTMLElement).closest("button")?.parentElement !== e.currentTarget) return;
+    const order = latest.current.keys;
+    const from = order.indexOf(key);
+    const rects = order.map((k) => blocks.current.get(k)?.getBoundingClientRect());
+    if (from < 0 || order.length < 2 || rects.some((r) => !r)) return;
+    const heights = rects.map((r) => r!.height);
+    // Measured on the library row itself (28px), not its open groups, so an
+    // expanded library swaps as soon as its row passes a neighbour's.
+    const centers = rects.map((r) => r!.top + Math.min(r!.height, 28) / 2);
+    const y0 = e.clientY;
+    let current: SiteDrag | null = null;
+
+    const move = (ev: PointerEvent) => {
+      const dy = ev.clientY - y0;
+      if (!current && Math.abs(dy) < 4) return;
+      if (!current) {
+        busy.current = true;
+        document.documentElement.classList.add("dragging-site");
+      }
+      ev.preventDefault();
+      // The dragged row's centre decides the slot it would drop into.
+      const c = centers[from] + dy;
+      let to = 0;
+      for (let i = 0; i < centers.length; i++) if (i !== from && centers[i] < c) to++;
+      current = { key, from, to, dy, heights };
+      setDrag(current);
+    };
+    const end = (cancel: boolean) => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", onCancel);
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.classList.remove("dragging-site");
+      if (!current) return;
+      swallow.current = true;
+      setTimeout(() => (swallow.current = false), 0);
+      const d = current;
+      const to = cancel ? d.from : d.to;
+      // Glide into the open slot, then commit the new order.
+      let slot = 0;
+      if (to > d.from) for (let i = d.from + 1; i <= to; i++) slot += heights[i];
+      else for (let i = to; i < d.from; i++) slot -= heights[i];
+      setDrag({ ...d, to, dy: slot, settling: true });
+      setTimeout(() => {
+        if (to !== d.from) {
+          const next = [...latest.current.keys];
+          const [k] = next.splice(d.from, 1);
+          next.splice(to, 0, k);
+          latest.current.onReorder(next);
+        }
+        setDrag(null);
+        busy.current = false;
+      }, 160);
+    };
+    const up = () => end(false);
+    const onCancel = () => end(true);
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") end(true);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("keydown", onKey);
+  };
+
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (!swallow.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  return { drag, blockRef, onPointerDown, onClickCapture };
 }
 
 // Large families split into their types, so no group runs past a screen.
