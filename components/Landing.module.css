@@ -46,7 +46,24 @@
 .copy { position: relative; z-index: 1; display: grid; justify-items: center; gap: clamp(12px, 2.4dvh, 22px); text-align: center; }
 .copy a { pointer-events: auto; }
 .title { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
-.title span { color: var(--muted); }
+.title .muted { color: var(--muted); }
+
+/* First load. The header settles in, the headline streams word by word like a
+   chat reply, then the buttons and the quire follow. Opacity and a small rise
+   only, so every element keeps its final box and nothing shifts. The stage
+   gets opacity alone: a transform there would trap its fixed canvas. */
+.enter { animation: land-rise 560ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms) both; }
+.word {
+  display: inline-block;
+  animation: land-word 420ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(140ms + var(--w) * 42ms) both;
+}
+.stage { animation: land-fade 900ms ease-out 380ms both; }
+@keyframes land-rise { from { opacity: 0; transform: translateY(6px); } }
+@keyframes land-word { from { opacity: 0; transform: translateY(0.18em); filter: blur(3px); } }
+@keyframes land-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .enter, .word, .stage { animation: none; }
+}
 .cta { display: flex; align-items: center; gap: 6px; }
 
 /* The one detail: a quire of holographic sheets. */
