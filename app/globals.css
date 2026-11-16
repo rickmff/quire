@@ -73,6 +73,10 @@ textarea:focus-visible { outline: none; }
 .slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
 
+/* Sidebar scrolls without a visible scrollbar. */
+.ruler { scrollbar-width: none; }
+.ruler::-webkit-scrollbar { display: none; }
+
 /* Sidebar ruler: a tick per item. Ticks near the pointer grow; the active
    item is marked with a long accent tick and steps right. */
 @media (min-width: 768px) {
