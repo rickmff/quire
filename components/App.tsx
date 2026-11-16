@@ -444,14 +444,31 @@ export default function App() {
     update((l) => ({ ...l, collections: l.collections.map((c) => (c.id === id ? { ...c, name: n } : c)) }));
   };
 
+  // Removes the collection only. Its components stay saved, with no collection.
   const deleteCollection = (id: string) => {
+    const idx = lib.collections.findIndex((c) => c.id === id);
+    const gone = lib.collections[idx];
+    if (!gone) return;
+    const members = new Set(lib.bookmarks.filter((b) => b.collectionId === id).map((b) => b.id));
     update((l) => ({
       ...l,
       collections: l.collections.filter((c) => c.id !== id),
       bookmarks: l.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
     }));
-    setView("all");
-    flash("Collection removed");
+    if (view === id) setView("all");
+    flash(`Removed “${gone.name}”`, () => {
+      update((l) => {
+        if (l.collections.some((c) => c.id === gone.id)) return l;
+        const collections = [...l.collections];
+        collections.splice(Math.min(idx, collections.length), 0, gone);
+        return {
+          ...l,
+          collections,
+          bookmarks: l.bookmarks.map((b) => (members.has(b.id) && b.collectionId === null ? { ...b, collectionId: gone.id } : b)),
+        };
+      });
+      setToast(null);
+    });
   };
 
   const moveTo = (bookmarkId: string, collectionId: string | null) =>
@@ -493,6 +510,7 @@ export default function App() {
         renaming={renaming}
         setRenaming={setRenaming}
         renameCollection={renameCollection}
+        deleteCollection={deleteCollection}
         moveTo={dropTo}
         openPalette={() => setPalette(true)}
         sites={sites}
@@ -800,6 +818,7 @@ function Sidebar(props: {
   renaming: string | null;
   setRenaming: (id: string | null) => void;
   renameCollection: (id: string, name: string) => void;
+  deleteCollection: (id: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
   openPalette: () => void;
   sites: { key: string; name: string; items: GalleryItem[] }[];
@@ -860,7 +879,7 @@ function Sidebar(props: {
                 className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
               />
             ) : (
-              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
+              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} onDelete={() => props.deleteCollection(c.id)} {...props} />
             ),
           )}
           {newCol !== null ? (
@@ -1025,6 +1044,7 @@ function NavItem({
   setView,
   moveTo,
   onRename,
+  onDelete,
 }: {
   id: View;
   name: string;
@@ -1033,6 +1053,7 @@ function NavItem({
   setView: (v: View) => void;
   moveTo: (bookmarkId: string, target: View) => void;
   onRename?: () => void;
+  onDelete?: () => void;
 }) {
   const [over, setOver] = useState(false);
   const active = view === id;
@@ -1066,6 +1087,29 @@ function NavItem({
       <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
         {count || ""}
       </span>
+      {onDelete && (
+        // A span, not a button: it sits inside the row's button.
+        <span
+          role="button"
+          tabIndex={0}
+          aria-label={`Remove collection “${name}”`}
+          title="Remove collection"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="-my-1 grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 transition hover:bg-hover hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+        >
+          <TrashIcon />
+        </span>
+      )}
     </button>
   );
 }
