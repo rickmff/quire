@@ -73,6 +73,16 @@ textarea:focus-visible { outline: none; }
 .slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
 
+/* Saved star: gold with a soft glow. A glint sweeps across it when it is
+   starred and when the pointer is on the card. */
+.star-gold { filter: drop-shadow(0 0 3px rgb(252 196 25 / 0.55)); }
+.star-glint { transform: translateX(-10px); }
+@keyframes star-glint { from { transform: translateX(-10px) } to { transform: translateX(26px) } }
+.group:hover .star-glint, .star-pop .star-glint { animation: star-glint 750ms ease-out; }
+@keyframes star-pop { 0% { transform: scale(.7) } 55% { transform: scale(1.18) } 100% { transform: scale(1) } }
+.star-pop { animation: star-pop 380ms cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .star-pop, .star-glint { animation: none !important; } }
+
 /* Sidebar scrolls without a visible scrollbar. */
 .ruler { scrollbar-width: none; }
 .ruler::-webkit-scrollbar { display: none; }
