@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CatalogLibrary } from "@/lib/catalog/schema";
 import type { GalleryItem } from "@/lib/useCatalog";
 import { useCaptureAvailable } from "@/lib/useCatalog";
@@ -73,6 +73,42 @@ export function Gallery({
     return [...m].sort((a, b) => b[1] - a[1]);
   }, [items]);
 
+  // Starring moves a card to the top. Measure every card before the change,
+  // then glide each one from its old place to its new one (FLIP).
+  const root = useRef<HTMLElement>(null);
+  const before = useRef<Map<string, DOMRect> | null>(null);
+  const star = onStar && ((i: GalleryItem) => {
+    const m = new Map<string, DOMRect>();
+    root.current?.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
+    before.current = m;
+    onStar(i);
+  });
+  useLayoutEffect(() => {
+    const prev = before.current;
+    before.current = null;
+    if (!prev || !root.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const easing = "cubic-bezier(.2,.8,.2,1)";
+    root.current.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => {
+      const was = prev.get(el.dataset.card!);
+      if (!was) {
+        el.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 320, easing });
+        return;
+      }
+      const now = el.getBoundingClientRect();
+      const dx = was.left - now.left;
+      const dy = was.top - now.top;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      // Far moves take a little longer, so every card reads as one motion.
+      const duration = Math.min(700, 380 + Math.hypot(dx, dy) * 0.25);
+      el.style.position = "relative";
+      el.style.zIndex = "2";
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration, easing }).onfinish = () => {
+        el.style.position = "";
+        el.style.zIndex = "";
+      };
+    });
+  }, [items]);
+
   useEffect(() => setShown(PAGE), [items, q, trigger, library, type]);
   useEffect(() => setType(null), [items]);
   useEffect(() => {
@@ -84,7 +120,7 @@ export function Gallery({
   }, [filtered.length]);
 
   return (
-    <section>
+    <section ref={root}>
       {/* Title, filters and interaction chips stay pinned under the top bar. */}
       <div className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
       <div className="flex h-12 items-center justify-between gap-4">
@@ -172,7 +208,7 @@ export function Gallery({
               <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {sec.items.slice(0, 4).map((i, n) => (
                   <div key={i.id} className={n === 3 ? "xl:hidden 2xl:block" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={onStar && (() => onStar(i))} />
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
                   </div>
                 ))}
               </div>
@@ -184,7 +220,7 @@ export function Gallery({
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={onStar && (() => onStar(i))} />
+            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
           ))}
         </div>
       )}
