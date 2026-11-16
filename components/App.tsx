@@ -817,21 +817,19 @@ export default function App() {
               intro={intro.phase === "wait" && Boolean(catalog)}
               onDeal={intro.dealt}
               onAgent={(text) => copy(text, "Copied for your agent")}
+              // Nothing shows while the catalog loads (the gallery fills in a
+              // moment), and an empty library is just the empty page.
               empty={
-                words.length ? (
+                !catalog ? (
+                  <div />
+                ) : words.length ? (
                   <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
                 ) : view === "starred" ? (
                   <p className="mx-auto max-w-sm pt-20 text-center text-muted">
                     Nothing starred yet. Open a library below and tap the star on a component.
                   </p>
                 ) : (
-                  <div className="mx-auto max-w-sm pt-20 text-center">
-                    <p>Your library is empty.</p>
-                    <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
-                    <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
-                      Choose sites
-                    </button>
-                  </div>
+                  <div />
                 )
               }
             />
