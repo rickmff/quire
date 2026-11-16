@@ -3,6 +3,7 @@ import Link from "next/link";
 import Quire3D from "@/components/Quire3D";
 import Wordmark from "@/components/Wordmark";
 import SocialLinks from "@/components/SocialLinks";
+import StartLink from "@/components/StartLink";
 import s from "@/components/Landing.module.css";
 
 const REPO = "https://github.com/rickmff/quire";
@@ -41,9 +42,9 @@ export default function Landing() {
             </span>
           </h1>
           <div className={`${s.cta} ${s.enter}`} style={{ "--d": "620ms" } as CSSProperties}>
-            <Link href="/app" className="btn btn-lg btn-primary">
+            <StartLink className="btn btn-lg btn-primary">
               Start collecting
-            </Link>
+            </StartLink>
             <a href={`${REPO}/tree/main/extension`} className="btn btn-lg btn-secondary">
               Add to Chrome
             </a>

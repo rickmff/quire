@@ -50,6 +50,12 @@
 @media (prefers-reduced-motion: reduce) {
   .enter, .word, .stage { animation: none; }
 }
+/* Leaving for /app (StartLink): the words and the bar step back, the hero
+   fades out under the pile of sheets that takes its place. */
+.leaving .bar, .leaving .copy { animation: land-leave 260ms cubic-bezier(0.4, 0, 1, 1) both; }
+.leaving .stage { animation: land-out 300ms ease-in both; }
+@keyframes land-leave { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes land-out { to { opacity: 0; } }
 .cta { display: flex; align-items: center; gap: 6px; }
 
 /* The one detail: a quire of holographic sheets. */
