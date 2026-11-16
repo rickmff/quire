@@ -235,3 +235,17 @@ textarea:focus-visible { outline: none; }
     .btn::after { display: none; }
   }
 }
+
+/* Everything clickable shows the pointer (Tailwind's preflight resets buttons
+   to the default cursor). Kept in the base layer so a cursor-* utility, such
+   as the text cursor on the editable note, still wins. */
+@layer base {
+  a[href], button, summary, select, label[for],
+  label:has(select, input[type="checkbox"], input[type="radio"], input[type="file"]),
+  [role="button"], [role="switch"], [role="tab"], [role="link"],
+  [role="menuitem"], [role="option"], [role="checkbox"], [role="radio"],
+  [cmdk-item], input[type="checkbox"], input[type="radio"], input[type="file"],
+  input[type="submit"], input[type="button"], input[type="range"] { cursor: pointer; }
+  button:disabled, [aria-disabled="true"], [data-disabled], select:disabled,
+  input:disabled { cursor: not-allowed; }
+}
