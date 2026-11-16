@@ -17,6 +17,7 @@ import {
 } from "@/lib/store";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { OTHER, TYPES, typeById } from "@/lib/types";
+import Link from "next/link";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
 import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
@@ -909,8 +910,10 @@ function Sidebar(props: {
   return (
     <aside data-chrome className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
-        <div className="flex h-10 items-center px-2 md:h-6 md:pl-[34px]">
-          <Wordmark className="h-[15px] w-auto text-fg" />
+        <div className="flex h-10 items-center px-2 md:h-7 md:pl-[34px]">
+          <Link href="/" aria-label="quire home" className="rounded-sm">
+            <Wordmark className="block h-6 w-auto text-fg md:h-[26px]" />
+          </Link>
         </div>
 
         <nav
