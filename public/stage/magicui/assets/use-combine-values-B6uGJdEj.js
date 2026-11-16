@@ -1,0 +1,1 @@
+import{h as e,m as t}from"./MotionConfigContext-CFZ5YofP.js";import{n}from"./as-number-jMH1HvcG.js";import{t as r}from"./use-motion-value-h5lqwVQx.js";function i(i,a){let o=r(a()),s=()=>o.set(a());return s(),n(()=>{let n=()=>e.preRender(s,!1,!0),r=i.map(e=>e.on(`change`,n));return s(),()=>{r.forEach(e=>e()),t(s)}}),o}export{i as t};

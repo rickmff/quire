@@ -41,6 +41,9 @@ export type Library = {
   mode?: "curated" | "scratch";
   // Catalog libraries the user follows (ids from lib/catalog).
   sources?: string[];
+  // The user's order of the libraries in the sidebar (site keys).
+  // Libraries missing from it follow, by name.
+  siteOrder?: string[];
   // Secret key of the synced copy that the MCP reads.
   syncKey?: string;
   syncedAt?: number;

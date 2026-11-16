@@ -1,0 +1,37 @@
+/* X and GitHub links, shared by the landing and the app header. */
+.social { display: flex; align-items: center; gap: 2px; }
+/* Each mark opens into a pill on hover ("@rickmff" on X, "Star" on GitHub);
+   the mark stays put and the label grows to its left. */
+.social .gh {
+  display: inline-flex; align-items: center; height: 30px; padding: 0 8px; margin-right: -8px;
+  border-radius: 999px; border: 1px solid transparent; color: var(--muted);
+  transition: color 0.2s, background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.social .x { margin-right: 0; }
+.social .gh:hover, .social .gh:focus-visible {
+  color: var(--fg); background: var(--sheet, var(--panel)); border-color: var(--edge, var(--line));
+  box-shadow: 0 4px 14px -6px var(--floor, rgb(0 0 0 / 0.1));
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.social .gh:focus-visible { outline: 2px solid var(--edge, var(--line)); outline-offset: 2px; }
+.reveal {
+  display: grid; grid-template-columns: 0fr; opacity: 0;
+  transition: grid-template-columns 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s;
+}
+.reveal > span {
+  min-width: 0; overflow: hidden; display: flex; align-items: center; gap: 5px;
+  padding-right: 7px; white-space: nowrap; font-size: 13px; font-weight: 500;
+}
+.gh:hover .reveal, .gh:focus-visible .reveal { grid-template-columns: 1fr; opacity: 1; }
+.star { display: grid; flex: none; }
+.gh:hover .star, .gh:focus-visible .star {
+  animation: star-pop 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+@keyframes star-pop {
+  0% { transform: scale(0.4) rotate(-72deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .social .gh, .reveal, .star { transition: none; }
+  .gh:hover .star, .gh:focus-visible .star { animation: none; }
+}

@@ -170,7 +170,7 @@ export default function ImportDialog({
             <button
               disabled={!chosen.length}
               onClick={() => onImport({ result, items: chosen, collection: toCollection ? result.site : null })}
-              className="rounded-md bg-fg px-3 py-1 text-bg transition hover:opacity-85 disabled:opacity-40"
+              className="btn btn-sm btn-primary"
             >
               Import {chosen.length}
             </button>

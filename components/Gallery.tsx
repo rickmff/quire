@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { CatalogLibrary } from "@/lib/catalog/schema";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CatalogLibrary, LiveDemo as Live } from "@/lib/catalog/schema";
 import type { GalleryItem } from "@/lib/useCatalog";
 import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { TRIGGERS, triggerById } from "@/lib/motion";
+import StarIcon from "@/components/StarIcon";
+import { deal } from "@/lib/deal";
+import { agentText } from "@/lib/agentText";
+import { Maximize2 } from "lucide-react";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
@@ -20,6 +24,11 @@ export function Gallery({
   empty,
   sections,
   onSite,
+  onStar,
+  tools,
+  intro,
+  onDeal,
+  onAgent,
 }: {
   items: GalleryItem[];
   title: string;
@@ -29,49 +38,78 @@ export function Gallery({
   // Library view: one row of cards per library, each opening its own page.
   sections?: { key: string; name: string; items: GalleryItem[] }[];
   onSite?: (key: string) => void;
+  // Star on each card: saves the component to Saved, or removes it.
+  onStar?: (item: GalleryItem) => void;
+  // Actions for a starred card (collection, type, note, copy, delete), shown beside the star.
+  tools?: (item: GalleryItem) => React.ReactNode;
+  // First load: deal the visible cards from a pile. onDeal gets the time in
+  // ms until the last card lands, so the rest of the page can follow it.
+  intro?: boolean;
+  onDeal?: (ms: number) => void;
+  // "Copy for agent" under the library name: gets the same text as the drawer's button.
+  onAgent?: (text: string) => void;
 }) {
-  const [q, setQ] = useState("");
   const [trigger, setTrigger] = useState<string | null>(null);
-  const [library, setLibrary] = useState<string | null>(null);
-  const [type, setType] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
   const more = useRef<HTMLDivElement>(null);
 
   const libName = useMemo(() => new Map(libraries.map((l) => [l.id, l.name])), [libraries]);
   const nameOf = (i: GalleryItem) => i.site ?? libName.get(i.library) ?? i.library;
 
-  const filtered = useMemo(() => {
-    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-    return items.filter((i) => {
-      if (trigger && !i.triggers.includes(trigger)) return false;
-      if (library && i.library !== library) return false;
-      if (type && i.type !== type) return false;
-      if (!words.length) return true;
-      const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${nameOf(i)} ${i.tech.join(" ")}`.toLowerCase();
-      return words.every((w) => hay.includes(w));
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, trigger, library, type]);
-
-  const typeCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const i of items) m.set(i.type, (m.get(i.type) ?? 0) + 1);
-    return [...m].sort((a, b) => b[1] - a[1]);
-  }, [items]);
+  const filtered = useMemo(() => (trigger ? items.filter((i) => i.triggers.includes(trigger)) : items), [items, trigger]);
 
   const triggerCounts = useMemo(() => {
     const m = new Map<string, number>();
     for (const i of items) for (const t of i.triggers) m.set(t, (m.get(t) ?? 0) + 1);
     return m;
   }, [items]);
-  const libCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const i of items) m.set(i.library, (m.get(i.library) ?? 0) + 1);
-    return [...m].sort((a, b) => b[1] - a[1]);
+
+  // Starring moves a card to the top. Measure every card before the change,
+  // then glide each one from its old place to its new one (FLIP).
+  const root = useRef<HTMLElement>(null);
+  const before = useRef<Map<string, DOMRect> | null>(null);
+  const star = onStar && ((i: GalleryItem) => {
+    const m = new Map<string, DOMRect>();
+    root.current?.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
+    before.current = m;
+    onStar(i);
+  });
+  useLayoutEffect(() => {
+    const prev = before.current;
+    before.current = null;
+    if (!prev || !root.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const easing = "cubic-bezier(.2,.8,.2,1)";
+    root.current.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => {
+      const was = prev.get(el.dataset.card!);
+      if (!was) {
+        el.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 320, easing });
+        return;
+      }
+      const now = el.getBoundingClientRect();
+      const dx = was.left - now.left;
+      const dy = was.top - now.top;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      // Far moves take a little longer, so every card reads as one motion.
+      const duration = Math.min(700, 380 + Math.hypot(dx, dy) * 0.25);
+      el.style.position = "relative";
+      el.style.zIndex = "2";
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration, easing }).onfinish = () => {
+        el.style.position = "";
+        el.style.zIndex = "";
+      };
+    });
   }, [items]);
 
-  useEffect(() => setShown(PAGE), [items, q, trigger, library, type]);
-  useEffect(() => setType(null), [items]);
+  // Runs once, as soon as the first cards are in the page.
+  const dealtRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!intro || dealtRef.current || !root.current?.querySelector("[data-card]")) return;
+    dealtRef.current = true;
+    onDeal?.(deal(root.current));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intro, items, sections]);
+
+  useEffect(() => setShown(PAGE), [items, trigger]);
   useEffect(() => {
     const el = more.current;
     if (!el) return;
@@ -81,65 +119,18 @@ export function Gallery({
   }, [filtered.length]);
 
   return (
-    <section>
-      <div className="flex h-12 items-center justify-between gap-4">
+    <section ref={root}>
+      {/* Title and interaction chips stay pinned under the top bar. */}
+      <div data-chrome style={{ "--d": "120ms" } as React.CSSProperties} className="sticky top-14 z-[9] -mx-4 mb-5 bg-bg/90 px-4 backdrop-blur-md md:mx-0 md:px-0">
+      <div className="flex h-12 items-center">
         <h1 className="flex items-baseline gap-2">
           <span className="font-medium">{title}</span>
           <span className="text-faint tabular-nums">{filtered.length || ""}</span>
         </h1>
-        <div className="flex items-center gap-1">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter"
-            aria-label="Filter components"
-            className="h-7 w-28 rounded-md bg-transparent px-2 text-right outline-none transition-[width,background-color] placeholder:text-faint focus:w-44 focus:bg-field-focus focus:text-left"
-          />
-          {libCounts.length <= 1 && typeCounts.length > 1 && (
-            <label className="relative">
-              <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${type ? "text-fg" : "text-faint hover:text-muted"}`}>
-                {type ? typeById(type).name : "All types"}
-              </span>
-              <select
-                value={type ?? ""}
-                onChange={(e) => setType(e.target.value || null)}
-                aria-label="Filter by type"
-                className="absolute inset-0 cursor-pointer opacity-0"
-              >
-                <option value="">All types</option>
-                {typeCounts.map(([id, n]) => (
-                  <option key={id} value={id}>
-                    {typeById(id).name} ({n})
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          {libCounts.length > 1 && (
-            <label className="relative">
-              <span className={`flex h-7 items-center rounded-md px-2 text-[12px] transition ${library ? "text-fg" : "text-faint hover:text-muted"}`}>
-                {library ? libName.get(library) ?? library : "All sites"}
-              </span>
-              <select
-                value={library ?? ""}
-                onChange={(e) => setLibrary(e.target.value || null)}
-                aria-label="Filter by site"
-                className="absolute inset-0 cursor-pointer opacity-0"
-              >
-                <option value="">All sites</option>
-                {libCounts.map(([id, n]) => (
-                  <option key={id} value={id}>
-                    {libName.get(id) ?? id} ({n})
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </div>
       </div>
 
       {triggerCounts.size > 1 && (
-        <div className="-mx-1 mb-5 flex gap-0.5 overflow-x-auto pb-1">
+        <div className="-mx-1 flex gap-0.5 overflow-x-auto pb-2">
           {TRIGGERS.filter((t) => triggerCounts.has(t.id)).map((t) => (
             <button
               key={t.id}
@@ -153,20 +144,21 @@ export function Gallery({
           ))}
         </div>
       )}
+      </div>
 
-      {sections && !q && !trigger && !library && !type ? (
+      {sections && !trigger ? (
         <div className="flex flex-col gap-12">
           {sections.map((sec) => (
             <section key={sec.key}>
-              <button onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
+              <button data-chrome style={{ "--d": "160ms" } as React.CSSProperties} onClick={() => onSite?.(sec.key)} className="group mb-3 flex items-baseline gap-2 text-left">
                 <span className="font-medium">{sec.name}</span>
                 <span className="text-faint tabular-nums">{sec.items.length}</span>
                 <span className="text-[12px] text-faint opacity-0 transition group-hover:opacity-100">View all</span>
               </button>
-              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
                 {sec.items.slice(0, 4).map((i, n) => (
-                  <div key={i.id} className={n === 3 ? "xl:hidden 2xl:block" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} />
+                  <div key={i.id} className={n === 3 ? "xl:hidden" : undefined}>
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
                   </div>
                 ))}
               </div>
@@ -176,9 +168,9 @@ export function Gallery({
       ) : filtered.length === 0 ? (
         empty ?? <p className="pt-16 text-center text-muted">Nothing here yet.</p>
       ) : (
-        <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} />
+            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))} />
           ))}
         </div>
       )}
@@ -200,17 +192,56 @@ function useDark() {
   return dark;
 }
 
-export function Preview({ item, site, large }: { item: GalleryItem; site: string; large?: boolean }) {
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduce(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return reduce;
+}
+
+// still: the image only. A live demo plays over it, so the clip is not needed.
+export function Preview({ item, site, large, still }: { item: GalleryItem; site: string; large?: boolean; still?: boolean }) {
   const dark = useDark();
   const image = (dark && item.previewDark) || item.preview;
-  const video = (dark && item.videoDark) || item.video;
+  const video = still ? undefined : (dark && item.videoDark) || item.video;
   return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
+}
+
+// Card clips loop on their own while they are on screen (or about to be), and pause off
+// screen, so only the cards in view decode at a time. One observer serves every card.
+// With reduced motion a clip plays only while the mouse is over it.
+const onScreen = new Map<Element, (visible: boolean) => void>();
+let screenObserver: IntersectionObserver | undefined;
+function watchOnScreen(el: Element, cb: (visible: boolean) => void) {
+  screenObserver ??= new IntersectionObserver((entries) => entries.forEach((e) => onScreen.get(e.target)?.(e.isIntersecting)), { rootMargin: "200px 0px" });
+  onScreen.set(el, cb);
+  screenObserver.observe(el);
+  return () => {
+    onScreen.delete(el);
+    screenObserver?.unobserve(el);
+  };
 }
 
 function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; site: string; large?: boolean; image?: string; video?: string }) {
   const [img, setImg] = useState(Boolean(image));
   const [vid, setVid] = useState(Boolean(video));
   const ref = useRef<HTMLVideoElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || large) return;
+    if (reduce) return el.pause();
+    return watchOnScreen(el, (visible) => {
+      if (visible) el.play().catch(() => {});
+      else el.pause();
+    });
+  }, [vid, large, reduce]);
 
   if (vid && video)
     return (
@@ -222,9 +253,9 @@ function PreviewMedia({ item, site, large, image, video }: { item: GalleryItem; 
         loop
         playsInline
         preload="none"
-        autoPlay={large}
-        onMouseEnter={() => ref.current?.play().catch(() => {})}
-        onMouseLeave={() => !large && ref.current?.pause()}
+        autoPlay={large && !reduce}
+        onMouseEnter={reduce ? () => ref.current?.play().catch(() => {}) : undefined}
+        onMouseLeave={reduce && !large ? () => ref.current?.pause() : undefined}
         onError={() => setVid(false)}
         className="size-full object-cover"
       />
@@ -260,29 +291,163 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
   );
 }
 
-function ComponentCard({ item, site, onOpen }: { item: GalleryItem; site: string; onOpen: () => void }) {
+// The component itself, running on the Quire stage (public/stage/, built by stage/build.sh)
+// in a frame on this site's own origin. The frame lays the demo out at the size it was
+// captured at (live.view) and shows the part the stills show (live.frame), scaled to fit.
+// It fades in over the still once the demo has mounted.
+// Cards do not run it: their clips loop on their own and show the interaction already.
+function LiveDemo({ live, title, onEscape }: { live: Live; title: string; onEscape?: () => void }) {
+  const dark = useDark();
+  const src = (dark && live.srcDark) || live.src;
+  return <LiveFrame key={src} src={src} frame={(dark && live.frameDark) || live.frame} view={live.view} title={title} onEscape={onEscape} />;
+}
+
+function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: number[]; view: number[]; title: string; onEscape?: () => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const win = useRef<HTMLIFrameElement>(null);
+  const [scale, setScale] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [x, y, w] = frame;
+  const events = useRef({ onEscape });
+  events.current = { onEscape };
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / w));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [w]);
+  useEffect(() => {
+    const on = (e: MessageEvent) => {
+      if (e.origin !== location.origin || e.source !== win.current?.contentWindow || e.data?.source !== "quire-stage") return;
+      if (e.data.event === "ready") setReady(true);
+      if (e.data.event === "escape") events.current.onEscape?.();
+    };
+    window.addEventListener("message", on);
+    return () => window.removeEventListener("message", on);
+  }, []);
+
+  return (
+    <div ref={box} className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${ready ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+      {scale > 0 && (
+        <iframe
+          ref={win}
+          src={src}
+          title={`${title}, live demo`}
+          allow="clipboard-write"
+          className="absolute top-0 left-0 origin-top-left border-0"
+          style={{ width: view[0], height: view[1], transform: `scale(${scale}) translate(${-x}px, ${-y}px)` }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ComponentCard({
+  item,
+  site,
+  onOpen,
+  onStar,
+  tools,
+  onAgent,
+}: {
+  item: GalleryItem;
+  site: string;
+  onOpen: () => void;
+  onStar?: () => void;
+  tools?: React.ReactNode;
+  onAgent?: () => void;
+}) {
+  const starred = Boolean(item.saved);
+  // Plays the pop and glint once, right after the user stars the card.
+  const [pop, setPop] = useState(false);
   return (
     <article data-card={item.id} className="group pop">
-      <button
-        onClick={onOpen}
-        className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover text-left ring-1 ring-line ring-inset"
-        aria-label={`${item.title} from ${site}`}
-      >
-        <Preview item={item} site={site} />
-      </button>
+      <div className="relative">
+        {/* The preview is only a picture; the corner icon opens the details. */}
+        <div className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
+          <Preview item={item} site={site} />
+        </div>
+        <OpenDetails onClick={onOpen} />
+        {onStar && (
+          <button
+            type="button"
+            data-star
+            onClick={(e) => {
+              // The card opens on click; the star must not.
+              e.preventDefault();
+              e.stopPropagation();
+              setPop(!starred);
+              onStar();
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-pressed={starred}
+            aria-label={starred ? `Remove ${item.title} from Saved` : `Save ${item.title}`}
+            title={starred ? "Remove from Saved" : "Save"}
+            onAnimationEnd={() => setPop(false)}
+            className={`absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg focus-visible:opacity-100 [@media(hover:none)]:opacity-100 ${
+              starred ? "opacity-100" : "text-muted opacity-0 group-hover:opacity-100 hover:text-[#F59F00]"
+            } ${pop ? "star-pop" : ""}`}
+          >
+            <StarIcon filled={starred} />
+          </button>
+        )}
+        {starred && tools}
+      </div>
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">
-          <button onClick={onOpen} className="truncate text-left first-letter:uppercase">
-            {item.title}
-          </button>
+          <span className="truncate first-letter:uppercase">{item.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
-        <p className="mt-0.5 truncate text-[12px] text-faint">
-          {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
-          {item.saved && <span> · saved</span>}
-        </p>
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <p className="min-w-0 truncate text-[12px] text-faint">
+            {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
+          </p>
+          {onAgent && <AgentButton onClick={onAgent} />}
+        </div>
       </div>
     </article>
+  );
+}
+
+// The open-details icon in a card preview's bottom-right corner, styled like the star.
+export function OpenDetails({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      data-open
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+      aria-label="Open details"
+      title="Open details"
+      className="absolute right-2 bottom-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 text-muted opacity-0 shadow-sm ring-1 ring-line backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+    >
+      <Maximize2 size={14} strokeWidth={1.75} aria-hidden />
+    </button>
+  );
+}
+
+// "Copy for agent" on a card, under the library name. Its click stays off the card.
+export function AgentButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+      title="Copy an agent-ready description"
+      className="btn btn-secondary btn-sm -my-[3px] -mr-0.5 shrink-0 !h-[22px] !px-2 text-[11px]"
+    >
+      Copy for agent
+    </button>
   );
 }
 
@@ -293,19 +458,22 @@ export function Detail({
   site,
   saved,
   onClose,
-  onSave,
+  onStar,
   copy,
 }: {
   item: GalleryItem;
   site: string;
   saved: boolean;
   onClose: () => void;
-  onSave: () => void;
+  // The star is the only way to save: it adds to Saved or removes from it.
+  onStar: () => void;
   copy: (text: string, msg: string) => void;
 }) {
   const [src, setSrc] = useState<{ state: "idle" | "loading" | "done" | "none"; files: SourceFile[]; from?: string }>({ state: "idle", files: [] });
   const [tab, setTab] = useState(0);
+  const [run, setRun] = useState(0);
   const mine = item.id.startsWith("mine/");
+  const [pop, setPop] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -327,15 +495,7 @@ export function Detail({
     }
   };
 
-  const forAgent = [
-    `${item.title} (${site}), ${typeById(item.type).name}.`,
-    item.description,
-    `Reference: ${item.docs}`,
-    item.install && `Install: ${item.install}`,
-    !mine && `Quire id: ${item.id} (get_component_source in the Quire MCP returns its code)`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const forAgent = agentText(item, site);
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-label={item.title}>
@@ -348,9 +508,19 @@ export function Detail({
           </button>
         </div>
         <div className="px-5 pb-10">
-          <div className="aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
-            <Preview item={item} site={site} large />
+          <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-hover">
+            <Preview item={item} site={site} large still={Boolean(item.live)} />
+            {item.live && <LiveDemo key={`${item.id}|${run}`} live={item.live} title={item.title} onEscape={onClose} />}
+            <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-line ring-inset" />
           </div>
+          {item.live && (
+            <div className="mt-1.5 flex items-center justify-between text-[12px] text-faint">
+              <span>Live. Hover, click and type in it.</span>
+              <button onClick={() => setRun((n) => n + 1)} className="transition hover:text-muted">
+                Restart
+              </button>
+            </div>
+          )}
 
           <div className="mt-5 flex items-baseline justify-between gap-4">
             <h2 className="text-[17px] font-medium tracking-tight first-letter:uppercase">{item.title}</h2>
@@ -401,14 +571,27 @@ export function Detail({
             </button>
           )}
 
-          <div className="mt-3 flex flex-wrap gap-1">
-            <button onClick={onSave} disabled={saved} className="h-8 rounded-md bg-fg px-3 text-bg transition hover:opacity-85 disabled:bg-hover disabled:text-muted">
-              {saved ? "Saved" : "Save to my library"}
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              data-star
+              onClick={() => {
+                setPop(!saved);
+                onStar();
+              }}
+              aria-pressed={saved}
+              title={saved ? "Remove from Saved" : "Save"}
+              className={`group btn ${saved ? "btn-secondary" : "btn-primary"}`}
+            >
+              <span className={`flex ${pop ? "star-pop" : ""}`} onAnimationEnd={() => setPop(false)}>
+                <StarIcon filled={saved} />
+              </span>
+              {saved ? "Starred" : "Star"}
             </button>
-            <button onClick={() => copy(forAgent, "Copied for your agent")} className="h-8 rounded-md px-3 text-muted transition hover:bg-hover hover:text-fg">
+            <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
             </button>
-            <a href={item.docs} target="_blank" rel="noreferrer" className="flex h-8 items-center rounded-md px-3 text-muted transition hover:bg-hover hover:text-fg">
+            <a href={item.docs} target="_blank" rel="noreferrer" className="btn btn-secondary">
               Open docs
             </a>
           </div>
@@ -612,7 +795,7 @@ export function Agents({
           <>
             <p>Agents read the curated library.</p>
             <p className="mt-1 text-[12px] text-muted">Connect your library so they read your sites, saved components and notes instead.</p>
-            <button onClick={onEnable} disabled={available === null} className="mt-3 h-8 rounded-md bg-fg px-3 text-bg transition hover:opacity-85 disabled:opacity-40">
+            <button onClick={onEnable} disabled={available === null} className="btn btn-primary mt-3">
               Connect my library
             </button>
           </>

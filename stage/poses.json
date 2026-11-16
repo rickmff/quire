@@ -1,7 +1,45 @@
 {
  "animate-ui/components-backgrounds-bubble": {
   "fill": true,
-  "wait": 2500
+  "wait": 2500,
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.4
+     ]
+    },
+    {
+     "at": 900,
+     "path": [
+      [
+       0.6,
+       0.3
+      ],
+      [
+       0.7,
+       0.7
+      ],
+      [
+       0.3,
+       0.65
+      ],
+      [
+       0.45,
+       0.45
+      ]
+     ],
+     "ms": 3000
+    },
+    {
+     "at": 4200,
+     "leave": true
+    }
+   ],
+   "seconds": 5
+  }
  },
  "animate-ui/components-backgrounds-fireworks": {
   "fill": true,
@@ -9,15 +47,96 @@
  },
  "animate-ui/components-backgrounds-gradient": {
   "fill": true,
-  "wait": 2500
+  "wait": 2500,
+  "video": {
+   "seconds": 6,
+   "force": true,
+   "pingpong": true
+  }
  },
  "animate-ui/components-backgrounds-gravity-stars": {
   "fill": true,
-  "wait": 2500
+  "wait": 2500,
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3200
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
  },
  "animate-ui/components-backgrounds-hexagon": {
   "fill": true,
-  "wait": 2500
+  "wait": 2500,
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3600
+    },
+    {
+     "at": 4900,
+     "leave": true
+    }
+   ],
+   "seconds": 6.1
+  }
  },
  "animate-ui/components-backgrounds-hole": {
   "fill": true,
@@ -25,7 +144,45 @@
  },
  "animate-ui/components-backgrounds-stars": {
   "fill": true,
-  "wait": 2500
+  "wait": 2500,
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3200
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
  },
  "animate-ui/components-radix-dialog": {
   "steps": [
@@ -38,7 +195,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open Dialog')"
+    },
+    {
+     "at": 2800,
+     "press": "Escape"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.6
+  }
  },
  "animate-ui/components-radix-alert-dialog": {
   "steps": [
@@ -51,7 +225,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open Dialog')"
+    },
+    {
+     "at": 2800,
+     "click": "button:has-text('Cancel')"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.6
+  }
  },
  "animate-ui/components-radix-sheet": {
   "steps": [
@@ -64,7 +255,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open')"
+    },
+    {
+     "at": 3000,
+     "press": "Escape"
+    },
+    {
+     "at": 3500,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
  },
  "animate-ui/components-radix-popover": {
   "steps": [
@@ -77,7 +285,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open popover')"
+    },
+    {
+     "at": 2800,
+     "press": "Escape"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.6
+  }
  },
  "animate-ui/components-radix-dropdown-menu": {
   "steps": [
@@ -90,7 +315,35 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open')"
+    },
+    {
+     "at": 1400,
+     "hover": "[role=menuitem] >> nth=1"
+    },
+    {
+     "at": 2100,
+     "hover": "[role=menuitem] >> nth=3"
+    },
+    {
+     "at": 3000,
+     "click": [
+      0.88,
+      0.5
+     ]
+    },
+    {
+     "at": 3600,
+     "leave": true
+    }
+   ],
+   "seconds": 5.2
+  }
  },
  "animate-ui/components-base-menu": {
   "steps": [
@@ -103,7 +356,32 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open')"
+    },
+    {
+     "at": 1400,
+     "hover": "[role=menuitem] >> nth=1"
+    },
+    {
+     "at": 2100,
+     "hover": "[role=menuitem] >> nth=3"
+    },
+    {
+     "at": 3000,
+     "press": "Escape"
+    },
+    {
+     "at": 3400,
+     "leave": true
+    }
+   ],
+   "seconds": 4.9
+  }
  },
  "animate-ui/primitives-base-menu": {
   "steps": [
@@ -116,7 +394,32 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Open')"
+    },
+    {
+     "at": 1400,
+     "hover": "[role=menuitem] >> nth=1"
+    },
+    {
+     "at": 2100,
+     "hover": "[role=menuitem] >> nth=3"
+    },
+    {
+     "at": 3000,
+     "press": "Escape"
+    },
+    {
+     "at": 3400,
+     "leave": true
+    }
+   ],
+   "seconds": 4.9
+  }
  },
  "animate-ui/components-radix-hover-card": {
   "steps": [
@@ -129,7 +432,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "#subject a"
+    },
+    {
+     "at": 2950,
+     "leave": true
+    }
+   ],
+   "seconds": 4.25
+  }
  },
  "animate-ui/components-radix-tooltip": {
   "steps": [
@@ -142,7 +458,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2750,
+     "leave": true
+    }
+   ],
+   "seconds": 4.05
+  }
  },
  "animate-ui/components-base-preview-card": {
   "steps": [
@@ -155,7 +484,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "#subject a"
+    },
+    {
+     "at": 2950,
+     "leave": true
+    }
+   ],
+   "seconds": 4.25
+  }
  },
  "animate-ui/primitives-base-preview-card": {
   "steps": [
@@ -168,7 +510,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "#subject a"
+    },
+    {
+     "at": 2950,
+     "leave": true
+    }
+   ],
+   "seconds": 4.25
+  }
  },
  "animate-ui/components-radix-preview-link-card": {
   "steps": [
@@ -181,7 +536,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "#subject a"
+    },
+    {
+     "at": 3150,
+     "leave": true
+    }
+   ],
+   "seconds": 4.45
+  }
  },
  "animate-ui/components-community-radial-menu": {
   "steps": [
@@ -194,7 +562,51 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "rightclick": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "at": 1300,
+     "to": [
+      0.5,
+      0.28
+     ]
+    },
+    {
+     "at": 2000,
+     "to": [
+      0.66,
+      0.42
+     ]
+    },
+    {
+     "at": 2700,
+     "to": [
+      0.6,
+      0.66
+     ]
+    },
+    {
+     "at": 3500,
+     "click": [
+      0.1,
+      0.9
+     ]
+    },
+    {
+     "at": 4000,
+     "leave": true
+    }
+   ],
+   "seconds": 5.4
+  }
  },
  "animate-ui/components-radix-accordion": {
   "w": 560,
@@ -208,7 +620,28 @@
    {
     "wait": 1000
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 1700,
+     "click": "button >> nth=1"
+    },
+    {
+     "at": 3100,
+     "click": "button >> nth=1"
+    },
+    {
+     "at": 4000,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  }
  },
  "animate-ui/primitives-radix-collapsible": {
   "steps": [
@@ -221,7 +654,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2400,
+     "click": "button"
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
  },
  "animate-ui/primitives-headless-disclosure": {
   "steps": [
@@ -234,7 +684,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2400,
+     "click": "button"
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
  },
  "animate-ui/components-radix-checkbox": {
   "steps": [
@@ -247,7 +714,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=checkbox]"
+    },
+    {
+     "at": 2300,
+     "click": "[role=checkbox]"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  }
  },
  "animate-ui/components-radix-switch": {
   "steps": [
@@ -260,7 +744,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=switch]"
+    },
+    {
+     "at": 2300,
+     "click": "[role=switch]"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  }
  },
  "animate-ui/components-radix-toggle": {
   "steps": [
@@ -273,7 +774,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2300,
+     "click": "button"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  }
  },
  "animate-ui/components-buttons-flip": {
   "steps": [
@@ -286,7 +804,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2450,
+     "leave": true
+    }
+   ],
+   "seconds": 3.75
+  }
  },
  "animate-ui/components-buttons-liquid": {
   "steps": [
@@ -299,7 +830,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2550,
+     "leave": true
+    }
+   ],
+   "seconds": 3.85
+  }
  },
  "animate-ui/components-buttons-ripple": {
   "steps": [
@@ -312,7 +856,32 @@
    {
     "wait": 250
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button",
+     "pos": [
+      0.3,
+      0.4
+     ]
+    },
+    {
+     "at": 1300,
+     "click": "button",
+     "pos": [
+      0.75,
+      0.6
+     ]
+    },
+    {
+     "at": 2400,
+     "leave": true
+    }
+   ],
+   "seconds": 3.9
+  }
  },
  "animate-ui/components-buttons-copy": {
   "steps": [
@@ -325,7 +894,20 @@
    {
     "wait": 500
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2600,
+     "leave": true
+    }
+   ],
+   "seconds": 4.2
+  }
  },
  "animate-ui/components-buttons-icon": {
   "steps": [
@@ -338,7 +920,24 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2300,
+     "click": "button"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  }
  },
  "animate-ui/components-animate-cursor": {
   "steps": [
@@ -355,7 +954,46 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.4
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.6,
+       0.35
+      ],
+      [
+       0.7,
+       0.6
+      ],
+      [
+       0.4,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3200
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7,
+   "cursor": false
+  }
  },
  "animate-ui/primitives-effects-magnetic": {
   "steps": [
@@ -372,7 +1010,45 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.62,
+      0.38
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.42,
+       0.62
+      ],
+      [
+       0.6,
+       0.62
+      ],
+      [
+       0.48,
+       0.4
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 2800
+    },
+    {
+     "at": 4100,
+     "leave": true
+    }
+   ],
+   "seconds": 5.6
+  }
  },
  "animate-ui/primitives-effects-click": {
   "steps": [
@@ -385,7 +1061,37 @@
    {
     "wait": 150
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": [
+      0.3,
+      0.5
+     ]
+    },
+    {
+     "at": 1300,
+     "click": [
+      0.7,
+      0.45
+     ]
+    },
+    {
+     "at": 2300,
+     "click": [
+      0.5,
+      0.55
+     ]
+    },
+    {
+     "at": 3200,
+     "leave": true
+    }
+   ],
+   "seconds": 4.7
+  }
  },
  "animate-ui/primitives-effects-tilt": {
   "steps": [
@@ -402,7 +1108,45 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.2,
+      0.3
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.75,
+       0.3
+      ],
+      [
+       0.75,
+       0.7
+      ],
+      [
+       0.2,
+       0.7
+      ],
+      [
+       0.45,
+       0.5
+      ]
+     ],
+     "ms": 3400
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9
+  }
  },
  "animate-ui/components-animate-github-stars-wheel": {
   "wait": 6500
@@ -433,7 +1177,24 @@
  },
  "animate-ui/components-animate-code-tabs": {
   "wait": 6500,
-  "w": 620
+  "w": 620,
+  "video": {
+   "steps": [
+    {
+     "at": 1800,
+     "click": "[role=tab] >> nth=1"
+    },
+    {
+     "at": 4200,
+     "click": "[role=tab] >> nth=0"
+    },
+    {
+     "at": 5000,
+     "leave": true
+    }
+   ],
+   "seconds": 6.5
+  }
  },
  "animate-ui/primitives-animate-code-block": {
   "wait": 6500
@@ -471,7 +1232,36 @@
    {
     "wait": 250
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 1000,
+     "down": true
+    },
+    {
+     "at": 2200,
+     "up": true
+    },
+    {
+     "at": 2700,
+     "click": "button"
+    },
+    {
+     "at": 3100,
+     "click": "button"
+    },
+    {
+     "at": 3600,
+     "leave": true
+    }
+   ],
+   "seconds": 5.1
+  }
  },
  "magicui/magic-card": {
   "w": 460,
@@ -489,7 +1279,45 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.25,
+      0.3
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.75,
+       0.35
+      ],
+      [
+       0.7,
+       0.75
+      ],
+      [
+       0.3,
+       0.7
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3400
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9
+  }
  },
  "magicui/glare-hover": {
   "steps": [
@@ -506,7 +1334,33 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.7
+      ]
+     ],
+     "ms": 900
+    },
+    {
+     "at": 2300,
+     "leave": true
+    }
+   ],
+   "seconds": 3.8
+  }
  },
  "magicui/smooth-cursor": {
   "steps": [
@@ -522,7 +1376,46 @@
    {
     "wait": 800
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.3
+      ],
+      [
+       0.7,
+       0.7
+      ],
+      [
+       0.3,
+       0.68
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3400
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9,
+   "cursor": false
+  }
  },
  "magicui/pointer": {
   "steps": [
@@ -539,7 +1432,45 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.32,
+      0.3
+     ]
+    },
+    {
+     "at": 1500,
+     "to": [
+      0.67,
+      0.3
+     ]
+    },
+    {
+     "at": 2700,
+     "to": [
+      0.32,
+      0.7
+     ]
+    },
+    {
+     "at": 3900,
+     "to": [
+      0.67,
+      0.7
+     ]
+    },
+    {
+     "at": 5100,
+     "leave": true
+    }
+   ],
+   "seconds": 6.6,
+   "cursor": false
+  }
  },
  "magicui/dock": {
   "steps": [
@@ -552,7 +1483,59 @@
    {
     "wait": 900
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.25,
+      0.73
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.35,
+       0.72
+      ],
+      [
+       0.45,
+       0.72
+      ],
+      [
+       0.55,
+       0.72
+      ],
+      [
+       0.65,
+       0.72
+      ],
+      [
+       0.75,
+       0.73
+      ]
+     ],
+     "ms": 2200
+    },
+    {
+     "at": 3500,
+     "path": [
+      [
+       0.5,
+       0.72
+      ]
+     ],
+     "ms": 900
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 6
+  }
  },
  "magicui/interactive-hover-button": {
   "steps": [
@@ -565,7 +1548,20 @@
    {
     "wait": 1200
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2550,
+     "leave": true
+    }
+   ],
+   "seconds": 3.85
+  }
  },
  "magicui/confetti": {
   "steps": [
@@ -578,7 +1574,30 @@
    {
     "wait": 500
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": [
+      0.4,
+      0.45
+     ]
+    },
+    {
+     "at": 1500,
+     "click": [
+      0.62,
+      0.55
+     ]
+    },
+    {
+     "at": 2600,
+     "leave": true
+    }
+   ],
+   "seconds": 4.5
+  }
  },
  "magicui/typing-animation": {
   "wait": 5000
@@ -610,7 +1629,33 @@
    {
     "wait": 900
    }
-  ]
+  ],
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.5,
+      0.55
+     ]
+    },
+    {
+     "at": 1000,
+     "scroll": 900,
+     "ms": 1600
+    },
+    {
+     "at": 3200,
+     "scroll": -900,
+     "ms": 1200
+    },
+    {
+     "at": 4600,
+     "leave": true
+    }
+   ],
+   "seconds": 7
+  }
  },
  "animate-ui/primitives-animate-motion-grid": {
   "wait": 1000
@@ -627,10 +1672,1197 @@
    {
     "wait": 700
    }
-  ]
+  ],
+  "video": {
+   "seconds": 6.5,
+   "steps": [
+    {
+     "at": 0,
+     "eval": "document.body.style.minHeight='2400px';window.scrollTo(0,0)"
+    },
+    {
+     "at": 600,
+     "scroll": 1600,
+     "ms": 2800
+    },
+    {
+     "at": 4200,
+     "scroll": -1600,
+     "ms": 1500
+    }
+   ]
+  }
  },
  "animate-ui/components-radix-sidebar": {
   "fill": true,
-  "wait": 2000
+  "wait": 2000,
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('Models')"
+    },
+    {
+     "at": 1500,
+     "click": "button:has-text('Documentation')"
+    },
+    {
+     "at": 2700,
+     "click": "button:has-text('Models')"
+    },
+    {
+     "at": 3900,
+     "click": "button:has-text('Documentation')"
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 6.2
+  }
+ },
+ "animate-ui/components-animate-avatar-group": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.28,
+      0.5
+     ]
+    },
+    {
+     "at": 900,
+     "path": [
+      [
+       0.36,
+       0.5
+      ],
+      [
+       0.44,
+       0.5
+      ],
+      [
+       0.52,
+       0.5
+      ],
+      [
+       0.6,
+       0.5
+      ],
+      [
+       0.68,
+       0.5
+      ]
+     ],
+     "ms": 2600
+    },
+    {
+     "at": 3800,
+     "leave": true
+    }
+   ],
+   "seconds": 5
+  }
+ },
+ "animate-ui/components-base-radio": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=radio] >> nth=1"
+    },
+    {
+     "at": 1400,
+     "click": "[role=radio] >> nth=2"
+    },
+    {
+     "at": 2500,
+     "click": "[role=radio] >> nth=0"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
+ },
+ "animate-ui/components-buttons-button": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 1300,
+     "click": "button"
+    },
+    {
+     "at": 2200,
+     "click": "button"
+    },
+    {
+     "at": 3000,
+     "leave": true
+    }
+   ],
+   "seconds": 4.5
+  }
+ },
+ "animate-ui/components-buttons-theme-toggler": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2300,
+     "click": "button"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.5
+  },
+  "freetheme": true
+ },
+ "animate-ui/components-community-flip-card": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": [
+      0.5,
+      0.45
+     ]
+    },
+    {
+     "at": 2900,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
+ },
+ "animate-ui/components-community-management-bar": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button >> nth=1"
+    },
+    {
+     "at": 1200,
+     "click": "button >> nth=1"
+    },
+    {
+     "at": 2100,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 3000,
+     "hover": "button >> nth=4"
+    },
+    {
+     "at": 3800,
+     "hover": "button >> nth=5"
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 6.2
+  }
+ },
+ "animate-ui/components-community-motion-carousel": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button >> nth=-1"
+    },
+    {
+     "at": 1400,
+     "click": "button >> nth=-1"
+    },
+    {
+     "at": 2500,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 3600,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 4400,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9
+  }
+ },
+ "animate-ui/components-community-notification-list": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": [
+      0.5,
+      0.45
+     ]
+    },
+    {
+     "at": 3150,
+     "leave": true
+    }
+   ],
+   "seconds": 4.45
+  }
+ },
+ "animate-ui/components-community-pin-list": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "text=NPM Stop"
+    },
+    {
+     "at": 1900,
+     "click": "text=Commit Zone"
+    },
+    {
+     "at": 3500,
+     "click": "text=NPM Stop"
+    },
+    {
+     "at": 5100,
+     "click": "text=Commit Zone"
+    },
+    {
+     "at": 6000,
+     "leave": true
+    }
+   ],
+   "seconds": 7.5
+  }
+ },
+ "animate-ui/components-community-playful-todolist": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=checkbox] >> nth=0"
+    },
+    {
+     "at": 1300,
+     "click": "[role=checkbox] >> nth=1"
+    },
+    {
+     "at": 2500,
+     "click": "[role=checkbox] >> nth=1"
+    },
+    {
+     "at": 3500,
+     "click": "[role=checkbox] >> nth=0"
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.8
+  }
+ },
+ "animate-ui/components-community-radial-nav": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=menuitem] >> nth=1"
+    },
+    {
+     "at": 1500,
+     "click": "[role=menuitem] >> nth=2"
+    },
+    {
+     "at": 2700,
+     "click": "[role=menuitem] >> nth=0"
+    },
+    {
+     "at": 3600,
+     "leave": true
+    }
+   ],
+   "seconds": 5.1
+  }
+ },
+ "animate-ui/components-community-share-button": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2950,
+     "leave": true
+    }
+   ],
+   "seconds": 4.25
+  }
+ },
+ "animate-ui/components-community-user-presence-avatar": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.2,
+      0.5
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.33,
+       0.5
+      ],
+      [
+       0.62,
+       0.5
+      ],
+      [
+       0.8,
+       0.5
+      ]
+     ],
+     "ms": 2400
+    },
+    {
+     "at": 3700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.2
+  }
+ },
+ "animate-ui/components-radix-files": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('components')"
+    },
+    {
+     "at": 1500,
+     "click": "button:has-text('(home)')"
+    },
+    {
+     "at": 2700,
+     "click": "button:has-text('(home)')"
+    },
+    {
+     "at": 3900,
+     "click": "button:has-text('components')"
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 6.2
+  }
+ },
+ "animate-ui/components-radix-radio-group": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=radio] >> nth=1"
+    },
+    {
+     "at": 1400,
+     "click": "[role=radio] >> nth=2"
+    },
+    {
+     "at": 2500,
+     "click": "[role=radio] >> nth=0"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
+ },
+ "animate-ui/components-radix-tabs": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=tab] >> nth=1"
+    },
+    {
+     "at": 1900,
+     "click": "[role=tab] >> nth=0"
+    },
+    {
+     "at": 2800,
+     "leave": true
+    }
+   ],
+   "seconds": 4.3
+  }
+ },
+ "animate-ui/components-radix-toggle-group": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "[role=radio] >> nth=0"
+    },
+    {
+     "at": 1200,
+     "click": "[role=radio] >> nth=1"
+    },
+    {
+     "at": 2100,
+     "click": "[role=radio] >> nth=2"
+    },
+    {
+     "at": 3000,
+     "click": "[role=radio] >> nth=2"
+    },
+    {
+     "at": 3800,
+     "leave": true
+    }
+   ],
+   "seconds": 5.3
+  }
+ },
+ "animate-ui/primitives-animate-pinned-list": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button >> nth=2"
+    },
+    {
+     "at": 1700,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 3100,
+     "click": "button >> nth=2"
+    },
+    {
+     "at": 4500,
+     "click": "button >> nth=0"
+    },
+    {
+     "at": 5300,
+     "leave": true
+    }
+   ],
+   "seconds": 6.8
+  }
+ },
+ "animate-ui/primitives-animate-slot": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 1300,
+     "click": "button"
+    },
+    {
+     "at": 2200,
+     "leave": true
+    }
+   ],
+   "seconds": 3.7
+  }
+ },
+ "animate-ui/primitives-animate-spring": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "drag": {
+      "from": "img",
+      "to": [
+       0.74,
+       0.25
+      ]
+     },
+     "ms": 900
+    },
+    {
+     "at": 2600,
+     "drag": {
+      "from": "img",
+      "to": [
+       0.28,
+       0.74
+      ]
+     },
+     "ms": 900
+    },
+    {
+     "at": 4900,
+     "leave": true
+    }
+   ],
+   "seconds": 6.4
+  },
+  "min": 600
+ },
+ "animate-ui/primitives-effects-auto-height": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2400,
+     "click": "button"
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
+ },
+ "animate-ui/primitives-effects-highlight": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "at": 1200,
+     "hover": [
+      0.68,
+      0.5
+     ]
+    },
+    {
+     "at": 1900,
+     "click": [
+      0.68,
+      0.5
+     ]
+    },
+    {
+     "at": 2900,
+     "click": [
+      0.31,
+      0.5
+     ]
+    },
+    {
+     "at": 3800,
+     "leave": true
+    }
+   ],
+   "seconds": 5.3
+  }
+ },
+ "animate-ui/primitives-effects-image-zoom": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.65,
+       0.3
+      ],
+      [
+       0.7,
+       0.65
+      ],
+      [
+       0.35,
+       0.7
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3400
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9
+  }
+ },
+ "animate-ui/primitives-effects-particles": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 1200,
+     "click": "button"
+    },
+    {
+     "at": 2400,
+     "click": "button"
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
+ },
+ "animate-ui/primitives-effects-shine": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2750,
+     "leave": true
+    }
+   ],
+   "seconds": 4.05
+  }
+ },
+ "animate-ui/primitives-texts-gradient": {
+  "video": {
+   "seconds": 6,
+   "force": true
+  }
+ },
+ "animate-ui/components-community-radial-intro": {
+  "video": {
+   "seconds": 6
+  }
+ },
+ "magicui/animated-theme-toggler": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button"
+    },
+    {
+     "at": 2400,
+     "click": "button"
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  },
+  "freetheme": true
+ },
+ "magicui/bento-grid": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.2,
+      0.28
+     ]
+    },
+    {
+     "at": 1800,
+     "to": [
+      0.45,
+      0.28
+     ]
+    },
+    {
+     "at": 3300,
+     "to": [
+      0.2,
+      0.75
+     ]
+    },
+    {
+     "at": 4600,
+     "leave": true
+    }
+   ],
+   "seconds": 6.1
+  }
+ },
+ "magicui/dither-field": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3200
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
+ },
+ "magicui/file-tree": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button:has-text('components')"
+    },
+    {
+     "at": 1500,
+     "click": "button:has-text('app')"
+    },
+    {
+     "at": 2700,
+     "click": "button:has-text('app')"
+    },
+    {
+     "at": 3900,
+     "click": "button:has-text('components')"
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 6.2
+  }
+ },
+ "magicui/hero-video-dialog": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button[aria-label='Play video']:visible"
+    },
+    {
+     "at": 1100,
+     "click": true
+    },
+    {
+     "at": 3000,
+     "click": [
+      0.04,
+      0.06
+     ]
+    },
+    {
+     "at": 3700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.2
+  }
+ },
+ "magicui/hyper-text": {
+  "video": {
+   "steps": [
+    {
+     "at": 2200,
+     "hover": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.8
+  }
+ },
+ "magicui/interactive-grid-pattern": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3600
+    },
+    {
+     "at": 4900,
+     "leave": true
+    }
+   ],
+   "seconds": 6.1
+  }
+ },
+ "magicui/kinetic-text": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.08,
+      0.5
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.92,
+       0.48
+      ]
+     ],
+     "ms": 2200
+    },
+    {
+     "at": 3500,
+     "path": [
+      [
+       0.3,
+       0.52
+      ]
+     ],
+     "ms": 1200
+    },
+    {
+     "at": 5000,
+     "leave": true
+    }
+   ],
+   "seconds": 6.5
+  }
+ },
+ "magicui/lens": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.35,
+      0.25
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.65,
+       0.3
+      ],
+      [
+       0.6,
+       0.6
+      ],
+      [
+       0.4,
+       0.55
+      ],
+      [
+       0.5,
+       0.4
+      ]
+     ],
+     "ms": 3400
+    },
+    {
+     "at": 4700,
+     "leave": true
+    }
+   ],
+   "seconds": 5.9
+  }
+ },
+ "magicui/light-rays": {
+  "video": {
+   "seconds": 6,
+   "force": true,
+   "pingpong": true
+  }
+ },
+ "magicui/particles": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.3,
+      0.35
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.7,
+       0.4
+      ],
+      [
+       0.65,
+       0.7
+      ],
+      [
+       0.35,
+       0.65
+      ],
+      [
+       0.5,
+       0.5
+      ]
+     ],
+     "ms": 3200
+    },
+    {
+     "at": 4500,
+     "leave": true
+    }
+   ],
+   "seconds": 5.7
+  }
+ },
+ "magicui/progressive-blur": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "at": 900,
+     "scroll": 500,
+     "ms": 1500
+    },
+    {
+     "at": 2800,
+     "scroll": -500,
+     "ms": 1300
+    },
+    {
+     "at": 4300,
+     "leave": true
+    }
+   ],
+   "seconds": 5.8
+  }
+ },
+ "magicui/pulsating-button": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "hover": "button"
+    },
+    {
+     "at": 2750,
+     "leave": true
+    }
+   ],
+   "seconds": 4.05,
+   "force": true
+  }
+ },
+ "magicui/ripple-button": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "click": "button",
+     "pos": [
+      0.3,
+      0.4
+     ]
+    },
+    {
+     "at": 1300,
+     "click": "button",
+     "pos": [
+      0.75,
+      0.6
+     ]
+    },
+    {
+     "at": 2400,
+     "leave": true
+    }
+   ],
+   "seconds": 3.9
+  }
+ },
+ "magicui/text-3d-flip": {
+  "video": {
+   "steps": [
+    {
+     "at": 300,
+     "to": [
+      0.1,
+      0.5
+     ]
+    },
+    {
+     "at": 1000,
+     "path": [
+      [
+       0.9,
+       0.5
+      ]
+     ],
+     "ms": 2000
+    },
+    {
+     "at": 3300,
+     "leave": true
+    }
+   ],
+   "seconds": 4.8
+  }
+ },
+ "magicui/text-reveal": {
+  "video": {
+   "seconds": 7,
+   "steps": [
+    {
+     "at": 0,
+     "eval": "(()=>{const s=document.getElementById('stage').style;s.position='absolute';s.bottom='auto';s.alignItems='flex-start';s.overflow='visible';window.scrollTo(0,0)})()"
+    },
+    {
+     "at": 600,
+     "scroll": 1000,
+     "ms": 3000
+    },
+    {
+     "at": 4700,
+     "scroll": -1000,
+     "ms": 1600
+    }
+   ]
+  }
+ },
+ "magicui/scroll-based-velocity": {
+  "video": {
+   "seconds": 7,
+   "steps": [
+    {
+     "at": 0,
+     "eval": "document.body.style.minHeight='8000px'"
+    },
+    {
+     "at": 1400,
+     "scroll": 2400,
+     "ms": 1400
+    },
+    {
+     "at": 4000,
+     "scroll": -2400,
+     "ms": 1400
+    }
+   ]
+  }
+ },
+ "magicui/code-comparison": {
+  "video": {
+   "lead": 900,
+   "steps": [
+    {
+     "at": 700,
+     "hover": [
+      0.74,
+      0.55
+     ]
+    },
+    {
+     "at": 3100,
+     "leave": true
+    }
+   ],
+   "seconds": 4.9
+  }
  }
 }

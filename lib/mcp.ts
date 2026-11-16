@@ -38,6 +38,7 @@ function full(c: CatalogComponent, base: string) {
     ...(c.dependencies?.length ? { dependencies: c.dependencies } : {}),
     ...(c.preview ? { preview: c.preview.startsWith("/") ? `${base}${c.preview}` : c.preview } : {}),
     ...(c.previewDark ? { previewDark: c.previewDark.startsWith("/") ? `${base}${c.previewDark}` : c.previewDark } : {}),
+    ...(c.live ? { liveDemo: `${base}${c.live.src}` } : {}),
     sourceAvailable: Boolean(c.item || (c.repo && c.files?.length)),
   };
 }

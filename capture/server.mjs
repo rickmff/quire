@@ -63,7 +63,7 @@ const PREVIEW_SELECTORS = [
   "[data-component-preview]",
   "[class*='ComponentPreview']",
   "[class*='component-preview']",
-  // shadcn-style docs (8bitcn and others): the bordered demo box.
+  // shadcn-style docs: the bordered demo box.
   "[class*='min-h-[450px]'][class*='border']",
   "[class*='min-h-[350px]'][class*='border']",
   "[class*='preview' i]:not(nav *):not(header *)",

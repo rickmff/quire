@@ -21,8 +21,19 @@ export type CatalogComponent = {
   previewDark?: string; // image URL for the dark theme
   video?: string; // short clip URL (webm or mp4), light theme
   videoDark?: string; // clip for the dark theme
+  live?: LiveDemo; // the component running on the Quire stage (stage/build.sh)
   note?: string; // the user's note, personal items only
   site?: string; // display name of the source, personal items only
+};
+
+// A page of the stage built into public/stage/<library>/. It lays the demo out in a
+// view-sized window; frame is the part of it the stills show ([x, y, width, height], 16:10).
+export type LiveDemo = {
+  src: string;
+  frame: number[];
+  view: number[]; // [width, height]
+  srcDark?: string;
+  frameDark?: number[];
 };
 
 export type CatalogLibrary = {

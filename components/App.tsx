@@ -1,7 +1,10 @@
 "use client";
 
 import { Command } from "cmdk";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SocialLinks from "@/components/SocialLinks";
+import StarIcon from "@/components/StarIcon";
+import { PlusIcon as Plus, SearchIcon } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   type Bookmark,
   type Library,
@@ -16,22 +19,26 @@ import {
 } from "@/lib/store";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { OTHER, TYPES, typeById } from "@/lib/types";
+import Link from "next/link";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
-import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
+import { AgentButton, Agents, Detail, Gallery, OpenDetails, Onboarding, Sources } from "@/components/Gallery";
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
+import { agentText } from "@/lib/agentText";
 
-// "library" = the whole reference gallery, "all" = saved cards, null = Inbox,
+// "starred" = the starred components (saved bookmarks, pasted links too),
 // "type:<id>" = one component type across the library, "sites", "agents",
-// else a collection id.
-type View = "library" | "all" | null | string;
+// else a collection id. The old "library" and "all" (Saved) views open Starred.
+type View = "starred" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
-// "site:<key>" = one library and its own components.
-const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5) : null);
-const PAGES = new Set(["library", "sites", "agents"]);
-const isGallery = (v: View) => v === "library" || typeView(v) !== null || siteView(v) !== null;
+// "site:<key>" = one library and its own components; "site:<key>|<group>" =
+// one category of that library (a sidebar group, see groupItems).
+const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
+const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
+const PAGES = new Set(["starred", "sites", "agents"]);
+const isGallery = (v: View) => v === "starred" || typeView(v) !== null || siteView(v) !== null;
 // Curated components group by library id; your own links by the site they came from.
 const siteKey = (i: { library: string; site?: string }) =>
   i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -44,10 +51,55 @@ const EXAMPLES = [
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
-  const [view, setView] = useState<View>("library");
+  const [view, setViewRaw] = useState<View>("starred");
+  const setView = useCallback((v: View) => setViewRaw(v === "all" || v === "library" ? "starred" : v), []);
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
+
+  // First load: "deal" hides the chrome while the gallery deals its cards,
+  // "show" brings the sidebar and headers in, then the attribute is dropped
+  // so later views mount without an entrance.
+  // Every entry into /app plays it: a refresh, or arriving from the landing.
+  const [intro, setIntro] = useState<"deal" | "show" | null>("deal");
+  const dealing = useRef(false);
+  useEffect(() => {
+    if (intro === "show") {
+      const t = setTimeout(() => setIntro(null), 900);
+      return () => clearTimeout(t);
+    }
+    if (intro !== "deal") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setIntro(null);
+    // Nothing to deal (another view, onboarding, slow catalog): show the page.
+    const t = setTimeout(() => !dealing.current && setIntro("show"), 1600);
+    return () => clearTimeout(t);
+  }, [intro]);
+  // Switching views from the sidebar: the new title and the cards in view
+  // settle in with a short stagger, a quick echo of the first-load deal.
+  const mainRef = useRef<HTMLElement>(null);
+  const shownView = useRef(view);
+  useLayoutEffect(() => {
+    if (shownView.current === view) return;
+    shownView.current = view;
+    const main = mainRef.current;
+    if (!main || intro || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const vh = window.innerHeight;
+    const els = [...main.querySelectorAll<HTMLElement>("h1, section > button[data-chrome], [data-grid] > *")].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.top < vh && r.bottom > 0;
+    });
+    els.forEach((el, i) =>
+      el.animate(
+        [{ opacity: 0, transform: "translateY(8px) scale(.985)", filter: "blur(2px)" }, { opacity: 1, transform: "none", filter: "none" }],
+        { duration: 360, delay: Math.min(i, 10) * 28, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" },
+      ),
+    );
+  }, [view, intro]);
+
+  const onDeal = useCallback((ms: number) => {
+    dealing.current = true;
+    setTimeout(() => setIntro("show"), ms);
+  }, []);
 
   // Quire registers no service worker. One left on this origin by another app
   // (localhost:3000 is shared by many projects) can serve stale scripts, so drop it.
@@ -58,10 +110,17 @@ export default function App() {
       .catch(() => {});
   }, []);
   const [input, setInput] = useState("");
+  // The top bar's input either searches the current view or adds a link
+  // (a component or a whole library). Search is the default.
+  const [barMode, setBarMode] = useState<"search" | "add">("search");
+  const query = barMode === "search" ? input.trim().toLowerCase() : "";
+  const words = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
   const [palette, setPalette] = useState(false);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null);
   const [newCol, setNewCol] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
+  // The collection waiting for the user to confirm its removal.
+  const [confirmDel, setConfirmDel] = useState<string | null>(null);
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const [sel, setSel] = useState(-1);
   const [importing, setImporting] = useState<string | null>(null);
@@ -80,7 +139,7 @@ export default function App() {
     const gone = lib.bookmarks[idx];
     if (!gone) return;
     update((l) => ({ ...l, bookmarks: l.bookmarks.filter((x) => x.id !== id) }));
-    flash("Deleted", () => {
+    flash("Removed from Starred", () => {
       update((l) => {
         if (l.bookmarks.some((x) => x.id === gone.id)) return l;
         const next = [...l.bookmarks];
@@ -113,11 +172,11 @@ export default function App() {
         install: m.install,
         tags: [],
         ...(t ? { type: t } : {}),
-        collectionId: view === "all" || t ? null : view,
+        collectionId: !t && lib.collections.some((c) => c.id === view) ? view : null,
         createdAt: Date.now(),
       };
       update((l) => ({ ...l, bookmarks: [draft, ...l.bookmarks] }));
-      flash("Saved");
+      flash("Starred");
       try {
         const meta = await fetchMeta(url);
         update((l) => ({
@@ -141,8 +200,9 @@ export default function App() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPalette((p) => !p);
-      } else if (e.key === "/" && !typing) {
+      } else if ((e.key === "/" || e.key === "+") && !typing) {
         e.preventDefault();
+        setBarMode(e.key === "/" ? "search" : "add");
         inputRef.current?.focus();
       } else if (e.key === "Escape" && typing) {
         (e.target as HTMLElement).blur();
@@ -201,9 +261,28 @@ export default function App() {
   const galleryView = useMemo(() => {
     const t = typeView(view);
     const s = siteView(view);
-    if (s) return galleryItems.filter((i) => siteKey(i) === s);
-    return t ? galleryItems.filter((i) => i.type === t) : galleryItems;
-  }, [galleryItems, view]);
+    const g = groupView(view);
+    const inView =
+      s && g
+        ? (groupItems(galleryItems.filter((i) => siteKey(i) === s)).find((x) => x.key === g)?.items ?? [])
+        : s
+          ? galleryItems.filter((i) => siteKey(i) === s)
+          : t
+            ? galleryItems.filter((i) => i.type === t)
+            : galleryItems.filter((i) => i.saved);
+    if (!words.length) return inView;
+    return inView.filter((i) => {
+      const hay = `${i.title} ${i.name} ${i.description ?? ""} ${i.category ?? ""} ${i.site ?? i.library} ${typeById(i.type).name} ${i.tech.join(" ")}`.toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
+  }, [galleryItems, view, words]);
+
+  // Nothing to deal (the onboarding, an empty Starred): show the page now.
+  const nothingToDeal =
+    Boolean(ready && catalog) && (!isGallery(view) || (!lib.mode && lib.bookmarks.length === 0) || galleryView.length === 0);
+  useEffect(() => {
+    if (nothingToDeal && intro === "deal") setIntro("show");
+  }, [nothingToDeal, intro]);
 
   // Library first: every site in the library, with its own components.
   const sites = useMemo(() => {
@@ -213,8 +292,17 @@ export default function App() {
       if (!m.has(key)) m.set(key, { key, name: i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library, items: [] });
       m.get(key)!.items.push(i);
     }
-    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [galleryItems, catalog]);
+    // The user's own order first (dragged in the sidebar), the rest by name.
+    const rank = new Map((lib.siteOrder ?? []).map((k, i) => [k, i]));
+    const at = (k: string) => rank.get(k) ?? Infinity;
+    return [...m.values()].sort((a, b) => at(a.key) - at(b.key) || a.name.localeCompare(b.name));
+  }, [galleryItems, catalog, lib.siteOrder]);
+
+  // Starred: only the components with a saved bookmark, grouped like the sites.
+  const starredSites = useMemo(
+    () => sites.map((x) => ({ ...x, items: x.items.filter((i) => i.saved) })).filter((x) => x.items.length),
+    [sites],
+  );
 
   const saveFromCatalog = (c: GalleryItem) => {
     if (lib.bookmarks.some((b) => b.ref === c.id || b.url === c.docs)) return flash("Already saved");
@@ -240,7 +328,16 @@ export default function App() {
         ...l.bookmarks,
       ],
     }));
-    flash("Saved");
+    flash("Starred");
+  };
+
+  // The star (on a card or in the drawer) is the only way to save: it saves
+  // the component, or removes the saved copy. Looks the copy up live, since
+  // the open drawer holds a snapshot of the item.
+  const toggleStar = (c: GalleryItem) => {
+    const id = lib.bookmarks.find((b) => b.id === c.saved || b.ref === c.id || b.url === c.docs)?.id;
+    if (id) removeBookmark(id);
+    else saveFromCatalog(c);
   };
 
   const setFollowed = (next: Set<string>) => update((l) => ({ ...l, sources: [...next] }));
@@ -261,7 +358,7 @@ export default function App() {
       setFollowed(new Set([...followed, site.id]));
       update((l) => ({ ...l, mode: l.mode ?? "scratch" }));
     }
-    setView("library");
+    setView(`site:${site.id}`);
     flash(`${site.name}: ${site.count} components in your library`);
     return true;
   };
@@ -281,9 +378,13 @@ export default function App() {
   };
 
   const visible = useMemo(() => {
-    const inView = selectView(lib, view).items;
-    return libFilter ? inView.filter((b) => b.library === libFilter) : inView;
-  }, [lib, view, libFilter]);
+    const inView = selectView(lib, view).items.filter((b) => !libFilter || b.library === libFilter);
+    if (!words.length) return inView;
+    return inView.filter((b) => {
+      const hay = `${b.title} ${b.url} ${b.library} ${b.description ?? ""} ${b.note ?? ""}`.toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
+  }, [lib, view, libFilter, words]);
 
   const importedSites = useMemo(() => {
     const m = new Map<string, number>();
@@ -308,7 +409,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog]);
 
-  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to delete.
+  // Keyboard: arrows or j/k to move, Enter to open, c to copy, Backspace to un-star.
   const navRef = useRef<{ visible: Bookmark[]; sel: number }>({ visible: [], sel: -1 });
   navRef.current = { visible: isGallery(view) || PAGES.has(view ?? "") ? [] : visible, sel };
   useEffect(() => {
@@ -332,7 +433,7 @@ export default function App() {
       else if (e.key === "Escape") setSel(-1);
       else if (cur && e.key === "Enter") window.open(cur.url, "_blank", "noopener");
       else if (cur && e.key === "c") document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-copy]`)?.click();
-      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-delete]`)?.click();
+      else if (cur && (e.key === "Backspace" || e.key === "Delete")) document.querySelector<HTMLButtonElement>(`[data-card="${cur.id}"] [data-star]`)?.click();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -348,25 +449,27 @@ export default function App() {
       const t = `type:${i.type}`;
       c[t] = (c[t] ?? 0) + 1;
     }
-    c.library = galleryItems.length;
+    c.starred = galleryItems.filter((i) => i.saved).length;
     return c;
   }, [lib.bookmarks, galleryItems]);
 
   const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
   const viewType = typeView(view);
   const viewName =
-    view === "library"
-      ? "Library"
-      : view === "all"
-        ? "Saved"
-        : view === null
-          ? "Inbox"
-          : viewType
+    view === "starred"
+      ? "Starred"
+      : viewType
             ? typeById(viewType).name
             : siteView(view)
-              ? (sites.find((x) => x.key === siteView(view))?.name ?? "Library")
-              : (current?.name ?? "Saved");
-  const exportView = view;
+              ? [
+                  sites.find((x) => x.key === siteView(view))?.name ?? "Library",
+                  groupView(view) && groupLabel(groupView(view)!),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              : (current?.name ?? "Starred");
+  // Starred holds every saved bookmark, which the store calls "all".
+  const exportView = view === "starred" ? "all" : view;
 
   const setType = (bookmarkId: string, type: string) =>
     update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.id === bookmarkId ? { ...b, type } : b)) }));
@@ -411,7 +514,7 @@ export default function App() {
       return { ...l, collections, bookmarks: [...fresh, ...l.bookmarks] };
     });
     setImporting(null);
-    setView("library");
+    setView("starred");
     flash(`Imported ${items.length} from ${result.site}`);
     capturePreviews(items.map((i) => i.url));
   };
@@ -446,14 +549,31 @@ export default function App() {
     update((l) => ({ ...l, collections: l.collections.map((c) => (c.id === id ? { ...c, name: n } : c)) }));
   };
 
+  // Removes the collection only. Its components stay saved, with no collection.
   const deleteCollection = (id: string) => {
+    const idx = lib.collections.findIndex((c) => c.id === id);
+    const gone = lib.collections[idx];
+    if (!gone) return;
+    const members = new Set(lib.bookmarks.filter((b) => b.collectionId === id).map((b) => b.id));
     update((l) => ({
       ...l,
       collections: l.collections.filter((c) => c.id !== id),
       bookmarks: l.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
     }));
-    setView("all");
-    flash("Collection removed");
+    if (view === id) setView("starred");
+    flash(`Removed “${gone.name}”`, () => {
+      update((l) => {
+        if (l.collections.some((c) => c.id === gone.id)) return l;
+        const collections = [...l.collections];
+        collections.splice(Math.min(idx, collections.length), 0, gone);
+        return {
+          ...l,
+          collections,
+          bookmarks: l.bookmarks.map((b) => (members.has(b.id) && b.collectionId === null ? { ...b, collectionId: gone.id } : b)),
+        };
+      });
+      setToast(null);
+    });
   };
 
   const moveTo = (bookmarkId: string, collectionId: string | null) =>
@@ -471,6 +591,22 @@ export default function App() {
     }
   };
 
+  // The drawer item for a saved card in a collection: its gallery card, or the same build.
+  const itemFor = (b: Bookmark): GalleryItem => {
+    const shown = galleryItems.find((i) => i.saved === b.id);
+    if (shown) return shown;
+    const c = toComponent(b);
+    const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
+    return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
+  };
+
+  // Same text as the drawer's "Copy for agent", for a saved card in a collection.
+  const copyForAgent = (b: Bookmark) => {
+    const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
+    const i = hit ?? toComponent(b);
+    copy(agentText(i, i.site ?? catalog?.libraries.find((l) => l.id === i.library)?.name ?? i.library), "Copied for your agent");
+  };
+
   const copyInstall = () => {
     const cmds = visible.map((b) => b.install).filter(Boolean).join("\n");
     if (!cmds) return flash("No install commands here");
@@ -483,7 +619,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col md:flex-row">
+    <div data-intro={intro ?? undefined} className="flex min-h-dvh flex-col md:flex-row">
       <Sidebar
         lib={lib}
         view={view}
@@ -495,46 +631,104 @@ export default function App() {
         renaming={renaming}
         setRenaming={setRenaming}
         renameCollection={renameCollection}
+        deleteCollection={setConfirmDel}
         moveTo={dropTo}
-        openPalette={() => setPalette(true)}
         sites={sites}
+        reorderSites={(keys) => update((l) => ({ ...l, siteOrder: keys }))}
         openItem={setOpen}
         openId={open?.id}
       />
 
-      <main className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
-        <header className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
+      <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-10">
+        <header data-chrome style={{ "--d": "60ms" } as React.CSSProperties} className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
-            className="flex h-14 items-center"
+            className="flex h-14 items-center gap-4"
             onSubmit={(e) => {
               e.preventDefault();
+              // Search filters as you type; Enter adds only a link.
+              if (barMode === "search" && !normalizeUrl(input)) return;
               add(input);
               setInput("");
             }}
           >
-            <div className="flex h-9 w-full items-center gap-2.5 rounded-lg bg-field px-3 transition-colors focus-within:bg-field-focus">
-            <PlusIcon />
+            <div className="flex h-9 w-full items-center gap-2 rounded-lg bg-field pr-2 pl-1 transition-colors focus-within:bg-field-focus">
+            <div role="radiogroup" aria-label="What the bar does" className="flex shrink-0 items-center gap-px rounded-md p-0.5">
+              {(
+                [
+                  ["search", "Search this view", "/", SearchIcon],
+                  ["add", "Add a component or library", "+", Plus],
+                ] as const
+              ).map(([m, label, key, Icon]) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={barMode === m}
+                  aria-label={label}
+                  title={`${label}  ${key}`}
+                  onClick={() => {
+                    setBarMode(m);
+                    inputRef.current?.focus();
+                  }}
+                  className={`grid size-7 place-items-center rounded-[5px] transition-[background-color,color,box-shadow] ${
+                    barMode === m ? "bg-panel text-fg shadow-sm ring-1 ring-line" : "text-faint hover:text-muted"
+                  }`}
+                >
+                  <Icon className="size-3.5" strokeWidth={1.75} aria-hidden />
+                </button>
+              ))}
+            </div>
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste a link"
-              className="h-full w-full bg-transparent outline-none placeholder:text-faint"
-              aria-label="Component link"
+              onKeyDown={(e) => {
+                // Escape clears first, then leaves the field.
+                if (e.key === "Escape" && input) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setInput("");
+                }
+              }}
+              placeholder={barMode === "search" ? `Search ${viewName}` : "Paste a component or library link"}
+              className="h-full w-full bg-transparent pl-1 outline-none placeholder:text-faint"
+              aria-label={barMode === "search" ? "Search components" : "Component or library link"}
               autoComplete="off"
               spellCheck={false}
             />
-            {input.trim() && (
+            {input.trim() && (barMode === "add" || normalizeUrl(input)) && (
+              <>
+                <button
+                  type="submit"
+                  title="Add this link as a component"
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                >
+                  Add component <span className="text-faint">↵</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    startImport(input);
+                    setInput("");
+                  }}
+                  title="Find every component on this library and sort them by type"
+                  className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                >
+                  Import library
+                </button>
+              </>
+            )}
+            {barMode === "search" && input && !normalizeUrl(input) && (
               <button
                 type="button"
                 onClick={() => {
-                  startImport(input);
                   setInput("");
+                  inputRef.current?.focus();
                 }}
-                title="Find every component on this site and sort them by type"
-                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] whitespace-nowrap text-muted transition hover:text-fg"
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
+                aria-label="Clear search"
               >
-                Import site
+                Clear
               </button>
             )}
             <button
@@ -546,6 +740,7 @@ export default function App() {
               ⌘K
             </button>
             </div>
+            <SocialLinks className="hidden md:flex" />
           </form>
         </header>
 
@@ -556,18 +751,46 @@ export default function App() {
             <Gallery
               items={galleryView}
               title={viewName}
-              sections={view === "library" && sites.length > 1 ? sites : undefined}
+              sections={view === "starred" && starredSites.length > 1 && !words.length ? starredSites : undefined}
               onSite={(key) => setView(`site:${key}`)}
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
+              onStar={toggleStar}
+              tools={(i) => {
+                const b = i.saved ? lib.bookmarks.find((x) => x.id === i.saved) : undefined;
+                return b ? (
+                  <StarredTools
+                    b={b}
+                    lib={lib}
+                    onMove={(cid) => {
+                      moveTo(b.id, cid);
+                      flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
+                    }}
+                    onType={(t) => setType(b.id, t)}
+                    onNote={(note) => update((l) => ({ ...l, bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)) }))}
+                    onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                  />
+                ) : null;
+              }}
+              intro={intro === "deal"}
+              onDeal={onDeal}
+              onAgent={(text) => copy(text, "Copied for your agent")}
               empty={
-                <div className="mx-auto max-w-sm pt-20 text-center">
-                  <p>Your library is empty.</p>
-                  <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
-                  <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
-                    Choose sites
-                  </button>
-                </div>
+                words.length ? (
+                  <p className="pt-16 text-center text-muted">No components match “{input.trim()}”.</p>
+                ) : view === "starred" ? (
+                  <p className="mx-auto max-w-sm pt-20 text-center text-muted">
+                    Nothing starred yet. Open a library below and tap the star on a component.
+                  </p>
+                ) : (
+                  <div className="mx-auto max-w-sm pt-20 text-center">
+                    <p>Your library is empty.</p>
+                    <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
+                    <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
+                      Choose sites
+                    </button>
+                  </div>
+                )
               }
             />
           )
@@ -613,7 +836,7 @@ export default function App() {
         ) : ready && visible.length === 0 ? (
           <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
         ) : (
-          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
             {visible.map((b) => (
               <Card
                 key={b.id}
@@ -622,9 +845,9 @@ export default function App() {
                 selected={visible[sel]?.id === b.id}
                 onMove={(cid) => {
                   moveTo(b.id, cid);
-                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "Inbox"}`);
+                  flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
                 }}
-                onDelete={() => removeBookmark(b.id)}
+                onUnstar={() => removeBookmark(b.id)}
                 onType={(t) => setType(b.id, t)}
                 onNote={(note) =>
                   update((l) => ({
@@ -633,6 +856,8 @@ export default function App() {
                   }))
                 }
                 onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                onAgent={() => copyForAgent(b)}
+                onOpen={() => setOpen(itemFor(b))}
               />
             ))}
           </div>
@@ -645,9 +870,9 @@ export default function App() {
         <Detail
           item={open}
           site={open.site ?? catalog?.libraries.find((l) => l.id === open.library)?.name ?? open.library}
-          saved={Boolean(open.saved) || lib.bookmarks.some((b) => b.ref === open.id)}
+          saved={lib.bookmarks.some((b) => b.id === open.saved || b.ref === open.id || b.url === open.docs)}
           onClose={() => setOpen(null)}
-          onSave={() => saveFromCatalog(open)}
+          onStar={() => toggleStar(open)}
           copy={copy}
         />
       )}
@@ -701,15 +926,14 @@ export default function App() {
           )}
           <Command.Group heading="Go to">
             {[
-              { id: "all", name: "All" },
-              { id: "inbox", name: "Inbox" },
+              { id: "starred", name: "Starred" },
               ...lib.collections,
               ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
             ].map((c) => (
               <Command.Item
                 key={c.id}
                 value={`go ${c.name} ${c.id}`}
-                onSelect={run(() => setView(c.id === "all" ? "all" : c.id === "inbox" ? null : c.id))}
+                onSelect={run(() => setView(c.id))}
                 className={itemCls}
               >
                 {c.name}
@@ -749,7 +973,7 @@ export default function App() {
                 <Command.Item onSelect={run(() => setRenaming(current.id))} className={itemCls}>
                   Rename “{current.name}”
                 </Command.Item>
-                <Command.Item onSelect={run(() => deleteCollection(current.id))} className={itemCls}>
+                <Command.Item onSelect={run(() => setConfirmDel(current.id))} className={itemCls}>
                   Delete “{current.name}”
                 </Command.Item>
               </>
@@ -763,6 +987,18 @@ export default function App() {
           </Command.Group>
         </Command.List>
       </Command.Dialog>
+
+      {confirmDel !== null && (
+        <ConfirmRemove
+          name={lib.collections.find((c) => c.id === confirmDel)?.name ?? "this collection"}
+          count={lib.bookmarks.filter((b) => b.collectionId === confirmDel).length}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            deleteCollection(confirmDel);
+            setConfirmDel(null);
+          }}
+        />
+      )}
 
       {importing !== null && (
         <ImportDialog
@@ -792,6 +1028,7 @@ export default function App() {
 
 const itemCls = "flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2 text-muted";
 
+
 function Sidebar(props: {
   lib: Library;
   view: View;
@@ -803,17 +1040,16 @@ function Sidebar(props: {
   renaming: string | null;
   setRenaming: (id: string | null) => void;
   renameCollection: (id: string, name: string) => void;
+  deleteCollection: (id: string) => void;
   moveTo: (bookmarkId: string, target: View) => void;
-  openPalette: () => void;
   sites: { key: string; name: string; items: GalleryItem[] }[];
+  reorderSites: (keys: string[]) => void;
   openItem: (item: GalleryItem) => void;
   openId?: string;
 }) {
   const { lib, view, setView, counts, newCol, setNewCol, sites, openItem, openId } = props;
   const activeSite = siteView(view);
-  const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
-
+  const { drag, blockRef, onPointerDown, onClickCapture } = useSiteDrag(sites.map((x) => x.key), props.reorderSites);
 
   // Ticks within ~3 rows of the pointer grow, nearest the most.
   const ruler = useRef<HTMLElement>(null);
@@ -829,15 +1065,13 @@ function Sidebar(props: {
     ruler.current?.querySelector("[aria-current=page]")?.scrollIntoView({ block: "nearest" });
   }, [view]);
 
-  const bookmarklet = origin
-    ? `javascript:(()=>{window.open('${origin}/add?url='+encodeURIComponent(location.href),'quire','width=380,height=240')})()`
-    : "#";
-
   return (
-    <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
+    <aside data-chrome className="md:sticky md:top-0 md:h-dvh md:w-56 md:shrink-0">
       <div className="flex h-full flex-col px-3 pt-4 md:px-4">
-        <div className="flex h-10 items-center px-2 md:h-6 md:pl-[34px]">
-          <Wordmark className="h-[15px] w-auto text-fg" />
+        <div className="flex h-10 items-center px-2 md:h-7 md:pl-[34px]">
+          <Link href="/" aria-label="quire home" className="rounded-sm">
+            <Wordmark className="block h-6 w-auto text-fg md:h-[26px]" />
+          </Link>
         </div>
 
         <nav
@@ -846,27 +1080,9 @@ function Sidebar(props: {
           onMouseLeave={settle}
           className="ruler -mx-1 mt-2 flex gap-0.5 overflow-x-auto pb-2 md:mx-0 md:mt-2 md:min-h-0 md:flex-1 md:flex-col md:gap-0 md:overflow-y-auto"
         >
-          <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
-          <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
-          <NavItem id={null} name="Inbox" count={counts.inbox ?? 0} {...props} />
-          <div className="hidden h-6 md:block" />
-          {lib.collections.map((c) =>
-            props.renaming === c.id ? (
-              <input
-                key={c.id}
-                autoFocus
-                defaultValue={c.name}
-                onBlur={(e) => props.renameCollection(c.id, e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                  if (e.key === "Escape") props.setRenaming(null);
-                }}
-                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
-              />
-            ) : (
-              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} {...props} />
-            ),
-          )}
+          {/* First block: rows spaced like the gallery title and its chips row
+              (38px apart), and shifted so they share those lines. */}
+          <div className="contents md:flex md:flex-col md:gap-2.5 md:pt-1">
           {newCol !== null ? (
             <input
               autoFocus
@@ -882,66 +1098,376 @@ function Sidebar(props: {
             />
           ) : (
             <button
+              data-row
               onClick={() => setNewCol("")}
-              className="h-7 shrink-0 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:pl-[34px]"
+              className="group flex h-7 shrink-0 items-center gap-2 rounded-md px-2 text-left whitespace-nowrap text-faint transition hover:text-muted md:rounded-none md:px-0"
             >
+              <span className="hidden w-[26px] shrink-0 md:block">
+                <span data-tick className="block h-px bg-faint group-hover:bg-muted" />
+              </span>
               New collection
             </button>
           )}
+          <NavItem id="starred" name="Starred" count={counts.starred ?? 0} {...props} />
+          </div>
+          {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
+          {lib.collections.map((c) =>
+            props.renaming === c.id ? (
+              <input
+                key={c.id}
+                autoFocus
+                defaultValue={c.name}
+                onBlur={(e) => props.renameCollection(c.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                  if (e.key === "Escape") props.setRenaming(null);
+                }}
+                className="h-7 shrink-0 rounded-md bg-field px-2 outline-none transition-colors focus:bg-field-focus md:ml-[34px]"
+              />
+            ) : (
+              <NavItem key={c.id} id={c.id} name={c.name} count={counts[c.id] ?? 0} onRename={() => props.setRenaming(c.id)} onDelete={() => props.deleteCollection(c.id)} {...props} />
+            ),
+          )}
           {sites.length > 0 && (
             <>
-              <div className="hidden h-6 md:block" />
+              <div className="hidden h-4 md:block" />
               <span className="hidden pb-1 pl-[34px] text-[11px] text-faint md:block">Libraries</span>
-              {sites.map((x) => (
-                <div key={x.key} className="contents">
-                  <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
-                  {activeSite === x.key && (
-                    <div className="hidden md:contents">
-                      {x.items.map((i) => (
-                        <button
-                          key={i.id}
-                          data-row
-                          aria-current={openId === i.id ? "page" : undefined}
-                          onClick={() => openItem(i)}
-                          className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
-                        >
-                          <span className="w-[26px] shrink-0">
-                            <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-line group-hover:bg-muted"}`} />
-                          </span>
-                          <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
-                            {i.title}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {sites.map((x, i) => {
+                const dragging = drag?.key === x.key;
+                return (
+                  <div
+                    key={x.key}
+                    ref={blockRef(x.key)}
+                    onPointerDown={(e) => onPointerDown(e, x.key)}
+                    onClickCapture={onClickCapture}
+                    style={drag ? { transform: `translateY(${dragging ? drag.dy : shiftFor(drag, i)}px)` } : undefined}
+                    className={`contents md:relative md:flex md:shrink-0 md:flex-col ${
+                      !drag ? "" : dragging ? `z-10 ${drag.settling ? "transition-transform duration-150 ease-out" : ""}` : "transition-transform duration-200 ease-out"
+                    }`}
+                  >
+                    {dragging && (
+                      <span
+                        aria-hidden
+                        className={`pointer-events-none absolute -inset-x-1.5 top-0 -z-10 hidden h-7 rounded-md bg-hover transition-[opacity,box-shadow] duration-150 md:block ${
+                          drag.settling ? "opacity-0" : "shadow-[0_8px_18px_-8px_rgb(0_0_0/0.45)]"
+                        }`}
+                      />
+                    )}
+                    <NavItem id={`site:${x.key}`} name={x.name} count={x.items.length} {...props} />
+                    <Collapse open={activeSite === x.key} className="hidden md:grid">
+                      <SiteGroups
+                        items={x.items}
+                        openItem={openItem}
+                        openId={openId}
+                        active={activeSite === x.key ? groupView(view) : null}
+                        onGroup={(g) => setView(g ? `site:${x.key}|${g}` : `site:${x.key}`)}
+                      />
+                    </Collapse>
+                  </div>
+                );
+              })}
             </>
           )}
         </nav>
 
-        <div className="-mx-1 flex shrink-0 gap-0.5 pb-2 md:mx-0 md:flex-col md:border-t md:border-line md:pt-3 md:pb-3">
+        <div className="-mx-1 flex shrink-0 gap-0.5 pb-2 md:mx-0 md:flex-col md:border-t md:border-line md:pt-3 md:pb-5">
           <NavItem id="sites" name="Sites" count={0} {...props} />
           <NavItem id="agents" name="Agents" count={0} {...props} />
         </div>
-
-        <div className="hidden shrink-0 flex-col gap-0.5 pb-5 whitespace-nowrap text-[11px] md:flex">
-          <a
-            href={bookmarklet}
-            onClick={(e) => e.preventDefault()}
-            title="Drag to your bookmarks bar, then click it on any page to save it"
-            className="rounded-md px-2 py-1 text-faint transition hover:text-muted md:pl-[34px]"
-          >
-            Save button <span className="text-faint">· drag to bar</span>
-          </a>
-          <button onClick={props.openPalette} className="rounded-md px-2 py-1 text-left text-faint transition hover:text-muted md:pl-[34px]">
-            Commands <span>⌘K</span>
-          </button>
-          <span className="px-2 py-1 text-faint md:pl-[34px]">Open source · MIT</span>
-        </div>
       </div>
     </aside>
+  );
+}
+
+type SiteDrag = { key: string; from: number; to: number; dy: number; heights: number[]; settling?: boolean };
+
+// How far a library that is not being dragged slides to open the gap.
+function shiftFor(d: SiteDrag, i: number) {
+  const h = d.heights[d.from];
+  if (d.from < d.to && i > d.from && i <= d.to) return -h;
+  if (d.from > d.to && i >= d.to && i < d.from) return h;
+  return 0;
+}
+
+// Drag a library row up or down to change the order. A press that does not
+// move stays a plain click; a drag swallows the click that follows it.
+function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void) {
+  const [drag, setDrag] = useState<SiteDrag | null>(null);
+  const blocks = useRef(new Map<string, HTMLDivElement>());
+  const swallow = useRef(false);
+  const busy = useRef(false);
+  const latest = useRef({ keys, onReorder });
+  latest.current = { keys, onReorder };
+
+  const blockRef = (key: string) => (el: HTMLDivElement | null) => {
+    if (el) blocks.current.set(key, el);
+    else blocks.current.delete(key);
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>, key: string) => {
+    if (e.button !== 0 || busy.current || !window.matchMedia("(min-width: 768px)").matches) return;
+    // Only the library row is a handle, not the groups under it.
+    if ((e.target as HTMLElement).closest("button")?.parentElement !== e.currentTarget) return;
+    const order = latest.current.keys;
+    const from = order.indexOf(key);
+    const rects = order.map((k) => blocks.current.get(k)?.getBoundingClientRect());
+    if (from < 0 || order.length < 2 || rects.some((r) => !r)) return;
+    const heights = rects.map((r) => r!.height);
+    // Measured on the library row itself (28px), not its open groups, so an
+    // expanded library swaps as soon as its row passes a neighbour's.
+    const centers = rects.map((r) => r!.top + Math.min(r!.height, 28) / 2);
+    const y0 = e.clientY;
+    let current: SiteDrag | null = null;
+
+    const move = (ev: PointerEvent) => {
+      const dy = ev.clientY - y0;
+      if (!current && Math.abs(dy) < 4) return;
+      if (!current) {
+        busy.current = true;
+        document.documentElement.classList.add("dragging-site");
+      }
+      ev.preventDefault();
+      // The dragged row's centre decides the slot it would drop into.
+      const c = centers[from] + dy;
+      let to = 0;
+      for (let i = 0; i < centers.length; i++) if (i !== from && centers[i] < c) to++;
+      current = { key, from, to, dy, heights };
+      setDrag(current);
+    };
+    const end = (cancel: boolean) => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", onCancel);
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.classList.remove("dragging-site");
+      if (!current) return;
+      swallow.current = true;
+      setTimeout(() => (swallow.current = false), 0);
+      const d = current;
+      const to = cancel ? d.from : d.to;
+      // Glide into the open slot, then commit the new order.
+      let slot = 0;
+      if (to > d.from) for (let i = d.from + 1; i <= to; i++) slot += heights[i];
+      else for (let i = to; i < d.from; i++) slot -= heights[i];
+      setDrag({ ...d, to, dy: slot, settling: true });
+      setTimeout(() => {
+        if (to !== d.from) {
+          const next = [...latest.current.keys];
+          const [k] = next.splice(d.from, 1);
+          next.splice(to, 0, k);
+          latest.current.onReorder(next);
+        }
+        setDrag(null);
+        busy.current = false;
+      }, 160);
+    };
+    const up = () => end(false);
+    const onCancel = () => end(true);
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") end(true);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("keydown", onKey);
+  };
+
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (!swallow.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  return { drag, blockRef, onPointerDown, onClickCapture };
+}
+
+// Large families split into their types, so no group runs past a screen.
+const SPLIT_AT = 15;
+const FAMILY_LABEL: Record<string, string> = {
+  Input: "Inputs",
+  Overlay: "Overlays",
+  Section: "Sections",
+  Effect: "Effects",
+};
+const TYPE_LABEL: Record<string, string> = {
+  "text-effect": "Text effects",
+  background: "Backgrounds",
+  cursor: "Cursors",
+  button: "Buttons",
+  card: "Cards",
+};
+
+function groupItems(items: GalleryItem[]) {
+  const byFamily = new Map<string, GalleryItem[]>();
+  for (const i of items) {
+    const f = typeById(i.type).family;
+    byFamily.set(f, [...(byFamily.get(f) ?? []), i]);
+  }
+  const groups: { key: string; name: string; items: GalleryItem[] }[] = [];
+  for (const [family, list] of byFamily) {
+    if (list.length <= SPLIT_AT || family === OTHER.family) {
+      groups.push({ key: family, name: FAMILY_LABEL[family] ?? family, items: list });
+      continue;
+    }
+    const byType = new Map<string, GalleryItem[]>();
+    for (const i of list) byType.set(i.type, [...(byType.get(i.type) ?? []), i]);
+    for (const [t, l] of byType) groups.push({ key: `${family}/${t}`, name: TYPE_LABEL[t] ?? typeById(t).name, items: l });
+  }
+  // Biggest groups first; "Other" always last.
+  return groups.sort((a, b) => Number(a.key === OTHER.family) - Number(b.key === OTHER.family) || b.items.length - a.items.length || a.name.localeCompare(b.name));
+}
+
+// Opens and closes its rows with a quick height and fade. Closed rows stay
+// mounted so they can animate out, and inert so they take no focus.
+function Collapse({ open, className = "grid", children }: { open: boolean; className?: string; children: React.ReactNode }) {
+  return (
+    <div
+      inert={!open}
+      className={`${className} transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${
+        open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      }`}
+    >
+      <div className="flex min-h-0 flex-col overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+// The sidebar name of a group key from groupItems ("Input", "Effect/text-effect").
+const groupLabel = (key: string) => {
+  const [family, type] = key.split("/");
+  return type ? (TYPE_LABEL[type] ?? typeById(type).name) : (FAMILY_LABEL[family] ?? family);
+};
+
+function SiteGroups({
+  items,
+  openItem,
+  openId,
+  active,
+  onGroup,
+}: {
+  items: GalleryItem[];
+  openItem: (item: GalleryItem) => void;
+  openId?: string;
+  // The category the gallery is filtered to, if any.
+  active: string | null;
+  onGroup: (key: string | null) => void;
+}) {
+  const groups = useMemo(() => groupItems(items), [items]);
+  // One group open at a time, like an accordion.
+  const [open, setOpen] = useState<string | null>(null);
+  // The group that holds the open component, or the filtered category, opens with it.
+  useEffect(() => {
+    const g = groups.find((g) => g.items.some((i) => i.id === openId));
+    if (g) setOpen(g.key);
+  }, [groups, openId]);
+  useEffect(() => {
+    if (active) setOpen(active);
+  }, [active]);
+  // A click filters the gallery to the category and opens it; a click on the
+  // filtered category goes back to the whole library and closes it.
+  const toggle = (k: string) => {
+    const off = active === k;
+    setOpen(off ? null : k);
+    onGroup(off ? null : k);
+  };
+
+  return (
+    <div className="contents">
+      {groups.map((g) => {
+        const expanded = open === g.key;
+        return (
+          <div key={g.key} className="contents">
+            <button
+              data-row
+              aria-expanded={expanded}
+              aria-pressed={active === g.key}
+              onClick={() => toggle(g.key)}
+              className={`group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap transition ${
+                active === g.key ? "text-accent" : "text-muted hover:text-fg"
+              }`}
+            >
+              <span className="flex w-[26px] shrink-0 items-center pl-[13px]">
+                <svg
+                  viewBox="0 0 8 8"
+                  className={`size-2 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-90" : ""}`}
+                  aria-hidden
+                >
+                  <path d="M2.5 1.5 5.5 4l-3 2.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1 truncate">{g.name}</span>
+              <span className="text-[11px] tabular-nums">{g.items.length}</span>
+            </button>
+            <Collapse open={expanded}>
+              {g.items.map((i) => (
+                <button
+                  key={i.id}
+                  data-row
+                  aria-current={openId === i.id ? "page" : undefined}
+                  onClick={() => openItem(i)}
+                  className="group flex h-7 shrink-0 items-center gap-2 rounded-md pr-2 pl-6 text-left text-[13px] whitespace-nowrap text-fg transition hover:bg-hover aria-[current=page]:hover:bg-transparent"
+                >
+                  <span className="w-[26px] shrink-0">
+                    <span data-tick className={`block h-px ${openId === i.id ? "" : "bg-faint group-hover:bg-fg"}`} />
+                  </span>
+                  <span data-label className="min-w-0 flex-1 truncate first-letter:uppercase">
+                    {i.title}
+                  </span>
+                </button>
+              ))}
+            </Collapse>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ConfirmRemove({
+  name,
+  count,
+  onCancel,
+  onConfirm,
+}: {
+  name: string;
+  count: number;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-40 flex items-start justify-center bg-black/30 p-4 pt-[20vh]"
+      onMouseDown={onCancel}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onCancel();
+      }}
+    >
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-remove-title"
+        aria-describedby="confirm-remove-desc"
+        onMouseDown={(e) => e.stopPropagation()}
+        className="pop w-full max-w-sm rounded-xl border border-line bg-panel p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.25)]"
+      >
+        <p id="confirm-remove-title" className="text-fg">
+          Remove “{name}”?
+        </p>
+        <p id="confirm-remove-desc" className="mt-1 text-muted">
+          {count
+            ? `Its ${count} component${count === 1 ? "" : "s"} stay saved, with no collection.`
+            : "The collection is empty."}
+        </p>
+        <div className="mt-4 flex justify-end gap-1.5">
+          <button onClick={onCancel} className="btn btn-sm btn-secondary">
+            Cancel
+          </button>
+          <button autoFocus onClick={onConfirm} className="btn btn-sm btn-primary">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -953,6 +1479,7 @@ function NavItem({
   setView,
   moveTo,
   onRename,
+  onDelete,
 }: {
   id: View;
   name: string;
@@ -961,10 +1488,11 @@ function NavItem({
   setView: (v: View) => void;
   moveTo: (bookmarkId: string, target: View) => void;
   onRename?: () => void;
+  onDelete?: () => void;
 }) {
   const [over, setOver] = useState(false);
   const active = view === id;
-  const droppable = id !== "all" && !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
+  const droppable = !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
   return (
     <button
       onClick={() => setView(id)}
@@ -994,6 +1522,29 @@ function NavItem({
       <span className={`text-[11px] tabular-nums text-faint transition ${active ? "" : "opacity-0 group-hover:opacity-100"}`}>
         {count || ""}
       </span>
+      {onDelete && (
+        // A span, not a button: it sits inside the row's button.
+        <span
+          role="button"
+          tabIndex={0}
+          aria-label={`Remove collection “${name}”`}
+          title="Remove collection"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="-my-1 grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 transition hover:bg-hover hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+        >
+          <TrashIcon />
+        </span>
+      )}
     </button>
   );
 }
@@ -1003,19 +1554,23 @@ function Card({
   lib,
   selected,
   onMove,
-  onDelete,
+  onUnstar,
   onType,
   onNote,
   onCopy,
+  onAgent,
+  onOpen,
 }: {
   b: Bookmark;
   lib: Library;
   selected: boolean;
   onMove: (cid: string | null) => void;
-  onDelete: () => void;
+  onUnstar: () => void;
   onType: (type: string) => void;
   onNote: (note: string) => void;
   onCopy: () => void;
+  onAgent: () => void;
+  onOpen: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [imgOk, setImgOk] = useState(true);
@@ -1031,13 +1586,8 @@ function Card({
       className="group pop"
     >
       <div className="relative">
-        <a
-          href={b.url}
-          target="_blank"
-          rel="noreferrer"
-          className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}
-          tabIndex={-1}
-        >
+        {/* The preview is only a picture; the corner icon opens the details. */}
+        <div className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}>
           {b.image && imgOk ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -1054,63 +1604,36 @@ function Card({
               <span className="text-[15px] font-medium tracking-tight text-faint">{b.library}</span>
             </div>
           )}
-        </a>
-
-        <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
-          <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
-            <CopyIcon />
-          </IconBtn>
-          <IconBtn label="Note for your agent" onClick={() => setEditing(true)}>
-            <NoteIcon />
-          </IconBtn>
-          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
-            <FolderIcon />
-            <select
-              value={b.collectionId ?? ""}
-              onChange={(e) => onMove(e.target.value || null)}
-              aria-label="Move to collection"
-              className="absolute inset-0 cursor-pointer opacity-0"
-            >
-              <option value="">Inbox</option>
-              {lib.collections.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
-            <TagIcon />
-            <select
-              value={typeOf(b)}
-              onChange={(e) => onType(e.target.value)}
-              aria-label="Component type"
-              className="absolute inset-0 cursor-pointer opacity-0"
-            >
-              {[...TYPES, OTHER].map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <IconBtn label="Delete" onClick={onDelete} data="delete">
-            <TrashIcon />
-          </IconBtn>
         </div>
+        <OpenDetails onClick={onOpen} />
+
+        {/* Every saved card is starred; un-starring is how it is removed. */}
+        <button
+          type="button"
+          data-star
+          onClick={onUnstar}
+          aria-pressed
+          aria-label={`Remove ${b.title} from Starred`}
+          title="Remove from Starred"
+          className="absolute top-2 right-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 shadow-sm ring-1 ring-line backdrop-blur-sm transition hover:bg-bg"
+        >
+          <StarIcon filled />
+        </button>
+        <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
       </div>
 
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">
-          <a href={b.url} target="_blank" rel="noreferrer" className="truncate first-letter:uppercase">
-            {b.title}
-          </a>
+          <span className="truncate first-letter:uppercase">{b.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
-        <p className="mt-0.5 truncate text-[12px] text-faint">
-          {typeById(typeOf(b)).name}
-          {b.description && <span className="text-faint"> · {b.description}</span>}
-        </p>
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <p className="min-w-0 truncate text-[12px] text-faint">
+            {typeById(typeOf(b)).name}
+            {b.description && <span className="text-faint"> · {b.description}</span>}
+          </p>
+          <AgentButton onClick={onAgent} />
+        </div>
 
         {b.install && (
           <button
@@ -1147,6 +1670,110 @@ function Card({
         )}
       </div>
     </article>
+  );
+}
+
+// The hover toolbar of a saved card: copy, note, collection, type. The star
+// beside it removes the card.
+function CardTools({
+  b,
+  lib,
+  onMove,
+  onType,
+  onNote,
+  onCopy,
+  className,
+}: {
+  b: Bookmark;
+  lib: Library;
+  onMove: (cid: string | null) => void;
+  onType: (type: string) => void;
+  onNote: () => void;
+  onCopy: () => void;
+  className: string;
+}) {
+  return (
+    <div className={`absolute ${className} flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100`}>
+      <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
+        <CopyIcon />
+      </IconBtn>
+      <IconBtn label="Note for your agent" onClick={onNote}>
+        <NoteIcon />
+      </IconBtn>
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
+        <FolderIcon />
+        <select
+          value={b.collectionId ?? ""}
+          onChange={(e) => onMove(e.target.value || null)}
+          aria-label="Move to collection"
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          <option value="">No collection</option>
+          {lib.collections.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
+        <TagIcon />
+        <select
+          value={typeOf(b)}
+          onChange={(e) => onType(e.target.value)}
+          aria-label="Component type"
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          {[...TYPES, OTHER].map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+}
+
+// The same toolbar on a starred gallery card, beside the star. Its clicks stay
+// off the card, and the note opens in a small field under the toolbar.
+function StarredTools({
+  b,
+  lib,
+  onMove,
+  onType,
+  onNote,
+  onCopy,
+}: {
+  b: Bookmark;
+  lib: Library;
+  onMove: (cid: string | null) => void;
+  onType: (type: string) => void;
+  onNote: (note: string) => void;
+  onCopy: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} className="contents">
+      <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
+      {editing && (
+        <textarea
+          autoFocus
+          rows={2}
+          defaultValue={b.note}
+          placeholder="A note for your agent"
+          onBlur={(e) => {
+            onNote(e.target.value.trim());
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) (e.target as HTMLTextAreaElement).blur();
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className="absolute top-11 right-2 left-2 z-10 resize-none rounded-md bg-panel px-2 py-1.5 text-[12px] shadow-sm ring-1 ring-line outline-none placeholder:text-faint"
+        />
+      )}
+    </div>
   );
 }
 

@@ -1,0 +1,1 @@
+import{t as e}from"./icon-JW5HD8cS.js";import{t}from"./star-BuGgYujd.js";import{t as n}from"./index-zOS5uHYh.js";var r=n();function i({variant:n,size:i}){return(0,r.jsx)(e,{variant:n,size:i,children:(0,r.jsx)(t,{})})}export{i as default};
