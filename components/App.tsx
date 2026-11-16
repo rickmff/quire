@@ -1001,7 +1001,7 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
               data-row
               aria-expanded={expanded}
               onClick={() => toggle(g.key)}
-              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[11px] whitespace-nowrap text-faint transition hover:text-muted"
+              className="group flex h-6 shrink-0 items-center gap-2 pl-3 text-left text-[12px] whitespace-nowrap text-muted transition hover:text-fg"
             >
               <span className="flex w-[26px] shrink-0 items-center">
                 <svg
@@ -1013,7 +1013,7 @@ function SiteGroups({ items, openItem, openId }: { items: GalleryItem[]; openIte
                 </svg>
               </span>
               <span className="min-w-0 flex-1 truncate">{g.name}</span>
-              <span className="text-[11px] tabular-nums text-faint">{g.items.length}</span>
+              <span className="text-[11px] tabular-nums">{g.items.length}</span>
             </button>
             {expanded &&
               g.items.map((i) => (
