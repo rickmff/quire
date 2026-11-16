@@ -137,6 +137,10 @@ export default function Quire3D() {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, drawLabels(font));
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      // The text is seen at a slant, so plain trilinear would pick the blurry mip
+      // for the short axis. Anisotropic filtering keeps it sharp along both.
+      const af = gl.getExtension("EXT_texture_filter_anisotropic");
+      if (af) gl.texParameterf(gl.TEXTURE_2D, af.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(af.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     };
@@ -149,7 +153,15 @@ export default function Quire3D() {
     // The canvas covers the page, so sheets can travel anywhere. The quire itself
     // is sized to the stage box, up to a fixed limit.
     const view = { cx: 0, cy: 0, fit: 100 }; // CSS px; fit is px per world unit
-    let scale = Math.min(devicePixelRatio || 1, 2), slow = 0;
+    // Render scale, in device pixels per CSS pixel. Below 1.5x the screen is too
+    // coarse for the sheet's text and edges, so render at twice the screen and let
+    // the browser average each 2x2 block back down: real supersampling. If frames
+    // run slow, drop the supersampling first, then resolution, a step at a time.
+    const native = devicePixelRatio || 1;
+    const scales: number[] = [];
+    for (const v of [native < 1.5 ? native * 2 : Math.min(native, 2), Math.min(native, 2), 1.5, 1.125, 1])
+      if (!scales.length || v < scales[scales.length - 1]) scales.push(v);
+    let step = 0, scale = scales[0], slow = 0;
     const resize = () => {
       const w = Math.max(1, Math.round(canvas.clientWidth * scale));
       const h = Math.max(1, Math.round(canvas.clientHeight * scale));
@@ -301,7 +313,7 @@ export default function Quire3D() {
       const dt = prev ? Math.min((now - prev) / 1000, 0.05) : 0;
       if (prev && now - prev > 30) slow++; else slow = Math.max(0, slow - 1);
       prev = now;
-      if (slow > 24 && scale > 1) { scale = Math.max(1, scale * 0.75); slow = 0; resize(); }
+      if (slow > 24 && step < scales.length - 1) { scale = scales[++step]; slow = 0; resize(); }
       clock += dt;
 
       px += (tx - px) * damp(dt, 6);

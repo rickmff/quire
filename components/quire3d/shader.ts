@@ -296,7 +296,7 @@ void main() {
         if (u > 0.0 && u < 1.0 && v > 0.0 && v < 1.0) {
           float rows = float(N * 2);
           vec2 tuv = vec2(u, (fi * 2.0 + float(r) + v) / rows);
-          vec2 sc = vec2(1.0 / LW, -1.0 / (LH * rows));
+          vec2 sc = vec2(1.0 / LW, -1.0 / (LH * rows)) * 0.8; // a touch of negative LOD bias: crisper glyphs
           float ink = textureGrad(uLabels, tuv, vec2(qx.x, -qx.y) * sc, vec2(qy.x, -qy.y) * sc).r;
           col = mix(col, INK, ink * pres);
         }
