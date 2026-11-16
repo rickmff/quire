@@ -1,0 +1,1 @@
+import{t as e}from"./button-DkQ3xcfg.js";import{t}from"./cool-mode-CoYKFZGd.js";import{t as n}from"./index-aq3vqO2C.js";var r=n();function i(){return(0,r.jsx)(`div`,{className:`relative justify-center`,children:(0,r.jsx)(t,{options:{particle:`https://avatars.githubusercontent.com/u/81306489`},children:(0,r.jsx)(e,{children:`Click Me!`})})})}export{i as default};

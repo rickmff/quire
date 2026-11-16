@@ -1,1 +1,0 @@
-import{a as e,c as t}from"./index-CUXLBZmm.js";var n=t(e(),1),r=globalThis?.document?n.useLayoutEffect:()=>{};export{r as t};

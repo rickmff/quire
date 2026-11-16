@@ -1,1 +1,0 @@
-import{t as e}from"./dither-field-m6xNZI0F.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{src:`https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop`,color:[`#7c2d12`,`#fb923c`,`#fff7ed`],dotSize:2,intensity:.8,className:`h-72 w-full rounded-lg border bg-black md:h-[500px]`})}export{r as default};

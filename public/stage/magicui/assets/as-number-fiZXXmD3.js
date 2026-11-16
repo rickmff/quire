@@ -1,1 +1,0 @@
-import{a as e,c as t}from"./index-BzrXL0dO.js";var n=t(e(),1),r=typeof window<`u`?n.useLayoutEffect:n.useEffect,i=e=>typeof e==`number`?e:parseFloat(e);export{r as n,i as t};

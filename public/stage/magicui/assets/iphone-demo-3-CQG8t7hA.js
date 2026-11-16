@@ -1,0 +1,1 @@
+import{t as e}from"./iphone-BTfWIWpm.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`w-[434px]`,children:(0,n.jsx)(e,{videoSrc:`https://videos.pexels.com/video-files/8946986/8946986-uhd_1440_2732_25fps.mp4`})})}export{r as default};

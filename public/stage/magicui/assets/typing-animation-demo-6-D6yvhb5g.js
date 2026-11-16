@@ -1,0 +1,1 @@
+import{t as e}from"./typing-animation-DdhRG8kn.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(e,{words:[`First`,`Second`,`Final`],loop:!1})}export{r as default};

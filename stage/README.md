@@ -63,10 +63,17 @@ the stage:
   until it is clicked, pressed or typed in.
 
 The detail panel runs the demo with hover, click and keyboard, and has a
-Restart button. A card runs it too, in place of its clip, when the mouse rests
-on the card (140 ms); the clip comes back 250 ms after the mouse leaves. One card
-runs a demo at a time, so a sweep across the grid loads nothing. The star, the
-open icon and the gear stay above the demo. A card clip plays while the card is
+Restart button. A card runs it too, in place of its clip, as soon as the mouse
+means the card: it comes in slowly (under 0.35 px/ms), slows down or stops on it,
+or stays on it for 300 ms. A pass across the grid is faster and loads nothing, and
+a demo not yet on screen when the mouse leaves is dropped, so a pass never flashes
+one. The clip comes back 250 ms after the mouse leaves. One card runs a demo at a
+time. The star, the open icon and the gear stay above the demo.
+
+The stage page loads the demo's module before its first render. A lazy component
+would suspend, and React holds a Suspense boundary back up to 300 ms before it
+shows the content. A card's demo is on screen about 60 ms after its frame starts
+loading (with the files cached), and fades in over 150 ms. A card clip plays while the card is
 on screen or within 200px of it, and pauses off screen (one shared
 `IntersectionObserver`). With reduced motion, a clip plays only while the mouse
 is over it.

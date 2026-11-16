@@ -1,0 +1,1 @@
+import{a as e,c as t,t as n}from"./index-aq3vqO2C.js";var r=t(e(),1),i=n(),a=r.forwardRef(({href:e,prefetch:t,replace:n,scroll:r,shallow:a,passHref:o,legacyBehavior:s,...c},l)=>(0,i.jsx)(`a`,{ref:l,href:typeof e==`string`?e:`#`,onClick:e=>e.preventDefault(),...c}));export{a as t};

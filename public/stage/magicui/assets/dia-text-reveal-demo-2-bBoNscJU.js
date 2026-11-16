@@ -1,0 +1,1 @@
+import{t as e}from"./dia-text-reveal-z967WT5F.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`flex min-h-56 items-center justify-center p-8`,children:(0,n.jsx)(e,{className:`text-4xl font-bold tracking-tight`,colors:[`#22d3ee`,`#818cf8`,`#f472b6`,`#34d399`],text:`Design systems`})})}export{r as default};

@@ -231,9 +231,10 @@ export async function install(lib, app, names) {
     if (!added) break;
   }
 
-  // demos.tsx: one lazy import per component, picking the default or first function export.
-  let src = `import { lazy } from "react";\nconst pick = (m: any) => ({ default: m.default ?? Object.values(m).find((v) => typeof v === "function") });\nexport const demos: Record<string, any> = {\n`;
-  const entry = (key, file) => `  ${JSON.stringify(key)}: lazy(() => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}).then(pick)),\n`;
+  // demos.tsx: one dynamic import per component; the stage page takes the default or first
+  // function export.
+  let src = `export const demos: Record<string, () => Promise<any>> = {\n`;
+  const entry = (key, file) => `  ${JSON.stringify(key)}: () => import(${JSON.stringify("@/" + file.replace(/\.(t|j)sx?$/, ""))}),\n`;
   for (const d of demos) if (d.demo) src += entry(d.name, d.file);
   // Other examples, as <name>~<example> (the stage page takes v=<example>).
   for (const d of demos) for (const [e, file] of Object.entries(d.examples ?? {})) src += entry(`${d.name}~${e}`, file);

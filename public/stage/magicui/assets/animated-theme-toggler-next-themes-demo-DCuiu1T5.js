@@ -1,1 +1,0 @@
-import{n as e,t}from"./index-BzrXL0dO.js";import{t as n}from"./animated-theme-toggler-5UZNMcEB.js";var r=t();function i(){let{resolvedTheme:t,setTheme:i}=e();return(0,r.jsx)(`div`,{className:`flex justify-center p-6`,children:(0,r.jsx)(n,{theme:t===`dark`?`dark`:`light`,onThemeChange:i})})}export{i as default};

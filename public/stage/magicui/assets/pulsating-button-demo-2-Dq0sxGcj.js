@@ -1,0 +1,1 @@
+import{t as e}from"./pulsating-button-pUvVqrs9.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(e,{variant:`ripple`,distance:`10px`,className:`bg-blue-400 text-white`,children:`Join Affiliate Program`})}export{r as default};

@@ -1,0 +1,1 @@
+import{t as e}from"./safari-DeREIzI8.js";import{t}from"./index-aq3vqO2C.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`w-[1203px]`,children:(0,n.jsx)(e,{url:`magicui.design`,imageSrc:`https://placehold.co/1200x750?text=Hello+World`})})}export{r as default};

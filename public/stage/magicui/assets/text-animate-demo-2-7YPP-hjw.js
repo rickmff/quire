@@ -1,1 +1,0 @@
-import{t as e}from"./text-animate-s67-TToS.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(e,{animation:`blurIn`,as:`h1`,children:`Blur in text`})}export{r as default};

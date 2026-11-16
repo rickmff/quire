@@ -1,1 +1,0 @@
-import{t as e}from"./dotted-map-BkkuK-QI.js";import{t}from"./index-BzrXL0dO.js";var n=t();function r(){return(0,n.jsx)(`div`,{className:`relative h-[500px] w-full overflow-hidden rounded-lg border`,children:(0,n.jsx)(e,{dotRadius:.1})})}export{r as default};
