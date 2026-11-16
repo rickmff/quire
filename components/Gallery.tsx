@@ -27,6 +27,7 @@ export function Gallery({
   sections,
   onSite,
   onStar,
+  tools,
   intro,
   onDeal,
 }: {
@@ -40,6 +41,8 @@ export function Gallery({
   onSite?: (key: string) => void;
   // Star on each card: saves the component to Saved, or removes it.
   onStar?: (item: GalleryItem) => void;
+  // Actions for a starred card (collection, type, note, copy, delete), shown beside the star.
+  tools?: (item: GalleryItem) => React.ReactNode;
   // First load: deal the visible cards from a pile. onDeal gets the time in
   // ms until the last card lands, so the rest of the page can follow it.
   intro?: boolean;
@@ -228,7 +231,7 @@ export function Gallery({
               <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
                 {sec.items.slice(0, 4).map((i, n) => (
                   <div key={i.id} className={n === 3 ? "xl:hidden" : undefined}>
-                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
+                    <ComponentCard item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} />
                   </div>
                 ))}
               </div>
@@ -240,7 +243,7 @@ export function Gallery({
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, shown).map((i) => (
-            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} />
+            <ComponentCard key={i.id} item={i} site={nameOf(i)} onOpen={() => onOpen(i)} onStar={star && (() => star(i))} tools={tools?.(i)} />
           ))}
         </div>
       )}
@@ -382,7 +385,19 @@ function LiveFrame({ src, frame, view, title, onEscape }: { src: string; frame: 
   );
 }
 
-function ComponentCard({ item, site, onOpen, onStar }: { item: GalleryItem; site: string; onOpen: () => void; onStar?: () => void }) {
+function ComponentCard({
+  item,
+  site,
+  onOpen,
+  onStar,
+  tools,
+}: {
+  item: GalleryItem;
+  site: string;
+  onOpen: () => void;
+  onStar?: () => void;
+  tools?: React.ReactNode;
+}) {
   const starred = Boolean(item.saved);
   // Plays the pop and glint once, right after the user stars the card.
   const [pop, setPop] = useState(false);
@@ -419,6 +434,7 @@ function ComponentCard({ item, site, onOpen, onStar }: { item: GalleryItem; site
             <StarIcon filled={starred} />
           </button>
         )}
+        {starred && tools}
       </div>
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">

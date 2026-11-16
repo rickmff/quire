@@ -24,18 +24,18 @@ import { Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Galle
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 
-// "library" = the whole reference gallery, "all" = saved cards,
+// "starred" = the starred components (saved bookmarks, pasted links too),
 // "type:<id>" = one component type across the library, "sites", "agents",
-// else a collection id.
-type View = "library" | "all" | null | string;
+// else a collection id. The old "library" and "all" (Saved) views open Starred.
+type View = "starred" | null | string;
 
 const typeView = (v: View) => (typeof v === "string" && v.startsWith("type:") ? v.slice(5) : null);
 // "site:<key>" = one library and its own components; "site:<key>|<group>" =
 // one category of that library (a sidebar group, see groupItems).
 const siteView = (v: View) => (typeof v === "string" && v.startsWith("site:") ? v.slice(5).split("|")[0] : null);
 const groupView = (v: View) => (typeof v === "string" && v.startsWith("site:") && v.includes("|") ? v.slice(v.indexOf("|") + 1) : null);
-const PAGES = new Set(["library", "sites", "agents"]);
-const isGallery = (v: View) => v === "library" || typeView(v) !== null || siteView(v) !== null;
+const PAGES = new Set(["starred", "sites", "agents"]);
+const isGallery = (v: View) => v === "starred" || typeView(v) !== null || siteView(v) !== null;
 // Curated components group by library id; your own links by the site they came from.
 const siteKey = (i: { library: string; site?: string }) =>
   i.library !== "mine" ? i.library : `mine-${(i.site ?? "mine").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -52,7 +52,8 @@ let dealtOnce = false;
 
 export default function App() {
   const { lib, ready, update } = useLibrary();
-  const [view, setView] = useState<View>("library");
+  const [view, setViewRaw] = useState<View>("starred");
+  const setView = useCallback((v: View) => setViewRaw(v === "all" || v === "library" ? "starred" : v), []);
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
   const [open, setOpen] = useState<GalleryItem | null>(null);
@@ -172,11 +173,11 @@ export default function App() {
         install: m.install,
         tags: [],
         ...(t ? { type: t } : {}),
-        collectionId: view === "all" || t ? null : view,
+        collectionId: !t && lib.collections.some((c) => c.id === view) ? view : null,
         createdAt: Date.now(),
       };
       update((l) => ({ ...l, bookmarks: [draft, ...l.bookmarks] }));
-      flash("Saved");
+      flash("Starred");
       try {
         const meta = await fetchMeta(url);
         update((l) => ({
@@ -263,7 +264,8 @@ export default function App() {
     const g = groupView(view);
     if (s && g) return groupItems(galleryItems.filter((i) => siteKey(i) === s)).find((x) => x.key === g)?.items ?? [];
     if (s) return galleryItems.filter((i) => siteKey(i) === s);
-    return t ? galleryItems.filter((i) => i.type === t) : galleryItems;
+    if (t) return galleryItems.filter((i) => i.type === t);
+    return galleryItems.filter((i) => i.saved);
   }, [galleryItems, view]);
 
   // Library first: every site in the library, with its own components.
@@ -279,6 +281,12 @@ export default function App() {
     const at = (k: string) => rank.get(k) ?? Infinity;
     return [...m.values()].sort((a, b) => at(a.key) - at(b.key) || a.name.localeCompare(b.name));
   }, [galleryItems, catalog, lib.siteOrder]);
+
+  // Starred: only the components with a saved bookmark, grouped like the sites.
+  const starredSites = useMemo(
+    () => sites.map((x) => ({ ...x, items: x.items.filter((i) => i.saved) })).filter((x) => x.items.length),
+    [sites],
+  );
 
   const saveFromCatalog = (c: GalleryItem) => {
     if (lib.bookmarks.some((b) => b.ref === c.id || b.url === c.docs)) return flash("Already saved");
@@ -304,7 +312,7 @@ export default function App() {
         ...l.bookmarks,
       ],
     }));
-    flash("Saved");
+    flash("Starred");
   };
 
   // The star (on a card or in the drawer) is the only way to save: it saves
@@ -312,7 +320,7 @@ export default function App() {
   // the open drawer holds a snapshot of the item.
   const toggleStar = (c: GalleryItem) => {
     const id = lib.bookmarks.find((b) => b.id === c.saved || b.ref === c.id || b.url === c.docs)?.id;
-    if (id) removeBookmark(id, "Removed from Saved");
+    if (id) removeBookmark(id, "Removed from Starred");
     else saveFromCatalog(c);
   };
 
@@ -334,7 +342,7 @@ export default function App() {
       setFollowed(new Set([...followed, site.id]));
       update((l) => ({ ...l, mode: l.mode ?? "scratch" }));
     }
-    setView("library");
+    setView(`site:${site.id}`);
     flash(`${site.name}: ${site.count} components in your library`);
     return true;
   };
@@ -421,18 +429,16 @@ export default function App() {
       const t = `type:${i.type}`;
       c[t] = (c[t] ?? 0) + 1;
     }
-    c.library = galleryItems.length;
+    c.starred = galleryItems.filter((i) => i.saved).length;
     return c;
   }, [lib.bookmarks, galleryItems]);
 
   const current = typeof view === "string" && view !== "all" ? lib.collections.find((c) => c.id === view) : undefined;
   const viewType = typeView(view);
   const viewName =
-    view === "library"
-      ? "Library"
-      : view === "all"
-        ? "Saved"
-        : viewType
+    view === "starred"
+      ? "Starred"
+      : viewType
             ? typeById(viewType).name
             : siteView(view)
               ? [
@@ -441,8 +447,9 @@ export default function App() {
                 ]
                   .filter(Boolean)
                   .join(" · ")
-              : (current?.name ?? "Saved");
-  const exportView = view;
+              : (current?.name ?? "Starred");
+  // Starred holds every saved bookmark, which the store calls "all".
+  const exportView = view === "starred" ? "all" : view;
 
   const setType = (bookmarkId: string, type: string) =>
     update((l) => ({ ...l, bookmarks: l.bookmarks.map((b) => (b.id === bookmarkId ? { ...b, type } : b)) }));
@@ -487,7 +494,7 @@ export default function App() {
       return { ...l, collections, bookmarks: [...fresh, ...l.bookmarks] };
     });
     setImporting(null);
-    setView("library");
+    setView("starred");
     flash(`Imported ${items.length} from ${result.site}`);
     capturePreviews(items.map((i) => i.url));
   };
@@ -533,7 +540,7 @@ export default function App() {
       collections: l.collections.filter((c) => c.id !== id),
       bookmarks: l.bookmarks.map((b) => (b.collectionId === id ? { ...b, collectionId: null } : b)),
     }));
-    if (view === id) setView("all");
+    if (view === id) setView("starred");
     flash(`Removed “${gone.name}”`, () => {
       update((l) => {
         if (l.collections.some((c) => c.id === gone.id)) return l;
@@ -651,21 +658,44 @@ export default function App() {
             <Gallery
               items={galleryView}
               title={viewName}
-              sections={view === "library" && sites.length > 1 ? sites : undefined}
+              sections={view === "starred" && starredSites.length > 1 ? starredSites : undefined}
               onSite={(key) => setView(`site:${key}`)}
               libraries={catalog?.libraries ?? []}
               onOpen={setOpen}
               onStar={toggleStar}
+              tools={(i) => {
+                const b = i.saved ? lib.bookmarks.find((x) => x.id === i.saved) : undefined;
+                return b ? (
+                  <StarredTools
+                    b={b}
+                    lib={lib}
+                    onMove={(cid) => {
+                      moveTo(b.id, cid);
+                      flash(`Moved to ${cid ? lib.collections.find((c) => c.id === cid)?.name : "no collection"}`);
+                    }}
+                    onDelete={() => removeBookmark(b.id)}
+                    onType={(t) => setType(b.id, t)}
+                    onNote={(note) => update((l) => ({ ...l, bookmarks: l.bookmarks.map((x) => (x.id === b.id ? { ...x, note } : x)) }))}
+                    onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
+                  />
+                ) : null;
+              }}
               intro={intro === "deal"}
               onDeal={onDeal}
               empty={
-                <div className="mx-auto max-w-sm pt-20 text-center">
-                  <p>Your library is empty.</p>
-                  <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
-                  <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
-                    Choose sites
-                  </button>
-                </div>
+                view === "starred" ? (
+                  <p className="mx-auto max-w-sm pt-20 text-center text-muted">
+                    Nothing starred yet. Open a library below and tap the star on a component.
+                  </p>
+                ) : (
+                  <div className="mx-auto max-w-sm pt-20 text-center">
+                    <p>Your library is empty.</p>
+                    <p className="mt-1 text-muted">Paste the link of a component library above, or turn on curated sites.</p>
+                    <button onClick={() => setView("sites")} className="mt-5 text-[12px] text-muted transition hover:text-fg">
+                      Choose sites
+                    </button>
+                  </div>
+                )
               }
             />
           )
@@ -799,7 +829,7 @@ export default function App() {
           )}
           <Command.Group heading="Go to">
             {[
-              { id: "all", name: "All" },
+              { id: "starred", name: "Starred" },
               ...lib.collections,
               ...[...TYPES, OTHER].filter((t) => counts[`type:${t.id}`]).map((t) => ({ id: `type:${t.id}`, name: t.name })),
             ].map((c) => (
@@ -981,8 +1011,7 @@ function Sidebar(props: {
               New collection
             </button>
           )}
-          <NavItem id="library" name="Library" count={counts.library ?? 0} {...props} />
-          <NavItem id="all" name="Saved" count={lib.bookmarks.length} {...props} />
+          <NavItem id="starred" name="Starred" count={counts.starred ?? 0} {...props} />
           </div>
           {lib.collections.length > 0 && <div className="hidden h-3 md:block" />}
           {lib.collections.map((c) =>
@@ -1366,7 +1395,7 @@ function NavItem({
 }) {
   const [over, setOver] = useState(false);
   const active = view === id;
-  const droppable = id !== "all" && !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
+  const droppable = !(typeof id === "string" && (PAGES.has(id) || id.startsWith("site:")));
   return (
     <button
       onClick={() => setView(id)}
@@ -1481,48 +1510,7 @@ function Card({
           )}
         </a>
 
-        <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
-          <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
-            <CopyIcon />
-          </IconBtn>
-          <IconBtn label="Note for your agent" onClick={() => setEditing(true)}>
-            <NoteIcon />
-          </IconBtn>
-          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
-            <FolderIcon />
-            <select
-              value={b.collectionId ?? ""}
-              onChange={(e) => onMove(e.target.value || null)}
-              aria-label="Move to collection"
-              className="absolute inset-0 cursor-pointer opacity-0"
-            >
-              <option value="">No collection</option>
-              {lib.collections.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
-            <TagIcon />
-            <select
-              value={typeOf(b)}
-              onChange={(e) => onType(e.target.value)}
-              aria-label="Component type"
-              className="absolute inset-0 cursor-pointer opacity-0"
-            >
-              {[...TYPES, OTHER].map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <IconBtn label="Delete" onClick={onDelete} data="delete">
-            <TrashIcon />
-          </IconBtn>
-        </div>
+        <CardTools b={b} lib={lib} onMove={onMove} onDelete={onDelete} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-2" />
       </div>
 
       <div className="mt-2.5 px-0.5">
@@ -1572,6 +1560,116 @@ function Card({
         )}
       </div>
     </article>
+  );
+}
+
+// The hover toolbar of a saved card: copy, note, collection, type, delete.
+function CardTools({
+  b,
+  lib,
+  onMove,
+  onDelete,
+  onType,
+  onNote,
+  onCopy,
+  className,
+}: {
+  b: Bookmark;
+  lib: Library;
+  onMove: (cid: string | null) => void;
+  onDelete: () => void;
+  onType: (type: string) => void;
+  onNote: () => void;
+  onCopy: () => void;
+  className: string;
+}) {
+  return (
+    <div className={`absolute ${className} flex items-center gap-0.5 rounded-md bg-panel/90 p-0.5 opacity-0 shadow-sm ring-1 ring-line backdrop-blur transition group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100`}>
+      <IconBtn label={b.install ? "Copy install command" : "Copy link"} onClick={onCopy} data="copy">
+        <CopyIcon />
+      </IconBtn>
+      <IconBtn label="Note for your agent" onClick={onNote}>
+        <NoteIcon />
+      </IconBtn>
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Move to collection">
+        <FolderIcon />
+        <select
+          value={b.collectionId ?? ""}
+          onChange={(e) => onMove(e.target.value || null)}
+          aria-label="Move to collection"
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          <option value="">No collection</option>
+          {lib.collections.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="relative grid size-6 cursor-pointer place-items-center rounded text-muted transition hover:bg-hover hover:text-fg" title="Change type">
+        <TagIcon />
+        <select
+          value={typeOf(b)}
+          onChange={(e) => onType(e.target.value)}
+          aria-label="Component type"
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          {[...TYPES, OTHER].map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <IconBtn label="Delete" onClick={onDelete} data="delete">
+        <TrashIcon />
+      </IconBtn>
+    </div>
+  );
+}
+
+// The same toolbar on a starred gallery card, beside the star. Its clicks stay
+// off the card, and the note opens in a small field under the toolbar.
+function StarredTools({
+  b,
+  lib,
+  onMove,
+  onDelete,
+  onType,
+  onNote,
+  onCopy,
+}: {
+  b: Bookmark;
+  lib: Library;
+  onMove: (cid: string | null) => void;
+  onDelete: () => void;
+  onType: (type: string) => void;
+  onNote: (note: string) => void;
+  onCopy: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} className="contents">
+      <CardTools b={b} lib={lib} onMove={onMove} onDelete={onDelete} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
+      {editing && (
+        <textarea
+          autoFocus
+          rows={2}
+          defaultValue={b.note}
+          placeholder="A note for your agent"
+          onBlur={(e) => {
+            onNote(e.target.value.trim());
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) (e.target as HTMLTextAreaElement).blur();
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className="absolute top-11 right-2 left-2 z-10 resize-none rounded-md bg-panel px-2 py-1.5 text-[12px] shadow-sm ring-1 ring-line outline-none placeholder:text-faint"
+        />
+      )}
+    </div>
   );
 }
 
