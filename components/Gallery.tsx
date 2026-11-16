@@ -9,6 +9,7 @@ import { TRIGGERS, triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
 import { deal } from "@/lib/deal";
 import { agentText } from "@/lib/agentText";
+import { Maximize2 } from "lucide-react";
 
 // The reference gallery: every component in the user's library, organized by
 // library, shown the way inspo shows a page (preview, credit, tags, details).
@@ -364,13 +365,11 @@ function ComponentCard({
   return (
     <article data-card={item.id} className="group pop">
       <div className="relative">
-        <button
-          onClick={onOpen}
-          className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover text-left ring-1 ring-line ring-inset"
-          aria-label={`${item.title} from ${site}`}
-        >
+        {/* The preview is only a picture; the corner icon opens the details. */}
+        <div className="block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
-        </button>
+        </div>
+        <OpenDetails onClick={onOpen} />
         {onStar && (
           <button
             type="button"
@@ -398,9 +397,7 @@ function ComponentCard({
       </div>
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">
-          <button onClick={onOpen} className="truncate text-left first-letter:uppercase">
-            {item.title}
-          </button>
+          <span className="truncate first-letter:uppercase">{item.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{site}</span>
         </div>
         <div className="mt-0.5 flex items-start justify-between gap-3">
@@ -411,6 +408,27 @@ function ComponentCard({
         </div>
       </div>
     </article>
+  );
+}
+
+// The open-details icon in a card preview's bottom-right corner, styled like the star.
+export function OpenDetails({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      data-open
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+      aria-label="Open details"
+      title="Open details"
+      className="absolute right-2 bottom-2 z-10 flex size-7 items-center justify-center rounded-md bg-bg/80 text-muted opacity-0 shadow-sm ring-1 ring-line backdrop-blur-sm transition group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-bg hover:text-fg focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+    >
+      <Maximize2 size={14} strokeWidth={1.75} aria-hidden />
+    </button>
   );
 }
 

@@ -22,7 +22,7 @@ import { OTHER, TYPES, typeById } from "@/lib/types";
 import Link from "next/link";
 import Wordmark from "@/components/Wordmark";
 import ImportDialog, { type ImportChoice } from "@/components/ImportDialog";
-import { AgentButton, Agents, Detail, Gallery, Onboarding, Sources } from "@/components/Gallery";
+import { AgentButton, Agents, Detail, Gallery, OpenDetails, Onboarding, Sources } from "@/components/Gallery";
 import { type GalleryItem, getStatus, useCatalog, useSyncAvailable } from "@/lib/useCatalog";
 import { newSyncKey, pushLibrary, toComponent } from "@/lib/store";
 import { agentText } from "@/lib/agentText";
@@ -591,6 +591,15 @@ export default function App() {
     }
   };
 
+  // The drawer item for a saved card in a collection: its gallery card, or the same build.
+  const itemFor = (b: Bookmark): GalleryItem => {
+    const shown = galleryItems.find((i) => i.saved === b.id);
+    if (shown) return shown;
+    const c = toComponent(b);
+    const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
+    return { ...(hit ?? c), note: b.note, saved: b.id, source: hit?.source ?? Boolean(c.item) };
+  };
+
   // Same text as the drawer's "Copy for agent", for a saved card in a collection.
   const copyForAgent = (b: Bookmark) => {
     const hit = b.ref ? catalog?.components.find((x) => x.id === b.ref) : undefined;
@@ -848,6 +857,7 @@ export default function App() {
                 }
                 onCopy={() => (b.install ? copy(b.install, "Command copied") : copy(b.url, "Link copied"))}
                 onAgent={() => copyForAgent(b)}
+                onOpen={() => setOpen(itemFor(b))}
               />
             ))}
           </div>
@@ -1549,6 +1559,7 @@ function Card({
   onNote,
   onCopy,
   onAgent,
+  onOpen,
 }: {
   b: Bookmark;
   lib: Library;
@@ -1559,6 +1570,7 @@ function Card({
   onNote: (note: string) => void;
   onCopy: () => void;
   onAgent: () => void;
+  onOpen: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [imgOk, setImgOk] = useState(true);
@@ -1574,13 +1586,8 @@ function Card({
       className="group pop"
     >
       <div className="relative">
-        <a
-          href={b.url}
-          target="_blank"
-          rel="noreferrer"
-          className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}
-          tabIndex={-1}
-        >
+        {/* The preview is only a picture; the corner icon opens the details. */}
+        <div className={`block aspect-[16/10] overflow-hidden rounded-lg bg-hover ring-inset transition ${selected ? "ring-2 ring-faint" : "ring-1 ring-line"}`}>
           {b.image && imgOk ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -1597,7 +1604,8 @@ function Card({
               <span className="text-[15px] font-medium tracking-tight text-faint">{b.library}</span>
             </div>
           )}
-        </a>
+        </div>
+        <OpenDetails onClick={onOpen} />
 
         {/* Every saved card is starred; un-starring is how it is removed. */}
         <button
@@ -1616,9 +1624,7 @@ function Card({
 
       <div className="mt-2.5 px-0.5">
         <div className="flex items-baseline justify-between gap-3">
-          <a href={b.url} target="_blank" rel="noreferrer" className="truncate first-letter:uppercase">
-            {b.title}
-          </a>
+          <span className="truncate first-letter:uppercase">{b.title}</span>
           <span className="shrink-0 text-[12px] text-faint">{b.library}</span>
         </div>
         <div className="mt-0.5 flex items-start justify-between gap-3">
