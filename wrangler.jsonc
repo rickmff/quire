@@ -9,10 +9,13 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // Wrangler runs this before `deploy` and `versions upload`,
+  // Wrangler runs this before `deploy` and `preview`,
   // so the worker exists whatever the dashboard build command is.
   "build": {
     "command": "npx opennextjs-cloudflare build"
   },
+  // Branch builds run `wrangler preview`, which needs this block.
+  // An empty block keeps every setting from the top level.
+  "previews": {},
   "observability": { "enabled": true }
 }
