@@ -622,7 +622,7 @@ export default function App() {
         openId={open?.id}
       />
 
-      <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-2">
+      <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-10">
         <header data-chrome style={{ "--d": "60ms" } as React.CSSProperties} className="sticky top-0 z-10 -mx-4 bg-bg/90 px-4 backdrop-blur-md md:mr-0 md:ml-0 md:px-0">
           <form
             className="flex h-14 items-center gap-4"
