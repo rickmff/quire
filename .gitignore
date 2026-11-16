@@ -10,3 +10,7 @@ AGENTS.md
 capture/media/
 capture/.env
 capture/node_modules/
+
+# OpenNext / Wrangler
+.open-next
+.wrangler
