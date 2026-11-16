@@ -1090,10 +1090,10 @@ function ConfirmRemove({
             : "The collection is empty."}
         </p>
         <div className="mt-4 flex justify-end gap-1.5">
-          <button onClick={onCancel} className="rounded-md px-3 py-1 text-muted transition hover:bg-hover hover:text-fg">
+          <button onClick={onCancel} className="btn btn-sm btn-secondary">
             Cancel
           </button>
-          <button autoFocus onClick={onConfirm} className="rounded-md bg-fg px-3 py-1 text-bg transition hover:opacity-85">
+          <button autoFocus onClick={onConfirm} className="btn btn-sm btn-primary">
             Remove
           </button>
         </div>

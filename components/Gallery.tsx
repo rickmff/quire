@@ -438,14 +438,14 @@ export function Detail({
             </button>
           )}
 
-          <div className="mt-3 flex flex-wrap gap-1">
-            <button onClick={onSave} disabled={saved} className="h-8 rounded-md bg-fg px-3 text-bg transition hover:opacity-85 disabled:bg-hover disabled:text-muted">
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            <button onClick={onSave} disabled={saved} className="btn btn-primary">
               {saved ? "Saved" : "Save to my library"}
             </button>
-            <button onClick={() => copy(forAgent, "Copied for your agent")} className="h-8 rounded-md px-3 text-muted transition hover:bg-hover hover:text-fg">
+            <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
             </button>
-            <a href={item.docs} target="_blank" rel="noreferrer" className="flex h-8 items-center rounded-md px-3 text-muted transition hover:bg-hover hover:text-fg">
+            <a href={item.docs} target="_blank" rel="noreferrer" className="btn btn-secondary">
               Open docs
             </a>
           </div>
@@ -649,7 +649,7 @@ export function Agents({
           <>
             <p>Agents read the curated library.</p>
             <p className="mt-1 text-[12px] text-muted">Connect your library so they read your sites, saved components and notes instead.</p>
-            <button onClick={onEnable} disabled={available === null} className="mt-3 h-8 rounded-md bg-fg px-3 text-bg transition hover:opacity-85 disabled:opacity-40">
+            <button onClick={onEnable} disabled={available === null} className="btn btn-primary mt-3">
               Connect my library
             </button>
           </>

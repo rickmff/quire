@@ -22,10 +22,13 @@ export default function Landing() {
             Keep every component you find. <span>Hand them to your agent.</span>
           </h1>
           <div className={s.cta}>
-            <Link href="/app" className={`${s.btn} ${s.solid}`}>
+            <Link href="/app" className="btn btn-lg btn-primary">
               Start collecting
+              <svg className="btn-arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </Link>
-            <a href={`${REPO}/tree/main/extension`} className={`${s.btn} ${s.ghost}`}>
+            <a href={`${REPO}/tree/main/extension`} className="btn btn-lg btn-secondary">
               Add to Chrome
             </a>
           </div>
