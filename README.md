@@ -16,8 +16,8 @@
 
 ## What it is
 
-Quire is a gallery for UI components. Start from a curated catalog or from scratch, add components and whole
-libraries by link, star the ones you want to keep, and give your agent everything it needs to use them: the
+Quire is a gallery for UI components. Start from the curated catalog, add components and whole libraries by
+link, star the ones you want to keep, and give your agent everything it needs to use them: the
 install command, the source and your notes, over MCP, or a brief with one click on **Copy for agent**.
 
 <p align="center">
@@ -62,7 +62,7 @@ The extension saves to [quire.fyi](https://quire.fyi). To use your own instance,
 
 ## Run it locally
 
-Needs Node 20 or newer. Nothing to sign up for.
+Needs Node 20 or newer. Nothing to sign up for, and no environment variables: it takes a few minutes from clone to a running app.
 
 ```bash
 git clone https://github.com/rickmff/quire.git
@@ -71,7 +71,7 @@ npm install
 npm run dev
 ```
 
-1. Open [localhost:3000](http://localhost:3000), click **Start collecting**, and pick **Curated library** or **From scratch**.
+1. Open [localhost:3000](http://localhost:3000) and click **Start collecting**. A new visitor starts with every curated library turned on; turn any of them off under **Sites**.
 2. Your library lives in the browser. Synced libraries for the MCP are saved in `.data/`.
 3. For the MCP, point your agent at `http://localhost:3000/api/mcp` (add `?key=<your key>` from **Agents** for your own library).
 4. For the extension, set its address to `http://localhost:3000` in its options.
@@ -113,6 +113,8 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 - [`wrangler.jsonc`](wrangler.jsonc) points the worker at `.open-next/worker.js` and serves static files (including `public/`) from the `ASSETS` binding.
 - Cloudflare Workers Builds deploys `main` to [quire.fyi](https://quire.fyi) and builds a preview for every other branch.
 - [CI](.github/workflows/ci.yml) runs on every pull request and on pushes to `main`: `npm ci`, the comment check, `tsc --noEmit` and the OpenNext build, on Node 24 like Workers Builds.
+- Its actions are pinned to commit hashes, and [Dependabot](.github/dependabot.yml) keeps them and the npm packages current.
+- Pushing a `v<version>` tag runs the [release workflow](.github/workflows/release.yml), which publishes that version's [changelog](CHANGELOG.md) entry as a GitHub release.
 
 `package-lock.json` must install on Linux. If you regenerate it on Windows or macOS, check that `npm ci` still passes in CI.
 
@@ -122,7 +124,8 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 
 ## Contributing
 
-Issues and pull requests are welcome. For a large change, open an issue first to discuss it.
+Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the setup, the checks and how a
+release is cut, and [SECURITY.md](SECURITY.md) says how to report a vulnerability privately.
 
 The code has no comments. Names, types and small functions carry the meaning, and what the code cannot show goes in [docs/architecture.md](docs/architecture.md) or the README of its folder. `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
 
