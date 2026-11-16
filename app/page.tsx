@@ -34,10 +34,6 @@ export default function Landing() {
           </div>
         </div>
       </main>
-
-      <footer className={`${s.bar} ${s.foot}`}>
-        <span>Free and open source</span>
-      </footer>
     </div>
   );
 }
