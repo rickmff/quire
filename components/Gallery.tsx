@@ -395,12 +395,12 @@ function ComponentCard({
         )}
         {starred && tools}
       </div>
-      <div className="mt-2.5 px-0.5">
+      <div className="mt-3 px-0.5">
         <div className="flex items-center justify-between gap-3">
           <span className="min-w-0 truncate first-letter:uppercase">{item.title}</span>
           {onAgent && <AgentButton onClick={onAgent} />}
         </div>
-        <div className="mt-0.5 flex items-baseline justify-between gap-3">
+        <div className="mt-2 flex items-baseline justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {[...new Set([typeById(item.type).name, ...item.triggers.map((t) => triggerById(t)?.name ?? t)])].join(" · ")}
           </p>

@@ -1622,12 +1622,12 @@ function Card({
         <CardTools b={b} lib={lib} onMove={onMove} onType={onType} onNote={() => setEditing(true)} onCopy={onCopy} className="top-2 right-11 z-10" />
       </div>
 
-      <div className="mt-2.5 px-0.5">
+      <div className="mt-3 px-0.5">
         <div className="flex items-center justify-between gap-3">
           <span className="min-w-0 truncate first-letter:uppercase">{b.title}</span>
           <AgentButton onClick={onAgent} />
         </div>
-        <div className="mt-0.5 flex items-baseline justify-between gap-3">
+        <div className="mt-2 flex items-baseline justify-between gap-3">
           <p className="min-w-0 truncate text-[12px] text-faint">
             {typeById(typeOf(b)).name}
             {b.description && <span className="text-faint"> · {b.description}</span>}
