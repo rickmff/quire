@@ -10,6 +10,7 @@
   --hover: rgb(0 0 0 / 0.035);
   --field: rgb(0 0 0 / 0.035);
   --field-focus: rgb(0 0 0 / 0.06);
+  --accent: #2f6fed;
   color-scheme: light;
 }
 
@@ -24,6 +25,7 @@
     --hover: rgb(255 255 255 / 0.04);
     --field: rgb(255 255 255 / 0.04);
     --field-focus: rgb(255 255 255 / 0.075);
+    --accent: #5b8cff;
     color-scheme: dark;
   }
 }
@@ -38,6 +40,7 @@
   --color-hover: var(--hover);
   --color-field: var(--field);
   --color-field-focus: var(--field-focus);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
@@ -65,3 +68,26 @@ body {
 [cmdk-input]:focus-visible,
 input:not([type="checkbox"]):not([type="radio"]):focus-visible,
 textarea:focus-visible { outline: none; }
+
+@keyframes slide { from { opacity: 0; transform: translateX(16px) } }
+.slide { animation: slide 220ms cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .pop, .slide { animation: none; } }
+
+/* Sidebar ruler: a tick per item. Ticks near the pointer grow; the active
+   item is marked with a long accent tick and steps right. */
+@media (min-width: 768px) {
+  .ruler {
+    mask-image: linear-gradient(to bottom, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+    padding-block: 20px;
+  }
+  [data-tick] {
+    width: calc(10px + var(--grow, 0) * 10px);
+    transition: width 160ms ease-out, background-color 160ms ease-out;
+  }
+  [aria-current="page"] [data-tick] { width: 26px; background: var(--accent); }
+  [aria-current="page"] [data-label] { transform: translateX(14px); color: var(--accent); }
+  [data-label] { transition: transform 200ms cubic-bezier(.2,.8,.2,1), color 160ms ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tick], [data-label] { transition: none; }
+}

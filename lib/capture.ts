@@ -1,0 +1,19 @@
+// Client for the capture service (capture/ in this repo), which runs on a VPS
+// with real Chromium. Server only. Off unless both variables are set.
+
+export const captureEnabled = () => Boolean(process.env.QUIRE_CAPTURE_URL && process.env.QUIRE_CAPTURE_TOKEN);
+
+export async function capture(url: string, video = true): Promise<{ image?: string; video?: string } | null> {
+  if (!captureEnabled()) return null;
+  try {
+    const r = await fetch(`${process.env.QUIRE_CAPTURE_URL!.replace(/\/$/, "")}/capture`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${process.env.QUIRE_CAPTURE_TOKEN}`, "content-type": "application/json" },
+      body: JSON.stringify({ url, video }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    return r.ok ? await r.json() : null;
+  } catch {
+    return null;
+  }
+}

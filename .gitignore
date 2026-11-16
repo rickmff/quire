@@ -4,3 +4,13 @@ node_modules
 *.tsbuildinfo
 next-env.d.ts
 .env*
+.cache/
+AGENTS.md
+.data/
+capture/media/
+capture/.env
+capture/node_modules/
+
+# OpenNext / Wrangler
+.open-next
+.wrangler

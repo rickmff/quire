@@ -1,0 +1,24 @@
+# capture: Chromium that records component previews
+# caddy:   HTTPS in front of it, with a certificate from Let's Encrypt
+services:
+  capture:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - media:/data/media
+    shm_size: "1gb"
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy:/data
+volumes:
+  media:
+  caddy:

@@ -1,6 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CatalogComponent, SyncedLibrary } from "@/lib/catalog/schema";
+import { techFrom, triggersFor } from "@/lib/motion";
+import { classify, typeById } from "@/lib/types";
 
 export type Bookmark = {
   id: string;
@@ -8,10 +11,21 @@ export type Bookmark = {
   title: string;
   description?: string;
   image?: string;
+  video?: string;
   library: string;
   install?: string;
   tags: string[];
   note?: string;
+  // Component type from lib/types.ts. Older cards have none and are
+  // classified on the fly from their title and description.
+  type?: string;
+  // The site's own category, e.g. "Inputs" on rareui.com.
+  category?: string;
+  // Pointer to the source in a shadcn registry, e.g. owner/repo/otp-input.
+  registry?: string;
+  dependencies?: string[];
+  // Catalog id when the card was saved from the curated library.
+  ref?: string;
   collectionId: string | null;
   createdAt: number;
 };
@@ -22,6 +36,14 @@ export type Library = {
   version: 1;
   bookmarks: Bookmark[];
   collections: Collection[];
+  // How the user started: with the curated catalog or from scratch.
+  // Unset until they choose.
+  mode?: "curated" | "scratch";
+  // Catalog libraries the user follows (ids from lib/catalog).
+  sources?: string[];
+  // Secret key of the synced copy that the MCP reads.
+  syncKey?: string;
+  syncedAt?: number;
 };
 
 const KEY = "quire:v1";
@@ -48,7 +70,7 @@ export function writeLibrary(lib: Library) {
   } catch {}
 }
 
-export type Meta = Omit<Bookmark, "id" | "collectionId" | "createdAt" | "note">;
+export type Meta = Omit<Bookmark, "id" | "collectionId" | "createdAt" | "note" | "type" | "category" | "registry" | "dependencies" | "ref" | "video">;
 
 export async function fetchMeta(url: string): Promise<Meta> {
   const res = await fetch(`/api/meta?url=${encodeURIComponent(url)}`);
@@ -91,20 +113,40 @@ export function useLibrary() {
     });
   }, []);
 
+  // Push the library to the server when it has a key, so agents see changes.
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!ready || !lib.syncKey) return;
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      pushLibrary(lib).then((ok) => ok && writeLibrary({ ...readLibrary(), syncedAt: Date.now() }));
+    }, 1200);
+    return () => window.clearTimeout(timer.current);
+    // syncedAt changes must not trigger another push
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, lib.syncKey, lib.bookmarks, lib.sources, lib.mode]);
+
   return { lib, ready, update };
 }
 
-export function exportMarkdown(lib: Library, collectionId: string | "all" | null) {
-  const items =
-    collectionId === "all"
-      ? lib.bookmarks
-      : lib.bookmarks.filter((b) => b.collectionId === collectionId);
-  const name =
-    collectionId === "all"
-      ? "All bookmarks"
-      : collectionId === null
-        ? "Inbox"
-        : (lib.collections.find((c) => c.id === collectionId)?.name ?? "Collection");
+export const typeOf = (b: Bookmark) => b.type ?? classify({ title: b.title, description: b.description });
+
+// A view is "all", null (Inbox), "type:<id>" or a collection id.
+export function selectView(lib: Library, view: string | null) {
+  if (view === "all") return { name: "All bookmarks", items: lib.bookmarks };
+  if (view === null) return { name: "Inbox", items: lib.bookmarks.filter((b) => b.collectionId === null) };
+  if (view.startsWith("type:")) {
+    const id = view.slice(5);
+    return { name: typeById(id).name, items: lib.bookmarks.filter((b) => typeOf(b) === id) };
+  }
+  return {
+    name: lib.collections.find((c) => c.id === view)?.name ?? "Collection",
+    items: lib.bookmarks.filter((b) => b.collectionId === view),
+  };
+}
+
+export function exportMarkdown(lib: Library, view: string | null) {
+  const { name, items } = selectView(lib, view);
   const lines = [
     `# ${name}`,
     "",
@@ -114,9 +156,12 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   ];
   for (const b of items) {
     lines.push(`## ${b.title}`);
+    lines.push(`- Type: ${typeById(typeOf(b)).name}`);
     lines.push(`- Source: ${b.url}`);
     lines.push(`- Library: ${b.library}`);
     if (b.install) lines.push(`- Install: \`${b.install}\``);
+    if (b.registry) lines.push(`- Registry: ${b.registry}`);
+    if (b.dependencies?.length) lines.push(`- Dependencies: ${b.dependencies.join(", ")}`);
     if (b.tags.length) lines.push(`- Tags: ${b.tags.join(", ")}`);
     if (b.note) lines.push(`- Note: ${b.note}`);
     if (b.description) lines.push(`- About: ${b.description}`);
@@ -125,23 +170,19 @@ export function exportMarkdown(lib: Library, collectionId: string | "all" | null
   return lines.join("\n");
 }
 
-export function exportJSON(lib: Library, collectionId: string | "all" | null) {
-  const items =
-    collectionId === "all" ? lib.bookmarks : lib.bookmarks.filter((b) => b.collectionId === collectionId);
-  const name =
-    collectionId === "all"
-      ? "All bookmarks"
-      : collectionId === null
-        ? "Inbox"
-        : (lib.collections.find((c) => c.id === collectionId)?.name ?? "Collection");
+export function exportJSON(lib: Library, view: string | null) {
+  const { name, items } = selectView(lib, view);
   return JSON.stringify(
     {
       collection: name,
       components: items.map((b) => ({
         title: b.title,
+        type: typeById(typeOf(b)).name,
         url: b.url,
         library: b.library,
         ...(b.install ? { install: b.install } : {}),
+        ...(b.registry ? { registry: b.registry } : {}),
+        ...(b.dependencies?.length ? { dependencies: b.dependencies } : {}),
         ...(b.tags.length ? { tags: b.tags } : {}),
         ...(b.note ? { note: b.note } : {}),
         ...(b.description ? { description: b.description } : {}),
@@ -150,4 +191,58 @@ export function exportJSON(lib: Library, collectionId: string | "all" | null) {
     null,
     2,
   );
+}
+
+// A saved card as a component record: the shape the MCP and the gallery read.
+export function toComponent(b: Bookmark): CatalogComponent {
+  const text = { title: b.title, description: b.description, category: b.category };
+  return {
+    id: b.ref ?? `mine/${b.id}`,
+    library: b.ref?.split("/")[0] ?? "mine",
+    name: b.title,
+    title: b.title,
+    description: b.description,
+    category: b.category,
+    type: typeOf(b),
+    triggers: triggersFor(text),
+    tech: techFrom(b.dependencies),
+    dependencies: b.dependencies,
+    docs: b.url,
+    item: b.registry && /^https:\/\//.test(b.registry) ? b.registry : undefined,
+    install: b.install,
+    preview: b.image,
+    video: b.video,
+    note: b.note,
+    site: b.library,
+  };
+}
+
+export function toSynced(lib: Library): SyncedLibrary {
+  return {
+    version: 1,
+    mode: lib.mode ?? "curated",
+    sources: lib.sources ?? [],
+    items: lib.bookmarks.map(toComponent),
+    updatedAt: Date.now(),
+  };
+}
+
+export async function pushLibrary(lib: Library) {
+  if (!lib.syncKey) return false;
+  try {
+    const r = await fetch(`/api/library/${lib.syncKey}`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(toSynced(lib)),
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
+export function newSyncKey() {
+  const a = new Uint8Array(20);
+  crypto.getRandomValues(a);
+  return [...a].map((x) => (x % 36).toString(36)).join("") + Date.now().toString(36);
 }

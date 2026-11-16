@@ -18,16 +18,45 @@
     --floor: rgb(170 150 255 / 0.12);
   }
 }
-.bar { display: flex; align-items: center; justify-content: space-between; color: var(--muted); }
+.bar { position: relative; z-index: 1; pointer-events: none; display: flex; align-items: center; justify-content: space-between; color: var(--muted); }
+.bar a { pointer-events: auto; }
 .bar a { transition: color 0.15s; }
 .bar a:hover { color: var(--fg); }
 .foot { font-size: 12px; color: var(--faint); }
 .wordmark { display: block; height: 22px; width: auto; color: var(--fg); }
 
-.main { display: grid; place-items: center; align-content: center; gap: 56px; }
-.copy { display: grid; justify-items: center; gap: 22px; text-align: center; }
+.main {
+  display: grid; justify-items: center; align-content: center; min-height: 0;
+  gap: clamp(14px, 3.5dvh, 40px); pointer-events: none;
+}
+.copy { position: relative; z-index: 1; display: grid; justify-items: center; gap: clamp(12px, 2.4dvh, 22px); text-align: center; }
+.copy a { pointer-events: auto; }
 .title { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
-.title span { color: var(--muted); }
+
+/* Focus reveal: words come out of blur as a bracket frame passes over them. */
+.reveal { position: relative; pointer-events: auto; cursor: default; }
+.word {
+  display: inline-block;
+  transition: filter 0.42s cubic-bezier(.2,.7,.2,1), opacity 0.42s cubic-bezier(.2,.7,.2,1);
+}
+.wordMuted { color: var(--muted); }
+.wordBlur { filter: blur(5px); opacity: 0.35; }
+.wordSoft { filter: blur(1.6px); opacity: 0.5; }
+.frame {
+  position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0;
+  transition: transform 0.3s cubic-bezier(.3,1.25,.4,1), width 0.3s cubic-bezier(.3,1.25,.4,1),
+    height 0.3s cubic-bezier(.3,1.25,.4,1), opacity 0.35s;
+}
+.frameOn { opacity: 1; }
+.frame i {
+  position: absolute; width: 6px; height: 6px; border: 0 solid var(--fg);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--fg) 55%, transparent));
+}
+.frame i:nth-child(1) { left: 0; top: 0; border-left-width: 1.5px; border-top-width: 1.5px; border-top-left-radius: 2px; }
+.frame i:nth-child(2) { right: 0; top: 0; border-right-width: 1.5px; border-top-width: 1.5px; border-top-right-radius: 2px; }
+.frame i:nth-child(3) { left: 0; bottom: 0; border-left-width: 1.5px; border-bottom-width: 1.5px; border-bottom-left-radius: 2px; }
+.frame i:nth-child(4) { right: 0; bottom: 0; border-right-width: 1.5px; border-bottom-width: 1.5px; border-bottom-right-radius: 2px; }
+@media (prefers-reduced-motion: reduce) { .word, .frame { transition: none; } }
 .cta { display: flex; align-items: center; gap: 6px; }
 .btn {
   height: 32px; padding: 0 14px; border-radius: 9px; display: inline-flex; align-items: center;
@@ -70,6 +99,11 @@
   background: radial-gradient(closest-side, var(--floor), transparent);
   filter: blur(14px); transform: translateY(calc(var(--gap, 12px) * 0.6));
 }
+
+/* The WebGL2 quire. The canvas covers the page and sits under the text; the
+   stage reserves the space the quire is sized to. */
+.stage { position: relative; width: min(520px, 100%); height: min(520px, 56dvh); display: grid; place-items: center; }
+.canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: auto; touch-action: none; }
 
 @media (max-width: 520px) {
   .page { padding: 20px; }
