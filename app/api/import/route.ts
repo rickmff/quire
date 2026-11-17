@@ -1,5 +1,6 @@
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { fetchJSON, fetchText, safeUrl } from "@/lib/net";
+import { USER_ADDS } from "@/lib/features";
 import { rateLimited } from "@/lib/rateLimit";
 import { classify } from "@/lib/types";
 import type { ImportItem, ImportResult } from "@/lib/importTypes";
@@ -158,6 +159,7 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
 }
 
 export async function GET(req: Request) {
+  if (!USER_ADDS) return Response.json({ error: "off" }, { status: 404 });
   const limited = rateLimited(req, "fetch");
   if (limited) return limited;
   const raw = new URL(req.url).searchParams.get("url") ?? "";

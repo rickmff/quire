@@ -5,12 +5,14 @@ import { PlusIcon as Plus, SearchIcon } from "lucide-react";
 import SocialLinks from "@/components/SocialLinks";
 import { Tip } from "@/components/ui/tooltip";
 import type { BarMode } from "@/components/app/useShortcuts";
+import { USER_ADDS } from "@/lib/features";
 import { normalizeUrl } from "@/lib/store";
 
-const MODES = [
+const ALL_MODES = [
   ["search", "Search this view", "/", SearchIcon],
   ["add", "Add a component or library", "+", Plus],
 ] as const;
+const MODES = ALL_MODES.filter(([m]) => USER_ADDS || m === "search");
 
 export function TopBar({
   input,
@@ -43,16 +45,23 @@ export function TopBar({
         className="flex h-14 items-center gap-4"
         onSubmit={(e) => {
           e.preventDefault();
+          if (!USER_ADDS) return;
           if (mode === "search" && !normalizeUrl(input)) return;
           onAdd(input);
           setInput("");
         }}
       >
         <div className="flex h-9 w-full items-center gap-2 rounded-lg bg-field pr-2 pl-1 transition-colors focus-within:bg-field-focus">
+          {MODES.length === 1 && (
+            <span className="grid size-8 shrink-0 place-items-center text-faint">
+              <SearchIcon className="size-3.5" strokeWidth={1.75} aria-hidden />
+            </span>
+          )}
           <div
             role="radiogroup"
             aria-label="What the bar does"
-            className="flex shrink-0 items-center gap-px rounded-md p-0.5"
+            hidden={MODES.length === 1}
+            className="flex shrink-0 items-center gap-px rounded-md p-0.5 [&[hidden]]:hidden"
           >
             {MODES.map(([m, label, key, Icon]) => (
               <Tip key={m} label={label} shortcut={key}>
@@ -91,7 +100,7 @@ export function TopBar({
             autoComplete="off"
             spellCheck={false}
           />
-          {input.trim() && (mode === "add" || normalizeUrl(input)) && (
+          {USER_ADDS && input.trim() && (mode === "add" || normalizeUrl(input)) && (
             <>
               <Tip label="Add this link as a component">
                 <button
@@ -115,7 +124,7 @@ export function TopBar({
               </Tip>
             </>
           )}
-          {mode === "search" && input && !normalizeUrl(input) && (
+          {mode === "search" && input && !(USER_ADDS && normalizeUrl(input)) && (
             <button
               type="button"
               onClick={() => {

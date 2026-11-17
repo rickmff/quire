@@ -16,8 +16,8 @@
 
 ## What it is
 
-Quire is a gallery for UI components. Start from the curated catalog, add components and whole libraries by
-link, star the ones you want to keep, and give your agent everything it needs to use them: the
+Quire is a gallery for UI components. Start from the curated catalog, star the ones you want to keep, and give
+your agent everything it needs to use them: the
 install command, the source and your notes, over MCP, or a brief with one click on **Copy for agent**.
 
 <p align="center">
@@ -34,9 +34,9 @@ install command, the source and your notes, over MCP, or a brief with one click 
 - **All libraries, sorted.** Browse one library or all of them at once, filtered by the motion that drives each component: hover, click, scroll, cursor, drag, typing, entrance, ambient loop, state change.
 - **Star what you keep.** Starred holds your picks. Group them in collections and leave a note for your agent.
 - **Copy for agent.** Every card copies a ready-to-paste brief: what the component is, its docs, how to install it, and its Quire id for fetching the source over MCP.
-- **One bar for search and add.** The top bar searches the current view (`/`) or takes a link (`+`) to add one component or a whole library. Quire reads the library's registry, pages or sitemap and sorts what it finds by type. ⌘K opens commands and export.
+- **Search and commands.** The top bar searches the current view (`/`). ⌘K opens commands and export.
+- **Adding by link is paused.** Adding one component by link, importing a whole site, the Chrome extension and the capture service are in the code but off. [docs/user-adds.md](docs/user-adds.md) says what each one does and how to turn them back on.
 - **MCP for agents.** `/api/mcp` serves the curated catalog, or your own library with your key. Tools: `recommend`, `search_components`, `get_component`, `get_component_source`, `get_filters`, `list_libraries`.
-- **Chrome extension.** Save the page you are on, or the whole library it belongs to, without leaving it.
 
 ## MCP
 
@@ -50,7 +50,8 @@ Give your agent a brief, for example "pricing page with a playful toggle and a m
 
 ## Browser extension
 
-`extension/` is a Chrome extension (Manifest V3).
+`extension/` is a Chrome extension (Manifest V3). It needs a Quire build with adding by link turned on
+([docs/user-adds.md](docs/user-adds.md)); quire.fyi has it off.
 
 1. Open `chrome://extensions` and turn on Developer mode.
 2. Click **Load unpacked** and select the `extension/` folder.

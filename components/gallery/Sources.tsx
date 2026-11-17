@@ -14,7 +14,7 @@ export function Sources({
   followed: Set<string>;
   onToggle: (id: string) => void;
   onAll: (on: boolean) => void;
-  onAddSite: () => void;
+  onAddSite?: () => void;
   imported: { name: string; count: number }[];
 }) {
   return (
@@ -59,12 +59,16 @@ export function Sources({
         })}
       </ul>
 
-      <div className="mt-10 flex h-8 items-center justify-between">
-        <h2 className="font-medium">Your sites</h2>
-        <button onClick={onAddSite} className="text-[12px] text-muted transition hover:text-fg">
-          Add a site by link
-        </button>
-      </div>
+      {(onAddSite || imported.length > 0) && (
+        <div className="mt-10 flex h-8 items-center justify-between">
+          <h2 className="font-medium">Your sites</h2>
+          {onAddSite && (
+            <button onClick={onAddSite} className="text-[12px] text-muted transition hover:text-fg">
+              Add a site by link
+            </button>
+          )}
+        </div>
+      )}
       {imported.length ? (
         <ul className="mt-2 divide-y divide-line">
           {imported.map((s) => (
@@ -74,11 +78,11 @@ export function Sources({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : onAddSite ? (
         <p className="mt-2 text-muted">
           Paste the link of any component library. Quire reads it and adds each component by type.
         </p>
-      )}
+      ) : null}
     </section>
   );
 }

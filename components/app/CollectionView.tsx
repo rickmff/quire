@@ -29,7 +29,7 @@ export function CollectionView({
   selected: number;
   libFilter: string | null;
   clearLibFilter: () => void;
-  onAdd: (url: string) => void;
+  onAdd?: (url: string) => void;
   onMove: (bookmarkId: string, collectionId: string | null) => void;
   onUnstar: (bookmarkId: string) => void;
   onType: (bookmarkId: string, type: string) => void;
@@ -54,10 +54,12 @@ export function CollectionView({
         )}
       </div>
 
-      {ready && lib.bookmarks.length === 0 ? (
+      {ready && lib.bookmarks.length === 0 && onAdd ? (
         <Empty onAdd={(u) => onAdd(`https://${u}`)} />
       ) : ready && bookmarks.length === 0 ? (
-        <p className="pt-16 text-center text-muted">Empty. Paste a link or drag cards here.</p>
+        <p className="pt-16 text-center text-muted">
+          {onAdd ? "Empty. Paste a link or drag cards here." : "Empty. Star a component, then drag its card here."}
+        </p>
       ) : (
         <div data-grid className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
           {bookmarks.map((b) => (

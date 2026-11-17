@@ -20,6 +20,7 @@
 | `capture/`, `extension/` | The optional capture service and the Chrome extension. |
 | `e2e/` | Playwright end-to-end tests. Unit tests sit next to the code they test, as `*.test.ts`. |
 | `docs/architecture.md` | Why things are the way they are: state diagrams, values kept in step, config reasons. |
+| `docs/user-adds.md` | The paused features that let a visitor add components by link, and the one flag (`lib/features.ts`) that turns them on. |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

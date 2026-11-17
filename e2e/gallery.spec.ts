@@ -76,7 +76,29 @@ test("the command menu creates a collection and opens it", async ({ page }) => {
   expect((await stored(page))?.collections.map((c) => c.name)).toEqual(["Hero ideas"]);
 });
 
+const USER_ADDS = process.env.NEXT_PUBLIC_QUIRE_USER_ADDS === "1";
+
+test("adding by link is off unless the build turns it on", async ({ page, request }) => {
+  test.skip(USER_ADDS, "this build has user adds on");
+  await page.goto("/app");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Add a component or library" })).toHaveCount(0);
+  await page.evaluate(() => {
+    const data = new DataTransfer();
+    data.setData("text/plain", "https://example.com/components/shiny-thing");
+    document.body.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true }));
+  });
+  await page.keyboard.press("ControlOrMeta+k");
+  await expect(page.getByRole("option", { name: "New collection" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Import every component from a site" })).toHaveCount(0);
+  expect((await stored(page))?.bookmarks ?? []).toEqual([]);
+  expect((await request.get("/api/import?url=https://magicui.design")).status()).toBe(404);
+  expect((await request.get("/api/meta?url=https://magicui.design")).status()).toBe(404);
+  expect((await request.get("/add?url=https://magicui.design")).status()).toBe(404);
+});
+
 test("pasting a link anywhere stars it", async ({ page }) => {
+  test.skip(!USER_ADDS, "user adds are paused, see docs/user-adds.md");
   await page.goto("/app");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.evaluate(() => {

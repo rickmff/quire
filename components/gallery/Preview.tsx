@@ -1,5 +1,6 @@
 "use client";
 
+import { USER_ADDS } from "@/lib/features";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { type LiveDemo as Live } from "@/lib/catalog/schema";
 import { type GalleryItem } from "@/lib/useCatalog";
@@ -98,7 +99,11 @@ function Pending({ item, site, large }: { item: GalleryItem; site: string; large
         {item.title}
       </span>
       <span className={`text-[11px] text-faint ${capture ? "animate-pulse" : ""}`}>
-        {capture === false ? "No preview. Start the capture service to record one." : `Recording preview · ${site}`}
+        {!USER_ADDS
+          ? "No preview"
+          : capture === false
+            ? "No preview. Start the capture service to record one."
+            : `Recording preview · ${site}`}
       </span>
     </div>
   );
