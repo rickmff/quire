@@ -13,6 +13,7 @@ export function mergeLibrary(a: Library, b: Library): Library {
   const urls = new Set(a.bookmarks.map((x) => x.url));
   const colIds = new Set(a.collections.map((c) => c.id));
   return {
+    ...a,
     version: 1,
     collections: [...a.collections, ...(b.collections ?? []).filter((c) => !colIds.has(c.id))],
     bookmarks: [...b.bookmarks.filter((x) => !urls.has(x.url)), ...a.bookmarks],
