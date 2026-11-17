@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   const raw = await req.text();
   if (raw.length > MAX_BODY)
     return json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Body too large" } }, 413);
-  let body: any;
+  let body: unknown;
   try {
     body = JSON.parse(raw);
   } catch {

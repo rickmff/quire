@@ -1,3 +1,4 @@
+import "server-only";
 export const captureEnabled = () => Boolean(process.env.QUIRE_CAPTURE_URL && process.env.QUIRE_CAPTURE_TOKEN);
 
 export async function capture(url: string, video = true): Promise<{ image?: string; video?: string } | null> {

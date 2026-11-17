@@ -6,11 +6,14 @@ import { techFrom, triggersFor } from "../lib/motion.ts";
 import { SOURCES, type Source } from "./catalog/sources.ts";
 import { dedupe } from "./catalog/dedupe.ts";
 import type { CatalogComponent, CatalogLibrary, Catalog } from "../lib/catalog/schema.ts";
+import type { Registry, RegistryItem } from "../lib/catalog/registry.ts";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const CACHE = join(ROOT, ".cache/catalog");
 const OUT = join(ROOT, "lib/catalog/data.json");
-const manual = JSON.parse(readFileSync(join(ROOT, "scripts/catalog/manual.json"), "utf8"));
+const manual: Record<string, RegistryItem[]> = JSON.parse(
+  readFileSync(join(ROOT, "scripts/catalog/manual.json"), "utf8"),
+);
 
 const COMPONENT_TYPES = new Set(["registry:ui", "registry:component", "registry:block", undefined]);
 const SKIP = /^(index|utils?|style|theme|demo|example)$|-(demo|example)(-\d+)?$/i;
@@ -52,6 +55,11 @@ function frontMatter(text: string) {
   }
   return out;
 }
+
+const filePaths = (i: RegistryItem) =>
+  (i.files ?? []).map((f) => (typeof f === "string" ? f : f.path)).filter((p): p is string => Boolean(p));
+
+const registryEntry = (i: RegistryItem) => ({ ...i, files: filePaths(i) });
 
 function entry(
   src: Source,
@@ -136,7 +144,7 @@ function findMedia(idx: Map<string, string[]>, name: string, category?: string) 
   return {};
 }
 
-async function fetchJSON(url: string) {
+async function fetchJSON<T>(url: string): Promise<T | null> {
   try {
     const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
     return r.ok ? await r.json() : null;
@@ -148,14 +156,14 @@ async function fetchJSON(url: string) {
 async function build(src: Source): Promise<CatalogComponent[]> {
   if (src.kind === "manual") {
     if (src.live) {
-      const live = await fetchJSON(src.live);
+      const live = await fetchJSON<Registry>(src.live);
       if (live?.items?.length) {
         return live.items
-          .filter((i: any) => COMPONENT_TYPES.has(i.type) && !SKIP.test(i.name))
-          .map((i: any) => entry(src, i));
+          .filter((i) => COMPONENT_TYPES.has(i.type) && !SKIP.test(i.name))
+          .map((i) => entry(src, registryEntry(i)));
       }
     }
-    return (manual[src.id] ?? []).map((i: any) => entry(src, i));
+    return (manual[src.id] ?? []).map((i) => entry(src, registryEntry(i)));
   }
 
   const { files, show } = checkout(src.repo!, src.branch);
@@ -176,10 +184,10 @@ async function build(src: Source): Promise<CatalogComponent[]> {
   };
 
   if (src.kind === "registry") {
-    const reg = JSON.parse(show(src.path!));
-    const items: any[] = Array.isArray(reg) ? reg : (reg.items ?? []);
+    const reg: Registry | RegistryItem[] = JSON.parse(show(src.path!));
+    const items: RegistryItem[] = Array.isArray(reg) ? reg : (reg.items ?? []);
     const cats = src.id === "reactbits" ? reactBitsCategories(show) : null;
-    const picked = new Map<string, any>();
+    const picked = new Map<string, RegistryItem>();
     const rank = (n: string) => {
       const i = (src.prefer ?? []).findIndex((suf) => n.endsWith(suf));
       return i < 0 ? 99 : i;
@@ -192,7 +200,7 @@ async function build(src: Source): Promise<CatalogComponent[]> {
     }
     const out: CatalogComponent[] = [];
     for (const [base, i] of picked) {
-      const paths = (i.files ?? []).map((f: any) => (typeof f === "string" ? f : f.path)).filter(Boolean);
+      const paths = filePaths(i);
       const category = cats?.get(base.toLowerCase()) ?? i.category ?? i.categories?.find((c: string) => c !== src.id);
       const c = entry(src, {
         name: i.name,
@@ -200,7 +208,7 @@ async function build(src: Source): Promise<CatalogComponent[]> {
         description: i.description,
         category,
         dependencies: i.dependencies,
-        files: paths.map((p: string) => resolve(p, src.pathHint?.(i.name))).filter(Boolean) as string[],
+        files: paths.map((p) => resolve(p, src.pathHint?.(i.name))).filter((p): p is string => Boolean(p)),
       });
       if (src.variant) c.docs = src.docs(base, category);
       out.push(withPreview(c, base));

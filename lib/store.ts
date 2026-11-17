@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef, useSyncExternalStore } from "react";
 import type { CatalogComponent, SyncedLibrary } from "@/lib/catalog/schema";
 import { techFrom, triggersFor } from "@/lib/motion";
 import { classify, typeById } from "@/lib/types";
+import { useClientValue } from "@/lib/useClientValue";
 
 export type Bookmark = {
   id: string;
@@ -39,6 +40,7 @@ export type Library = {
 };
 
 const KEY = "quire:v1";
+const SYNC_DELAY_MS = 1200;
 const EMPTY: Library = { version: 1, bookmarks: [], collections: [] };
 
 export const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
@@ -55,10 +57,40 @@ export function readLibrary(): Library {
   }
 }
 
+let current: Library | null = null;
+const listeners = new Set<() => void>();
+const notify = () => listeners.forEach((l) => l());
+
 export function writeLibrary(lib: Library) {
   try {
     localStorage.setItem(KEY, JSON.stringify(lib));
   } catch {}
+  current = lib;
+  notify();
+}
+
+const librarySnapshot = () => (current ??= readLibrary());
+const serverLibrary = () => EMPTY;
+
+function subscribeLibrary(onChange: () => void) {
+  if (!listeners.size) current = readLibrary();
+  listeners.add(onChange);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key !== KEY) return;
+    current = readLibrary();
+    onChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(onChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+export function updateLibrary(fn: (l: Library) => Library) {
+  const prev = librarySnapshot();
+  const next = fn(prev);
+  if (next !== prev) writeLibrary(next);
 }
 
 export type Meta = Omit<
@@ -86,34 +118,18 @@ export function normalizeUrl(input: string): string | null {
 }
 
 export function useLibrary() {
-  const [lib, setLib] = useState<Library>(EMPTY);
-  const [ready, setReady] = useState(false);
+  const lib = useSyncExternalStore(subscribeLibrary, librarySnapshot, serverLibrary);
+  const ready = useClientValue(() => true, false);
+  const update = useCallback((fn: (l: Library) => Library) => updateLibrary(fn), []);
 
-  useEffect(() => {
-    setLib(readLibrary());
-    setReady(true);
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === KEY) setLib(readLibrary());
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  const update = useCallback((fn: (l: Library) => Library) => {
-    setLib((prev) => {
-      const next = fn(prev);
-      writeLibrary(next);
-      return next;
-    });
-  }, []);
-
+  const push = useEffectEvent(() => {
+    pushLibrary(lib).then((ok) => ok && writeLibrary({ ...readLibrary(), syncedAt: Date.now() }));
+  });
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!ready || !lib.syncKey) return;
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      pushLibrary(lib).then((ok) => ok && writeLibrary({ ...readLibrary(), syncedAt: Date.now() }));
-    }, 1200);
+    timer.current = window.setTimeout(push, SYNC_DELAY_MS);
     return () => window.clearTimeout(timer.current);
   }, [ready, lib.syncKey, lib.bookmarks, lib.sources, lib.mode]);
 
