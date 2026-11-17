@@ -126,9 +126,9 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 
 Issues and pull requests are welcome. Run `npm run check` and `npm run build` before you open one.
 
-The code has no comments. Names, types and small functions carry the meaning, and the commit message says why. `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
+The code has no comments. Names, types and small functions carry the meaning, and what the code cannot show goes in [docs/architecture.md](docs/architecture.md). `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
 
-When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing. Examples: `lib/useIntro.ts` (the /app entrance), `components/gallery/useCardLive.ts` (a card's live demo), `SidebarEdit` in `components/app/Sidebar.tsx` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
+When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing; and draw the transitions in [docs/architecture.md](docs/architecture.md). Examples: `lib/useIntro.ts` (the /app entrance), `components/gallery/useCardLive.ts` (a card's live demo), `SidebarEdit` in `components/app/Sidebar.tsx` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
 
 ## License
 
