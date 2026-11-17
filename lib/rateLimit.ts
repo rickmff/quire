@@ -1,4 +1,5 @@
 import "server-only";
+import { logSuspicious } from "./security";
 export type Window = { max: number; windowMs: number };
 
 type Bucket = { count: number; resetAt: number };
@@ -39,6 +40,7 @@ export const ROUTE_LIMITS = {
   fetch: { max: 30, windowMs: MINUTE },
   capture: { max: 6, windowMs: MINUTE },
   write: { max: 20, windowMs: MINUTE },
+  read: { max: 60, windowMs: MINUTE },
   mcp: { max: 120, windowMs: MINUTE },
 } satisfies Record<string, Window>;
 
@@ -49,8 +51,10 @@ const limiters = Object.fromEntries(
 ) as Record<RouteLimit, ReturnType<typeof createRateLimiter>>;
 
 export function rateLimited(req: Request, route: RouteLimit, extraHeaders: Record<string, string> = {}) {
-  const verdict = limiters[route](clientAddress(req));
+  const client = clientAddress(req);
+  const verdict = limiters[route](client);
   if (verdict.ok) return null;
+  logSuspicious({ reason: "rate-limited", route, client });
   return Response.json(
     { error: "rate-limited" },
     { status: 429, headers: { "retry-after": String(verdict.retryAfterSec), ...extraHeaders } },

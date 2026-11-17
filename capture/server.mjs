@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, rename, rm, stat } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { lookup } from "node:dns/promises";
@@ -21,6 +21,10 @@ const MEDIA = process.env.MEDIA_DIR || new URL("./media", import.meta.url).pathn
 const PUBLIC = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
 const CONCURRENCY = Number(process.env.CONCURRENCY || 2);
 if (!TOKEN) throw new Error("Set CAPTURE_TOKEN");
+if (TOKEN.length < 32) console.warn("CAPTURE_TOKEN is short. Use at least 32 random characters.");
+
+const digest = (s) => createHash("sha256").update(String(s)).digest();
+const authorized = (header) => timingSafeEqual(digest(header ?? ""), digest(`Bearer ${TOKEN}`));
 
 const R2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL"].every(
   (k) => process.env[k],
@@ -217,7 +221,7 @@ createServer(async (req, res) => {
     }
   }
   if (req.method === "POST" && path === "/capture") {
-    if (req.headers.authorization !== `Bearer ${TOKEN}`) return send(res, 401, { error: "unauthorized" });
+    if (!authorized(req.headers.authorization)) return send(res, 401, { error: "unauthorized" });
     let body = "";
     for await (const chunk of req) {
       body += chunk;
