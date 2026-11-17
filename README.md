@@ -75,7 +75,7 @@ npm run dev
 2. Your library lives in the browser. Synced libraries for the MCP are saved in `.data/`.
 3. For the MCP, point your agent at `http://localhost:3000/api/mcp` (add `?key=<your key>` from **Agents** for your own library).
 4. For the extension, set its address to `http://localhost:3000` in its options.
-5. For previews of components you add by link, run the capture service on your computer, see [`capture/`](capture/README.md).
+5. For previews of components you add by link, run the capture service on your computer, in [`capture/`](capture).
 
 `npm run build:next` runs a plain Next.js build, and `QUIRE_FILE_STORE=1 npm start` serves it while still saving to `.data/`.
 
@@ -88,7 +88,7 @@ Put these in `.env.local`. Without any of them, everything above works on your m
 | Variable | What it adds |
 | --- | --- |
 | `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, `CF_API_TOKEN` | Store synced libraries in Cloudflare KV, for a hosted deploy. Upstash also works: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. |
-| `QUIRE_CAPTURE_URL`, `QUIRE_CAPTURE_TOKEN` | Previews for components added by link, from the [capture service](capture/README.md). |
+| `QUIRE_CAPTURE_URL`, `QUIRE_CAPTURE_TOKEN` | Previews for components added by link, from the capture service in [`capture/`](capture). |
 | `QUIRE_FILE_STORE=1` | Keep saving libraries in `.data/` under `npm start`. |
 
 ## Curated catalog and previews
@@ -100,7 +100,7 @@ node scripts/build-catalog.ts            # all sites
 node scripts/build-catalog.ts magicui    # one site
 ```
 
-Previews come from the Quire stage in [`stage/`](stage/README.md). It installs each component's own demo from
+Previews come from the Quire stage in [`stage/`](stage). It installs each component's own demo from
 the library's registry into a neutral Vite app, poses it, and saves stills for the light and dark theme plus a
 short clip when the component moves. Files go to `public/previews/` and `lib/catalog/stage.json`; the live
 demos in the cards run from the stage build in `public/stage/`. Components without a preview stay out of the gallery.
@@ -114,7 +114,7 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 - Cloudflare Workers Builds deploys `main` to [quire.fyi](https://quire.fyi) and builds a preview for every other branch.
 - [CI](.github/workflows/ci.yml) runs on every pull request and on pushes to `main`: `npm ci`, then `npm run check` (comment check, Prettier, ESLint, type check, Vitest) step by step and the OpenNext build, on Node 24 like Workers Builds.
 - Its actions are pinned to commit hashes, and [Dependabot](.github/dependabot.yml) keeps them and the npm packages current.
-- Pushing a `v<version>` tag runs the [release workflow](.github/workflows/release.yml), which publishes that version's [changelog](CHANGELOG.md) entry as a GitHub release.
+- Pushing a `v<version>` tag runs the [release workflow](.github/workflows/release.yml), which publishes a GitHub release with notes generated from the merged pull requests.
 
 `package-lock.json` must install on Linux. If you regenerate it on Windows or macOS, check that `npm ci` still passes in CI.
 
@@ -124,12 +124,11 @@ Quire runs on Cloudflare Workers through [OpenNext](https://opennext.js.org/clou
 
 ## Contributing
 
-Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the setup, the checks and how a
-release is cut, and [SECURITY.md](SECURITY.md) says how to report a vulnerability privately.
+Issues and pull requests are welcome. Run `npm run check` and `npm run build` before you open one.
 
-The code has no comments. Names, types and small functions carry the meaning, and what the code cannot show goes in [docs/architecture.md](docs/architecture.md) or the README of its folder. `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
+The code has no comments. Names, types and small functions carry the meaning, and the commit message says why. `npm run check:comments` enforces it in CI; the rules for contributors and coding agents are in [AGENTS.md](AGENTS.md).
 
-When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing; and draw the transitions in [docs/architecture.md](docs/architecture.md). Examples: `lib/useIntro.ts` (the /app entrance), `components/gallery/useCardLive.ts` (a card's live demo), `SidebarEdit` in `components/app/Sidebar.tsx` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
+When a piece of UI has a few real states, keep them in one value, not in several flags, refs or timers that only make sense together. Name the states in a union and put each state's data on it (`{ kind: "error"; message: string }`, not `error` beside `status`); move only from the state you expect, so a late timer or a second click does nothing. Examples: `lib/useIntro.ts` (the /app entrance), `components/gallery/useCardLive.ts` (a card's live demo), `SidebarEdit` in `components/app/Sidebar.tsx` and `AppDialog` in `components/App.tsx`, and the status in `components/ImportDialog.tsx`.
 
 ## License
 
