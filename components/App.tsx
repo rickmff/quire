@@ -51,7 +51,6 @@ export default function App() {
   const [view, setView] = useViewRoute();
   const catalog = useCatalog();
   const syncOk = useSyncAvailable();
-  const intro = useIntro();
   const { toast, flash, dismiss: dismissToast } = useToast();
 
   const [open, setOpen] = useState<GalleryItem | null>(null);
@@ -82,6 +81,9 @@ export default function App() {
     dismissToast,
   });
 
+  const nothingToDeal = Boolean(ready && catalog) && (!isGallery(view) || galleryView.length === 0);
+  const intro = useIntro({ nothingToDeal });
+
   useViewSettle(mainRef, view, intro.phase === "done");
   useDropServiceWorkers();
 
@@ -104,11 +106,6 @@ export default function App() {
     resetOn: `${view}|${libFilter}`,
   });
 
-  const nothingToDeal = Boolean(ready && catalog) && (!isGallery(view) || galleryView.length === 0);
-  useEffect(() => {
-    if (nothingToDeal) intro.skip();
-  }, [nothingToDeal, intro.skip]);
-
   useEffect(() => {
     if (ready && catalog && fresh)
       update((l) => (l.mode ? l : { ...l, mode: "curated", sources: l.sources ?? catalog.libraries.map((x) => x.id) }));
@@ -121,6 +118,7 @@ export default function App() {
     window.history.replaceState(null, "", window.location.pathname);
   });
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (catalog) importFromAddress();
   }, [catalog]);
 

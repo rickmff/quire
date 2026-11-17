@@ -1,5 +1,6 @@
 import { fetchText } from "./net";
 import type { CatalogComponent } from "./catalog/schema";
+import type { RegistryItem } from "./catalog/registry";
 
 export type SourceFile = { path: string; content: string; truncated?: boolean };
 export type SourceResult = {
@@ -29,10 +30,12 @@ async function fromRegistry(url: string): Promise<SourceResult | null> {
   const r = await fetchText(url, { accept: "application/json", timeout: 8000 });
   if (!r) return null;
   try {
-    const item = JSON.parse(r.text);
-    const files: SourceFile[] = (item.files ?? [])
-      .filter((f: any) => typeof f?.content === "string")
-      .map((f: any) => ({ path: f.target || f.path, content: f.content }));
+    const item = JSON.parse(r.text) as RegistryItem;
+    const files: SourceFile[] = (item.files ?? []).flatMap((f) =>
+      typeof f === "object" && typeof f.content === "string"
+        ? [{ path: f.target || f.path || "", content: f.content }]
+        : [],
+    );
     if (!files.length) return null;
     return {
       from: url,

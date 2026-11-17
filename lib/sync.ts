@@ -32,13 +32,18 @@ const url = (v: unknown) => {
   return x && /^https?:\/\//.test(x) ? x : undefined;
 };
 
-export function cleanLibrary(input: any): SyncedLibrary | null {
-  if (!input || typeof input !== "object") return null;
+type Untrusted = Record<string, unknown>;
+
+const isRecord = (v: unknown): v is Untrusted => typeof v === "object" && v !== null;
+
+export function cleanLibrary(input: unknown): SyncedLibrary | null {
+  if (!isRecord(input)) return null;
   const known = new Set(libraries.map((l) => l.id));
-  const items: CatalogComponent[] = (Array.isArray(input.items) ? input.items : []).slice(0, 5000).flatMap((i: any) => {
-    const id = s(i?.id, 120);
-    const title = s(i?.title, 160);
-    const docs = url(i?.docs);
+  const items: CatalogComponent[] = (Array.isArray(input.items) ? input.items : []).slice(0, 5000).flatMap((entry: unknown) => {
+    const i: Untrusted = isRecord(entry) ? entry : {};
+    const id = s(i.id, 120);
+    const title = s(i.title, 160);
+    const docs = url(i.docs);
     if (!id || !title || !docs) return [];
     return [
       {

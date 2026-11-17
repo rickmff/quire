@@ -114,7 +114,11 @@ const text = (value: unknown, isError = false) => ({
   ...(isError ? { isError: true } : {}),
 });
 
-async function callTool(name: string, args: any, ctx: Ctx) {
+type ToolArgs = Record<string, unknown>;
+
+const optionalText = (v: unknown) => (typeof v === "string" ? v : undefined);
+
+async function callTool(name: string, args: ToolArgs, ctx: Ctx) {
   const items = scope(ctx.user);
   const find = (id: string) => items.find((c) => c.id === id) ?? catalog.components.find((c) => c.id === id);
 
@@ -149,7 +153,14 @@ async function callTool(name: string, args: any, ctx: Ctx) {
       });
     }
     case "search_components": {
-      const r = search(items, { ...args, limit: Number(args?.limit) || 12 });
+      const r = search(items, {
+        query: optionalText(args.query),
+        type: optionalText(args.type),
+        trigger: optionalText(args.trigger),
+        tech: optionalText(args.tech),
+        library: optionalText(args.library),
+        limit: Number(args.limit) || 12,
+      });
       return text({ total: r.total, items: r.items.map(card) });
     }
     case "get_component": {
@@ -196,7 +207,8 @@ async function callTool(name: string, args: any, ctx: Ctx) {
   return null;
 }
 
-type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: any };
+type RpcParams = { name?: string; arguments?: ToolArgs; protocolVersion?: string };
+type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: RpcParams };
 
 export async function handleRpc(msg: Rpc, ctx: Ctx) {
   const reply = (result: unknown) => ({ jsonrpc: "2.0", id: msg.id ?? null, result });
@@ -205,7 +217,7 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
     case "initialize": {
       const asked = msg.params?.protocolVersion;
       return reply({
-        protocolVersion: VERSIONS.includes(asked) ? asked : VERSIONS[0],
+        protocolVersion: asked && VERSIONS.includes(asked) ? asked : VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "quire", title: "Quire", version: "0.2.0" },
         instructions:
@@ -225,7 +237,7 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
         })),
       });
     case "tools/call": {
-      const out = await callTool(msg.params?.name, msg.params?.arguments ?? {}, ctx);
+      const out = await callTool(String(msg.params?.name ?? ""), msg.params?.arguments ?? {}, ctx);
       return out ? reply(out) : fail(-32602, `Unknown tool ${msg.params?.name}`);
     }
     case "resources/list":
