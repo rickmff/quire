@@ -1,22 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { REDUCED_MOTION, useMedia } from "@/lib/media";
 
 export type IntroPhase = "wait" | "deal" | "show" | "done";
 
 const FALLBACK_MS = 1600;
 const RISE_MS = 900;
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-
-const subscribeNothing = () => () => {};
 
 export function useIntro({ nothingToDeal }: { nothingToDeal: boolean }) {
   const [state, setState] = useState<{ phase: IntroPhase; ms: number }>({ phase: "wait", ms: 0 });
-  const reducedMotion = useSyncExternalStore(
-    subscribeNothing,
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    () => null,
-  );
+  const reducedMotion = useMedia(REDUCED_MOTION, null);
 
   if (state.phase === "wait" && reducedMotion) setState({ phase: "done", ms: 0 });
   else if (state.phase === "wait" && reducedMotion === false && nothingToDeal) setState({ phase: "show", ms: 0 });

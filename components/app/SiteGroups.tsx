@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { type GalleryItem } from "@/lib/useCatalog";
 import { groupItems } from "@/lib/groups";
 
@@ -39,13 +39,19 @@ export function SiteGroups({
 }) {
   const groups = useMemo(() => groupItems(items), [items]);
   const [open, setOpen] = useState<string | null>(null);
-  useEffect(() => {
-    const g = groups.find((g) => g.items.some((i) => i.id === openId));
-    if (g) setOpen(g.key);
-  }, [groups, openId]);
-  useEffect(() => {
-    if (active) setOpen(active);
-  }, [active]);
+  const [followed, setFollowed] = useState<{ groups: typeof groups; openId?: string; active: string | null } | null>(
+    null,
+  );
+  if (!followed || followed.groups !== groups || followed.openId !== openId || followed.active !== active) {
+    let next = open;
+    if (!followed || followed.groups !== groups || followed.openId !== openId) {
+      const holder = groups.find((g) => g.items.some((i) => i.id === openId));
+      if (holder) next = holder.key;
+    }
+    if ((!followed || followed.active !== active) && active) next = active;
+    setFollowed({ groups, openId, active });
+    if (next !== open) setOpen(next);
+  }
   const toggle = (k: string) => {
     const off = active === k;
     setOpen(off ? null : k);

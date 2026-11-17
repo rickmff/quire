@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { type LiveVariant } from "@/lib/catalog/schema";
 import { Tip } from "@/components/ui/tooltip";
@@ -34,7 +34,9 @@ export function VariantsMenu({
   const one = groups.length === 1;
   const changed = groups.some((g) => g.key in picked && picked[g.key] !== (g.value ?? ""));
   const events = useRef({ onOpenChange });
-  events.current = { onOpenChange };
+  useLayoutEffect(() => {
+    events.current = { onOpenChange };
+  });
   const mouse = useRef<{ x: number; y: number } | undefined>(undefined);
   const isOpen = menu.kind === "open";
   const open = (o: boolean) => {
@@ -52,14 +54,15 @@ export function VariantsMenu({
     events.current.onOpenChange?.(o, mouse.current);
   };
   const choose = (group: number | null) => setMenu((m) => (m.kind === "open" ? { ...m, group, grown: false } : m));
+  const close = useEffectEvent(() => open(false));
   useEffect(() => {
     if (!isOpen) return;
     const key = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       e.stopPropagation();
-      open(false);
+      close();
     };
-    const away = () => open(false);
+    const away = () => close();
     window.addEventListener("keydown", key, true);
     window.addEventListener("resize", away);
     document.addEventListener("scroll", away, true);
@@ -91,7 +94,7 @@ export function VariantsMenu({
         pick: () => choose(i),
       }));
   const labels = items.map((it) => it.label).join("\n");
-  const ring = useMemo(() => (isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null), [isOpen, labels]);
+  const ring = isOpen ? ringLayout(pillSizes(labels.split("\n"))) : null;
   const shown = menu.kind === "open" && menu.grown;
   let cx = 0,
     cy = 0;

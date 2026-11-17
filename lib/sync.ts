@@ -39,35 +39,37 @@ const isRecord = (v: unknown): v is Untrusted => typeof v === "object" && v !== 
 export function cleanLibrary(input: unknown): SyncedLibrary | null {
   if (!isRecord(input)) return null;
   const known = new Set(libraries.map((l) => l.id));
-  const items: CatalogComponent[] = (Array.isArray(input.items) ? input.items : []).slice(0, 5000).flatMap((entry: unknown) => {
-    const i: Untrusted = isRecord(entry) ? entry : {};
-    const id = s(i.id, 120);
-    const title = s(i.title, 160);
-    const docs = url(i.docs);
-    if (!id || !title || !docs) return [];
-    return [
-      {
-        id,
-        library: s(i.library, 80) ?? "mine",
-        name: s(i.name, 120) ?? id,
-        title,
-        description: s(i.description, 600),
-        category: s(i.category, 80),
-        type: s(i.type, 40) ?? "other",
-        triggers: arr(i.triggers, 4),
-        tech: arr(i.tech, 6),
-        dependencies: arr(i.dependencies, 30),
-        docs,
-        item: url(i.item),
-        install: s(i.install, 300),
-        repo: s(i.repo, 120),
-        files: arr(i.files, 10),
-        preview: url(i.preview),
-        note: s(i.note, 1000),
-        site: s(i.site, 80),
-      },
-    ];
-  });
+  const items: CatalogComponent[] = (Array.isArray(input.items) ? input.items : [])
+    .slice(0, 5000)
+    .flatMap((entry: unknown) => {
+      const i: Untrusted = isRecord(entry) ? entry : {};
+      const id = s(i.id, 120);
+      const title = s(i.title, 160);
+      const docs = url(i.docs);
+      if (!id || !title || !docs) return [];
+      return [
+        {
+          id,
+          library: s(i.library, 80) ?? "mine",
+          name: s(i.name, 120) ?? id,
+          title,
+          description: s(i.description, 600),
+          category: s(i.category, 80),
+          type: s(i.type, 40) ?? "other",
+          triggers: arr(i.triggers, 4),
+          tech: arr(i.tech, 6),
+          dependencies: arr(i.dependencies, 30),
+          docs,
+          item: url(i.item),
+          install: s(i.install, 300),
+          repo: s(i.repo, 120),
+          files: arr(i.files, 10),
+          preview: url(i.preview),
+          note: s(i.note, 1000),
+          site: s(i.site, 80),
+        },
+      ];
+    });
   return {
     version: 1,
     mode: input.mode === "scratch" ? "scratch" : "curated",

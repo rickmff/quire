@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { type LiveDemo as Live } from "@/lib/catalog/schema";
 import { type GalleryItem } from "@/lib/useCatalog";
 import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
-import { useDark, useReducedMotion, watchOnScreen } from "@/components/gallery/hooks";
+import { watchOnScreen } from "@/components/gallery/hooks";
+import { useDark, useReducedMotion } from "@/lib/media";
 import { variantQuery } from "@/components/gallery/variants";
 import type { Picked } from "@/components/gallery/types";
 
@@ -152,8 +153,8 @@ function LiveFrame({
   const [scale, setScale] = useState(0);
   const [ready, setReady] = useState(false);
   const [x, y, w] = frame;
-  const events = useRef({ onEscape, onReady });
-  events.current = { onEscape, onReady };
+  const announceReady = useEffectEvent(() => onReady?.());
+  const announceEscape = useEffectEvent(() => onEscape?.());
 
   useLayoutEffect(() => {
     const el = box.current;
@@ -169,9 +170,9 @@ function LiveFrame({
         return;
       if (e.data.event === "ready") {
         setReady(true);
-        events.current.onReady?.();
+        announceReady();
       }
-      if (e.data.event === "escape") events.current.onEscape?.();
+      if (e.data.event === "escape") announceEscape();
     };
     window.addEventListener("message", on);
     return () => window.removeEventListener("message", on);

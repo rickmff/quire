@@ -41,7 +41,11 @@ export function Detail({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
-  useEffect(() => setSrc({ state: "idle" }), [item.id]);
+  const [sourceFor, setSourceFor] = useState(item.id);
+  if (sourceFor !== item.id) {
+    setSourceFor(item.id);
+    setSrc({ state: "idle" });
+  }
 
   const loadSource = async () => {
     setSrc({ state: "loading" });

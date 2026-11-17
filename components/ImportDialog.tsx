@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { ImportItem, ImportResult } from "@/app/api/import/route";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
+import type { ImportItem, ImportResult } from "@/lib/importTypes";
 import { normalizeUrl } from "@/lib/store";
 import { OTHER, TYPES, typeById } from "@/lib/types";
 
@@ -12,6 +12,30 @@ const SOURCE: Record<ImportResult["source"], string> = {
   links: "page links",
   sitemap: "sitemap",
 };
+
+type ImportStatus =
+  | { kind: "empty" }
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "found"; result: ImportResult };
+
+const NOT_A_LINK = "Not a link";
+
+async function readSite(url: string): Promise<ImportResult | string> {
+  try {
+    const res = await fetch(`/api/import?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error ?? "Could not read that site");
+    return data as ImportResult;
+  } catch (e) {
+    return e instanceof Error ? e.message : "Could not read that site";
+  }
+}
+
+function startingStatus(initialUrl: string): ImportStatus {
+  if (!initialUrl) return { kind: "empty" };
+  return normalizeUrl(initialUrl) ? { kind: "loading" } : { kind: "error", message: NOT_A_LINK };
+}
 
 export default function ImportDialog({
   initialUrl,
@@ -25,35 +49,34 @@ export default function ImportDialog({
   onImport: (choice: ImportChoice) => void;
 }) {
   const [url, setUrl] = useState(initialUrl);
-  const [status, setStatus] = useState<
-    | { kind: "empty" }
-    | { kind: "loading" }
-    | { kind: "error"; message: string }
-    | { kind: "found"; result: ImportResult }
-  >({ kind: "empty" });
+  const [status, setStatus] = useState<ImportStatus>(() => startingStatus(initialUrl));
   const result = status.kind === "found" ? status.result : null;
   const [items, setItems] = useState<(ImportItem & { on: boolean })[]>([]);
   const [toCollection, setToCollection] = useState(true);
 
-  const find = async (raw: string) => {
-    const u = normalizeUrl(raw);
-    if (!u) return setStatus({ kind: "error", message: "Not a link" });
-    setStatus({ kind: "loading" });
-    try {
-      const res = await fetch(`/api/import?url=${encodeURIComponent(u)}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Could not read that site");
-      const r = data as ImportResult;
-      setItems(r.items.map((i) => ({ ...i, on: !savedUrls.has(i.url) })));
-      setStatus({ kind: "found", result: r });
-    } catch (e) {
-      setStatus({ kind: "error", message: e instanceof Error ? e.message : "Could not read that site" });
-    }
+  const show = (found: ImportResult | string) => {
+    if (typeof found === "string") return setStatus({ kind: "error", message: found });
+    setItems(found.items.map((i) => ({ ...i, on: !savedUrls.has(i.url) })));
+    setStatus({ kind: "found", result: found });
   };
 
+  const find = (raw: string) => {
+    const u = normalizeUrl(raw);
+    if (!u) return setStatus({ kind: "error", message: NOT_A_LINK });
+    setStatus({ kind: "loading" });
+    readSite(u).then(show);
+  };
+
+  const lookUpInitial = useEffectEvent(() => {
+    const u = initialUrl && normalizeUrl(initialUrl);
+    if (u) readSite(u).then(show);
+  });
+  const closeOnEscape = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key === "Escape") onClose();
+  });
   useEffect(() => {
-    if (initialUrl) find(initialUrl);
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    lookUpInitial();
+    const onKey = (e: KeyboardEvent) => closeOnEscape(e);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);

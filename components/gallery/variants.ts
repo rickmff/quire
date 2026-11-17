@@ -8,8 +8,7 @@ export function variantQuery(groups: LiveVariant[] | undefined, picked: Picked =
     if (!(g.key in picked)) continue;
     if (g.key === "v") {
       if (picked.v) q.set("v", String(picked.v));
-    }
-    else props[g.key] = picked[g.key];
+    } else props[g.key] = picked[g.key];
   }
   if (Object.keys(props).length) q.set("p", JSON.stringify(props));
   const s = q.toString();

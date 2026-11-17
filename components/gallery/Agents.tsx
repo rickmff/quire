@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SITE_URL } from "@/lib/seo";
+import { useClientValue } from "@/lib/useClientValue";
 
 export function Agents({
   syncKey,
@@ -17,8 +18,7 @@ export function Agents({
   onSyncNow: () => void;
   copy: (text: string, msg: string) => void;
 }) {
-  const [origin, setOrigin] = useState("https://quire.fyi");
-  useEffect(() => setOrigin(window.location.origin), []);
+  const origin = useClientValue(() => window.location.origin, SITE_URL);
   const url = `${origin}/api/mcp${syncKey ? `?key=${syncKey}` : ""}`;
   const rows = [
     { name: "Claude Code", text: `claude mcp add --transport http quire "${url}"` },

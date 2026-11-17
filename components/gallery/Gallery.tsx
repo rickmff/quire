@@ -45,6 +45,11 @@ export function Gallery({
 }) {
   const [trigger, setTrigger] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
+  const [pagedFor, setPagedFor] = useState({ items, trigger });
+  if (pagedFor.items !== items || pagedFor.trigger !== trigger) {
+    setPagedFor({ items, trigger });
+    setShown(PAGE);
+  }
   const more = useRef<HTMLDivElement>(null);
 
   const libName = useMemo(() => new Map(libraries.map((l) => [l.id, l.name])), [libraries]);
@@ -63,16 +68,14 @@ export function Gallery({
 
   const root = useRef<HTMLElement>(null);
   const before = useRef<Map<string, DOMRect> | null>(null);
-  const star =
-    onStar &&
-    ((i: GalleryItem) => {
-      const m = new Map<string, DOMRect>();
-      root.current
-        ?.querySelectorAll<HTMLElement>("[data-card]")
-        .forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
-      before.current = m;
-      onStar(i);
-    });
+  const starWithMotion = (i: GalleryItem) => {
+    const m = new Map<string, DOMRect>();
+    root.current
+      ?.querySelectorAll<HTMLElement>("[data-card]")
+      .forEach((el) => m.set(el.dataset.card!, el.getBoundingClientRect()));
+    before.current = m;
+    onStar?.(i);
+  };
   useLayoutEffect(() => {
     const prev = before.current;
     before.current = null;
@@ -110,9 +113,8 @@ export function Gallery({
     if (!intro || dealtRef.current || !root.current?.querySelector("[data-card]")) return;
     dealtRef.current = true;
     onDeal?.(deal(root.current));
-  }, [intro, items, sections]);
+  }, [intro, items, sections, onDeal]);
 
-  useEffect(() => setShown(PAGE), [items, trigger]);
   useEffect(() => {
     const el = more.current;
     if (!el) return;
@@ -175,7 +177,7 @@ export function Gallery({
                       item={i}
                       site={nameOf(i)}
                       onOpen={() => onOpen(i)}
-                      onStar={star && (() => star(i))}
+                      onStar={onStar ? () => starWithMotion(i) : undefined}
                       tools={tools?.(i)}
                       onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))}
                     />
@@ -195,7 +197,7 @@ export function Gallery({
               item={i}
               site={nameOf(i)}
               onOpen={() => onOpen(i)}
-              onStar={star && (() => star(i))}
+              onStar={onStar ? () => starWithMotion(i) : undefined}
               tools={tools?.(i)}
               onAgent={onAgent && (() => onAgent(agentText(i, nameOf(i))))}
             />
@@ -224,18 +226,19 @@ function ComponentCard({
   const starred = Boolean(item.saved);
   const [pop, setPop] = useState(false);
   const live = useCardLive(Boolean(item.live));
+  const { attach, ready, hold } = live;
   const [picked, setPicked] = useState<Picked>({});
   return (
     <article data-card={item.id} className="group pop">
-      <div ref={live.ref} className="relative">
+      <div ref={attach} className="relative">
         <div className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-hover ring-1 ring-line ring-inset">
           <Preview item={item} site={site} />
           {live.on && item.live && (
-            <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={live.ready} />
+            <LiveDemo live={item.live} title={item.title} card picked={picked} onReady={ready} />
           )}
         </div>
         {item.live?.variants && (
-          <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} onOpenChange={live.hold} />
+          <VariantsMenu groups={item.live.variants} picked={picked} onPick={setPicked} onOpenChange={hold} />
         )}
         <OpenDetails onClick={onOpen} />
         {onStar && (

@@ -53,6 +53,10 @@ export function CommandMenu({
     setOpen(false);
     fn();
   };
+  const pickBackup = () => {
+    setOpen(false);
+    fileRef.current?.click();
+  };
 
   return (
     <>
@@ -164,7 +168,7 @@ export function CommandMenu({
             <Command.Item onSelect={run(() => download(lib))} className={itemCls}>
               Export backup (JSON)
             </Command.Item>
-            <Command.Item onSelect={run(() => fileRef.current?.click())} className={itemCls}>
+            <Command.Item onSelect={pickBackup} className={itemCls}>
               Import backup
             </Command.Item>
           </Command.Group>

@@ -210,7 +210,11 @@ async function callTool(name: string, args: ToolArgs, ctx: Ctx) {
 type RpcParams = { name?: string; arguments?: ToolArgs; protocolVersion?: string };
 type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: RpcParams };
 
-export async function handleRpc(msg: Rpc, ctx: Ctx) {
+const isRpc = (m: unknown): m is Rpc => typeof m === "object" && m !== null && typeof (m as Rpc).method === "string";
+
+export async function handleRpc(message: unknown, ctx: Ctx) {
+  if (!isRpc(message)) return { jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid Request" } };
+  const msg = message;
   const reply = (result: unknown) => ({ jsonrpc: "2.0", id: msg.id ?? null, result });
   const fail = (code: number, message: string) => ({ jsonrpc: "2.0", id: msg.id ?? null, error: { code, message } });
   switch (msg.method) {
@@ -245,6 +249,6 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
     case "prompts/list":
       return reply({ prompts: [] });
   }
-  if (msg.method?.startsWith("notifications/")) return null;
+  if (msg.method.startsWith("notifications/")) return null;
   return fail(-32601, `Method not found: ${msg.method}`);
 }

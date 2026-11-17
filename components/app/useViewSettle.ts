@@ -1,6 +1,7 @@
 "use client";
 
 import { type RefObject, useLayoutEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/media";
 import type { View } from "@/lib/view";
 
 const SETTLING = "h1, section > button[data-chrome], [data-grid] > *";
@@ -14,7 +15,7 @@ export function useViewSettle(main: RefObject<HTMLElement | null>, view: View, e
     if (shownView.current === view) return;
     shownView.current = view;
     const root = main.current;
-    if (!root || !enabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!root || !enabled || prefersReducedMotion()) return;
     const vh = window.innerHeight;
     const inView = [...root.querySelectorAll<HTMLElement>(SETTLING)].filter((el) => {
       const r = el.getBoundingClientRect();

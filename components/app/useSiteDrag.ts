@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 type SiteDrag = { key: string; from: number; to: number; dy: number; heights: number[]; settling?: boolean };
 export function shiftFor(d: SiteDrag, i: number) {
@@ -13,7 +13,9 @@ export function useSiteDrag(keys: string[], onReorder: (keys: string[]) => void)
   const swallow = useRef(false);
   const busy = useRef(false);
   const latest = useRef({ keys, onReorder });
-  latest.current = { keys, onReorder };
+  useLayoutEffect(() => {
+    latest.current = { keys, onReorder };
+  });
 
   const blockRef = (key: string) => (el: HTMLDivElement | null) => {
     if (el) blocks.current.set(key, el);

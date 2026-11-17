@@ -4,6 +4,7 @@ import { useCallback, useEffect, useEffectEvent, useRef, useSyncExternalStore } 
 import type { CatalogComponent, SyncedLibrary } from "@/lib/catalog/schema";
 import { techFrom, triggersFor } from "@/lib/motion";
 import { classify, typeById } from "@/lib/types";
+import { useClientValue } from "@/lib/useClientValue";
 
 export type Bookmark = {
   id: string;
@@ -86,8 +87,6 @@ function subscribeLibrary(onChange: () => void) {
   };
 }
 
-const subscribeNothing = () => () => {};
-
 export function updateLibrary(fn: (l: Library) => Library) {
   const prev = librarySnapshot();
   const next = fn(prev);
@@ -120,11 +119,7 @@ export function normalizeUrl(input: string): string | null {
 
 export function useLibrary() {
   const lib = useSyncExternalStore(subscribeLibrary, librarySnapshot, serverLibrary);
-  const ready = useSyncExternalStore(
-    subscribeNothing,
-    () => true,
-    () => false,
-  );
+  const ready = useClientValue(() => true, false);
   const update = useCallback((fn: (l: Library) => Library) => updateLibrary(fn), []);
 
   const push = useEffectEvent(() => {
