@@ -1,30 +1,25 @@
-# Working on Quire
+# Quire
 
-## No code comments
+- Do not write code comments. `npm run check:comments` fails on them in CI. What the code cannot say goes in
+  `docs/architecture.md`.
+- Before you finish, run `npm run check` and `npm run build`.
 
-Do not write comments in code. This covers `//` and `/* */` in TypeScript, JavaScript and CSS, JSX comments,
-JSDoc, comments inside GLSL strings, `#` in shell, Python, YAML and Dockerfiles, and `<!-- -->` in HTML.
-`npm run check:comments` fails on any of them, and CI runs it.
+## Where things live
 
-Make the code say it instead: a precise name, a named constant, a type, a small function. When something
-cannot be said in code, such as why a choice was made, a value that must match another file, a state diagram,
-or how to run a script, write it in `docs/architecture.md` or in the README of the folder.
-
-Comments that tools read are allowed, and the check lets them through: `@ts-expect-error`, `@ts-ignore`,
-`@ts-nocheck`, `/// <reference>`, lint and formatter directives, `@jsx` pragmas, bundler hints such as
-`/*#__PURE__*/`, `webpackChunkName` and `@vite-ignore`, licence headers (`/*!`, `@license`, `@preserve`,
-`SPDX-License-Identifier`, `Copyright`), and the shebang line of a script. Use them only when the tool needs them.
-
-Do not edit generated or vendored files: `public/stage/` and `public/previews/` (built
-by the stage) and lockfiles. The check skips them.
-
-## Checks before you finish
-
-```bash
-npm run check:comments
-npx tsc --noEmit
-npm run build
-```
+| Path | What it holds |
+| --- | --- |
+| `app/` | Next.js routes. `app/page.tsx` is the landing, `app/app/layout.tsx` mounts the gallery once for every `/app/...` view, `app/add/` is the extension's save page, `app/api/*` are the server routes (catalog, MCP, sync, import, meta, source, capture). |
+| `components/App.tsx` | The gallery's composition root: it wires the hooks below to the parts below and holds only UI state (dialog, palette, search bar). |
+| `components/app/` | The gallery shell: `Sidebar`, `TopBar`, `CommandMenu`, `CollectionView`, `Toast`, dialogs, and the hooks `useViewRoute`, `useGalleryData` (what each view shows), `useLibraryActions` (every change to the library), `useShortcuts`, `useGridKeys`, `useToast`. |
+| `components/gallery/` | The component grid and its card, previews and live frames, the hover live demo (`useCardLive`), the variants ring, the detail drawer, the Sites and Agents pages. |
+| `components/` (top level) | The landing: the WebGL hero (`Quire3D`, `quire3d/shader.ts`), `FocusReveal`, `StartLink`, wordmark and social links. `components/ui/` holds the shadcn-based primitives. |
+| `lib/` | Logic with no markup. Browser state: `store.ts` (the library in localStorage), `useCatalog.ts`, `useIntro.ts`, `media.ts`. Shared rules: `view.ts` (views and their URLs), `groups.ts`, `types.ts` and `motion.ts` (taxonomy), `libraries.ts`. Server only: `net.ts`, `kv.ts`, `sync.ts`, `mcp.ts`, `source.ts`, `capture.ts`, `rateLimit.ts`. |
+| `lib/catalog/` | The curated catalog: `data.json` (generated), its schema, search and facets. |
+| `scripts/` | The catalog build (`build-catalog.ts`, `catalog/sources.ts`) and the comment check. |
+| `stage/` | The preview stage that builds live demos into `public/stage/` and records previews into `public/previews/`. |
+| `capture/`, `extension/` | The optional capture service and the Chrome extension. |
+| `e2e/` | Playwright end-to-end tests. Unit tests sit next to the code they test, as `*.test.ts`. |
+| `docs/architecture.md` | Why things are the way they are: state diagrams, values kept in step, config reasons. |
 
 <!-- BEGIN:nextjs-agent-rules -->
 
