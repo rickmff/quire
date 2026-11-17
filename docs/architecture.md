@@ -12,7 +12,7 @@ view shares the same title, description and canonical, because they are views of
 
 The address is the source of truth. Picking a view pushes its path; back, forward or a link moves the view.
 
-| Path | View | `view` value in `components/App.tsx` |
+| Path | View | `view` value (`lib/view.ts`) |
 | --- | --- | --- |
 | `/app` | Starred | `"starred"` |
 | `/app/all-libraries` | All libraries, category by category | `"libraries"` |
@@ -35,7 +35,7 @@ extension's save page and is kept out of search, as is `/api`.
 ```
 wait ──dealt(ms)──▶ deal ──ms──▶ show ──900ms──▶ done
   │                                ▲
-  ├──skip() or 1600ms──────────────┘   nothing to deal, or the catalog is slow
+  ├──nothingToDeal or 1600ms───────┘   nothing to deal, or the catalog is slow
   └──reduced motion──▶ done
 ```
 
@@ -47,6 +47,9 @@ wait ──dealt(ms)──▶ deal ──ms──▶ show ──900ms──▶ d
 The phase is also the page's `data-intro` attribute (absent when done), which `app/globals.css` uses to hide
 and raise the chrome. A phase moves only from the phase it expects, so a late timer or a second call does
 nothing. Starred cards exist before the catalog arrives, so the deal waits until every card of the view is in.
+`nothingToDeal` (a page that is not a gallery, or an empty one) and reduced motion are inputs read during
+render, so the phase moves before the first paint instead of one frame later. Reduced motion is read with
+`useSyncExternalStore` and is unknown (`null`) on the server, so the server always renders `wait`.
 
 `lib/deal.ts` deals the visible cards out of one pile, using transforms and opacity only, so the grid keeps its
 final layout. The first frame of a new page is long (layout, images), so the pile is shown standing still
@@ -87,7 +90,7 @@ slant.
 ## Gallery cards
 
 A card runs its component live, in an iframe from the stage build, as soon as the mouse means it. Only one card
-runs live at a time. `useCardLive` in `components/Gallery.tsx`:
+runs live at a time. `useCardLive` in `components/gallery/useCardLive.ts`, one controller object per card:
 
 ```
 off ──start──▶ loading ──ready──▶ shown
@@ -116,6 +119,29 @@ each.
 Starring a card moves it to the top with a FLIP animation. Card clips play only while on screen (one shared
 `IntersectionObserver`); with reduced motion, only while the mouse is over them. See
 [stage/README.md](../stage/README.md#live-demos) for the timing numbers.
+
+## The gallery's state
+
+```
+localStorage "quire:v1" ◀──▶ lib/store.ts (external store) ──useLibrary──▶ App
+                                                                 │
+             useViewRoute (address ⇄ view)  useGalleryData (what each view shows)
+                                                                 │
+             useLibraryActions (star, add, import, collections, copy, sync) ──update──▶ store
+```
+
+- The library is an external store read with `useSyncExternalStore`: the server and the hydration pass see an
+  empty library and `ready` false, then the browser's copy. `update` applies the change, writes localStorage and
+  notifies; a `storage` event from another tab reloads it. `writeLibrary` from the save page and the sync's
+  `syncedAt` stamp go through the same store.
+- With a sync key, changes to bookmarks, sources or mode are pushed 1.2 s after the last one; the push reads
+  the latest library through `useEffectEvent`.
+- The address is the source of truth for the view (see Routes); `useViewRoute` follows it during render.
+- `components/App.tsx` reads `?import=` once the catalog has loaded, in an effect, because following a curated
+  site or opening the dialog needs the catalog. It is the one place that sets state from an effect, and the
+  ESLint rule is turned off on that line only.
+- ESLint allows plain `<img>`: previews and favicons are files Quire serves itself or third-party images it does
+  not resize, and the worker has no image optimizer.
 
 ## Taxonomy
 
@@ -175,7 +201,7 @@ and Headless UI).
   empty `previews` block, which `wrangler preview` needs for branch builds and which keeps every top-level
   setting.
 - CI uses Node 24 to match Cloudflare Workers Builds.
-- `app/layout.tsx` and `components/App.tsx` remove any service worker on the origin and reload once. Quire
+- `app/layout.tsx` and `components/app/useDropServiceWorkers.ts` remove any service worker on the origin and reload once. Quire
   registers none, but `localhost:3000` is shared by many projects and a stale worker breaks hydration.
 - On quire.fyi, Cloudflare adds its managed content-signal block above `app/robots.ts`'s rules.
 - `stage/setup.sh` pins `lucide-react@0.577.0` for Animate UI, because lucide-react 1.x dropped the brand
