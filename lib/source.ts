@@ -1,3 +1,4 @@
+import "server-only";
 import { fetchText } from "./net";
 import type { CatalogComponent } from "./catalog/schema";
 import type { RegistryItem } from "./catalog/registry";

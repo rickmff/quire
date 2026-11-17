@@ -1,3 +1,4 @@
+import "server-only";
 import { kv } from "./kv";
 import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { libraries } from "./catalog";

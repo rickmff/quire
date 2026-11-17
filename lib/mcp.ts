@@ -1,3 +1,4 @@
+import "server-only";
 import { catalog, facets, libraries, libraryName, readBrief, scope, search, typeById } from "./catalog";
 import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { triggerById } from "./motion";
