@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   check:
-    name: Type check and build
+    name: Checks, tests and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -31,8 +31,17 @@ jobs:
       - name: No code comments
         run: npm run check:comments
 
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
       - name: Type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
 
       - name: Build (OpenNext for Cloudflare)
         run: npm run build
