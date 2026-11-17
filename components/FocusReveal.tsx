@@ -1,39 +1,39 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { REDUCED_MOTION, useMedia } from "@/lib/media";
 import s from "./Landing.module.css";
 
 type Part = { text: string; muted?: boolean };
 type Box = { x: number; y: number; w: number; h: number };
 
 const STEP = 230;
+const FIRST_STEP = 650;
 const PAD_X = 6,
   PAD_Y = 3;
 
 export default function FocusReveal({ parts, className }: { parts: Part[]; className?: string }) {
   const words = parts.flatMap((p) => p.text.split(" ").map((w) => ({ w, muted: !!p.muted })));
   const root = useRef<HTMLHeadingElement>(null);
-  const [at, setAt] = useState(-1);
+  const [revealed, setRevealed] = useState(-1);
   const [hover, setHover] = useState(-1);
   const [box, setBox] = useState<Box | null>(null);
-  const [still, setStill] = useState(false);
+  const reducedMotion = useMedia(REDUCED_MOTION, null);
+  const still = reducedMotion === true;
+  const at = still ? words.length : revealed;
 
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStill(true);
-      setAt(words.length);
-      return;
-    }
+    if (reducedMotion !== false) return;
     let i = -1,
       timer = 0;
     const tick = () => {
       i++;
-      setAt(i);
+      setRevealed(i);
       if (i < words.length) timer = window.setTimeout(tick, STEP);
     };
-    timer = window.setTimeout(tick, 650);
+    timer = window.setTimeout(tick, FIRST_STEP);
     return () => clearTimeout(timer);
-  }, [words.length]);
+  }, [reducedMotion, words.length]);
 
   const done = at >= words.length;
   const focus = done ? hover : at;

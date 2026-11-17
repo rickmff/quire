@@ -1,3 +1,4 @@
+import "server-only";
 import { catalog, facets, libraries, libraryName, readBrief, scope, search, typeById } from "./catalog";
 import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { triggerById } from "./motion";
@@ -114,7 +115,11 @@ const text = (value: unknown, isError = false) => ({
   ...(isError ? { isError: true } : {}),
 });
 
-async function callTool(name: string, args: any, ctx: Ctx) {
+type ToolArgs = Record<string, unknown>;
+
+const optionalText = (v: unknown) => (typeof v === "string" ? v : undefined);
+
+async function callTool(name: string, args: ToolArgs, ctx: Ctx) {
   const items = scope(ctx.user);
   const find = (id: string) => items.find((c) => c.id === id) ?? catalog.components.find((c) => c.id === id);
 
@@ -149,7 +154,14 @@ async function callTool(name: string, args: any, ctx: Ctx) {
       });
     }
     case "search_components": {
-      const r = search(items, { ...args, limit: Number(args?.limit) || 12 });
+      const r = search(items, {
+        query: optionalText(args.query),
+        type: optionalText(args.type),
+        trigger: optionalText(args.trigger),
+        tech: optionalText(args.tech),
+        library: optionalText(args.library),
+        limit: Number(args.limit) || 12,
+      });
       return text({ total: r.total, items: r.items.map(card) });
     }
     case "get_component": {
@@ -196,16 +208,21 @@ async function callTool(name: string, args: any, ctx: Ctx) {
   return null;
 }
 
-type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: any };
+type RpcParams = { name?: string; arguments?: ToolArgs; protocolVersion?: string };
+type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params?: RpcParams };
 
-export async function handleRpc(msg: Rpc, ctx: Ctx) {
+const isRpc = (m: unknown): m is Rpc => typeof m === "object" && m !== null && typeof (m as Rpc).method === "string";
+
+export async function handleRpc(message: unknown, ctx: Ctx) {
+  if (!isRpc(message)) return { jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid Request" } };
+  const msg = message;
   const reply = (result: unknown) => ({ jsonrpc: "2.0", id: msg.id ?? null, result });
   const fail = (code: number, message: string) => ({ jsonrpc: "2.0", id: msg.id ?? null, error: { code, message } });
   switch (msg.method) {
     case "initialize": {
       const asked = msg.params?.protocolVersion;
       return reply({
-        protocolVersion: VERSIONS.includes(asked) ? asked : VERSIONS[0],
+        protocolVersion: asked && VERSIONS.includes(asked) ? asked : VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "quire", title: "Quire", version: "0.2.0" },
         instructions:
@@ -225,7 +242,7 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
         })),
       });
     case "tools/call": {
-      const out = await callTool(msg.params?.name, msg.params?.arguments ?? {}, ctx);
+      const out = await callTool(String(msg.params?.name ?? ""), msg.params?.arguments ?? {}, ctx);
       return out ? reply(out) : fail(-32602, `Unknown tool ${msg.params?.name}`);
     }
     case "resources/list":
@@ -233,6 +250,6 @@ export async function handleRpc(msg: Rpc, ctx: Ctx) {
     case "prompts/list":
       return reply({ prompts: [] });
   }
-  if (msg.method?.startsWith("notifications/")) return null;
+  if (msg.method.startsWith("notifications/")) return null;
   return fail(-32601, `Method not found: ${msg.method}`);
 }

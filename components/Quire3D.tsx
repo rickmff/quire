@@ -491,8 +491,8 @@ export default function Quire3D() {
         SHOW.tilt - py * 4 * DEG - hov.z * hov.y * 7 * DEG + (reduce ? 0 : Math.sin(t * 0.8 + 1) * 1.1 * DEG);
       const stackYaw = (slot: number) => yaw0 + (slot - (N - 2) / 2) * fan;
 
-      let best = 0.2,
-        was = top;
+      let best = 0.2;
+      const was = top;
       top = -1;
       for (let i = 0; i < N; i++) {
         const q = (((i + turn.x) % N) + N) % N;

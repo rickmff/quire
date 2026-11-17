@@ -2,38 +2,13 @@ import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 import { fetchJSON, fetchText, safeUrl } from "@/lib/net";
 import { rateLimited } from "@/lib/rateLimit";
 import { classify } from "@/lib/types";
+import type { ImportItem, ImportResult } from "@/lib/importTypes";
+import type { Registry } from "@/lib/catalog/registry";
 
 export const runtime = "nodejs";
 
-export type ImportItem = {
-  url: string;
-  title: string;
-  description?: string;
-  category?: string;
-  install?: string;
-  registry?: string;
-  dependencies?: string[];
-  type: string;
-};
-
-export type ImportResult = {
-  site: string;
-  library: string;
-  source: "registry" | "links" | "sitemap";
-  items: ImportItem[];
-};
-
 const MAX_ITEMS = 300;
 
-type RegistryItem = {
-  name: string;
-  type?: string;
-  title?: string;
-  description?: string;
-  dependencies?: string[];
-  categories?: string[];
-};
-type Registry = { name?: string; homepage?: string; items?: RegistryItem[] };
 type RegistryIndexEntry = { name: string; homepage?: string; url?: string };
 
 const COMPONENT_TYPES = new Set(["registry:ui", "registry:component", "registry:block", undefined]);

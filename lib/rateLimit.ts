@@ -1,3 +1,4 @@
+import "server-only";
 export type Window = { max: number; windowMs: number };
 
 type Bucket = { count: number; resetAt: number };
