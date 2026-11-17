@@ -13,3 +13,7 @@ capture/node_modules/
 # OpenNext / Wrangler
 .open-next
 .wrangler
+
+# Playwright
+test-results/
+playwright-report/
