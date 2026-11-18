@@ -8,6 +8,7 @@ export type CatalogComponent = {
   type: string;
   triggers: string[];
   tech: string[];
+  engine?: string;
   dependencies?: string[];
   docs: string;
   item?: string;
