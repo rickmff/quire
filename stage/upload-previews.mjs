@@ -27,14 +27,18 @@ const files = walk(DIR).map((path) => ({ path, name: `previews/${relative(DIR, p
 const changed = files.filter((f) => remote.get(f.name) !== statSync(f.path).size);
 
 let done = 0;
-for (const f of changed) {
-  await put(f.name, readFileSync(f.path), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    cacheControlMaxAge: 86_400,
-  });
-  done++;
-  if (done % 50 === 0) console.log(`${done}/${changed.length}`);
-}
+const queue = [...changed];
+const worker = async () => {
+  for (let f = queue.shift(); f; f = queue.shift()) {
+    await put(f.name, readFileSync(f.path), {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      cacheControlMaxAge: 86_400,
+    });
+    done++;
+    if (done % 50 === 0) console.log(`${done}/${changed.length}`);
+  }
+};
+await Promise.all(Array.from({ length: 8 }, worker));
 console.log(`uploaded ${changed.length} of ${files.length} previews, ${files.length - changed.length} unchanged`);
