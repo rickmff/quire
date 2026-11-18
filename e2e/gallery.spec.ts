@@ -143,3 +143,48 @@ test("the MCP endpoint lists its tools", async ({ request }) => {
   const body = await res.json();
   expect(body.result.tools.map((t: { name: string }) => t.name)).toContain("search_components");
 });
+
+test("a browser agent runs commands through WebMCP and cannot replace the library", async ({ page }) => {
+  await page.addInitScript(() => {
+    const tools: Record<string, (input: unknown) => Promise<unknown>> = {};
+    Object.assign(window, { webmcp: tools });
+    Object.defineProperty(document, "modelContext", {
+      value: {
+        registerTool: async (tool: { name: string; execute: (input: unknown) => Promise<unknown> }) => {
+          tools[tool.name] = tool.execute;
+        },
+      },
+    });
+  });
+  const call = (name: string, input: unknown) =>
+    page.evaluate(
+      ([n, i]) => (window as unknown as { webmcp: Record<string, (x: unknown) => Promise<unknown>> }).webmcp[n](i),
+      [name, input] as const,
+    ) as Promise<{ ok: boolean; error?: { message: string } }>;
+
+  await page.goto("/app");
+  await expect
+    .poll(() => page.evaluate(() => Object.keys((window as unknown as { webmcp: object }).webmcp)))
+    .toEqual(["snapshot", "act", "query"]);
+  await expect.poll(async () => JSON.stringify(await call("snapshot", {}))).toContain("Open command menu");
+
+  const go = await call("act", {
+    steps: [
+      { ref: "Open command menu", action: "setOpen", args: [true] },
+      { ref: "Search or run a command", action: "run", args: ["new-collection"] },
+    ],
+  });
+  expect(go.error).toBeUndefined();
+  await expect(page.getByPlaceholder("Name")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect.poll(async () => JSON.stringify(await call("snapshot", {}))).toContain('"label":"Open command menu"');
+
+  const restore = await call("act", {
+    steps: [
+      { ref: "Open command menu", action: "setOpen", args: [true] },
+      { ref: "Search or run a command", action: "run", args: ["import-backup"] },
+    ],
+  });
+  expect(restore.ok).toBe(false);
+  expect(restore.error?.message).toContain("Replaces the library");
+});

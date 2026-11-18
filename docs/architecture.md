@@ -234,6 +234,11 @@ and Headless UI).
   icons (Github, Facebook) its demos use.
 - The command menu is built on [UI SDK](https://ui-sdk.dev) (`@ui-sdk/react`, Apache-2.0). UI SDK is in beta, so
   `@ui-sdk/core` and `@ui-sdk/react` are pinned to one exact version and move together.
+- `components/app/agent.ts` creates the UI SDK agent when the module loads, before the gallery renders, because the
+  agent only hears components made after it. `App` registers its tools with the browser through WebMCP
+  (`document.modelContext`) and does nothing where the browser has none. The command menu's dialog shares one
+  controller with the ⌘K button, so an agent sees the closed menu as a component it can open. Commands marked
+  `data-agent-confirm` (Delete collection, Import backup) are refused for agents: a person runs them.
 - `CommandMenu` closes the dialog inside `flushSync` before it runs a command. While the dialog is open the rest of
   the page is inert, so a command that focuses something outside it, such as the New collection name field, must
   run after the close is committed. It runs in the same task, so keys typed right after Enter reach that field.
