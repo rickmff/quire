@@ -157,9 +157,11 @@ description.
 
 - The library key is a random secret held by the browser. Whoever has it can read and replace that library.
   The server accepts only the known fields, with size caps (`lib/sync.ts`).
-- `lib/kv.ts` uses the first backend configured: Cloudflare KV over its REST API, Upstash Redis REST (Vercel
-  KV's `KV_REST_API_URL` and `KV_REST_API_TOKEN` work too), or local files in `.data/` for development. The
-  REST APIs work from any host, so no platform binding is needed.
+- `lib/kv.ts` uses Upstash Redis over REST (`lib/redis.ts`; the Vercel Marketplace names `KV_REST_API_URL` and
+  `KV_REST_API_TOKEN` work too), Cloudflare KV over its REST API, or local files in `.data/` for development.
+  When both Redis and Cloudflare KV are configured, a read that misses in Redis falls back to Cloudflare KV and
+  copies the value into Redis. Libraries saved before the move to Vercel move over the first time they are
+  read, so the Cloudflare variables can be removed once no old key is expected.
 - `/api/mcp` is a Model Context Protocol server over Streamable HTTP, written without an SDK. It answers
   JSON-RPC with plain JSON responses (no SSE stream), which the spec allows. `GET` returns 405 so clients use
   POST only. Every tool is read-only. The key comes from `?key=`, the `x-quire-key` header or a bearer token.
@@ -178,20 +180,22 @@ description.
   `Origin` from another host). `PUT /api/library/:key` and `POST /api/capture` use it. Clients that send neither
   header, such as scripts holding the key, still work. `/api/mcp` stays open to every origin (`*`) because MCP
   clients call it from anywhere; it is read-only and uses no cookies.
-- `lib/rateLimit.ts` counts per isolate, in memory. On Cloudflare each isolate counts on its own, so it is a
-  first line only. A Cloudflare WAF rate limiting rule on `/api/*` gives a global limit.
-- Refused requests (rate limit, cross-site) are logged as one JSON line with `kind: "security"`. Cloudflare
-  Workers observability (`wrangler.jsonc`) keeps them; filter on that field.
-- `next.config.ts` sets the headers for pages and routes that the worker serves. `public/_headers` sets them for
-  static files that Cloudflare serves directly, so the two lists are kept in step. `script-src` keeps
-  `'unsafe-inline'` because Next.js inlines its bootstrap scripts; removing it needs a nonce per request.
+- `lib/rateLimit.ts` counts in Redis when it is configured, one fixed window per route and client, so every
+  function instance shares the count. Without Redis, or when Redis fails, it counts in memory per instance.
+- quire.fyi is proxied by Cloudflare in front of Vercel, so Vercel sees a Cloudflare address as the client.
+  A Cloudflare Transform Rule adds the `x-quire-proxy` header with the value of `QUIRE_PROXY_SECRET`. Only
+  requests that carry it have their `cf-connecting-ip` trusted; anyone else can forge that header by calling
+  the Vercel URL directly. Without the secret, the client is `x-real-ip`, which Vercel sets.
+- Refused requests (rate limit, cross-site) are logged as one JSON line with `kind: "security"`. Vercel runtime
+  logs keep them (one hour on Hobby); filter on that field.
+- `next.config.ts` sets the headers for every response, static files included, because Vercel applies them to
+  `public/` too. `script-src` keeps `'unsafe-inline'` because Next.js inlines its bootstrap scripts; removing it
+  needs a nonce per request.
 - Live demos in `/stage/` run on the same origin as the app, so their code can read the app's `localStorage`,
   which holds the library key. Only curated libraries are built into `/stage/`. Anything that stores a more
   valuable secret in the browser must first move the demos to another origin.
 - `capture/server.mjs` compares its bearer token in constant time and warns when the token is shorter than 32
   characters.
-- `@opennextjs/cloudflare` pins `glob` 13, which has a moderate advisory. `package.json` overrides it to 14. Drop
-  the override once the package ships a fixed `glob`.
 - `.env.example` and `capture/.env.example` list every variable. Real `.env` files are ignored by Git.
 
 ## Reading component sites
@@ -222,12 +226,15 @@ and Headless UI).
 
 ## Config notes
 
-- `open-next.config.ts` sets `buildCommand` to `npm run build:next`, because `npm run build` runs OpenNext
-  itself and would call itself.
-- `wrangler.jsonc` sets a build command so the worker exists whatever the dashboard's build command is, and an
-  empty `previews` block, which `wrangler preview` needs for branch builds and which keeps every top-level
-  setting.
-- CI uses Node 24 to match Cloudflare Workers Builds.
+- Quire deploys to Vercel from Git with no `vercel.json`: the framework preset and project settings are enough.
+  Every pull request gets a preview deployment.
+- Recorded previews (`public/previews/`) live in Vercel Blob, not in Git. `npm run previews:upload` sends the
+  files whose size changed. `next.config.ts` rewrites `/previews/*` to `QUIRE_PREVIEWS_URL` only as a
+  fallback, so a local file still wins in development and URLs in `lib/catalog/stage.json` stay relative, which
+  keeps the CSP at `'self'`.
+- `@vercel/analytics` and `@vercel/speed-insights` load from `/_vercel/`, on the same origin, so the CSP needs no
+  extra host. They do nothing outside Vercel.
+- CI uses Node 24, the Vercel default.
 - `app/layout.tsx` and `components/app/useDropServiceWorkers.ts` remove any service worker on the origin and reload once. Quire
   registers none, but `localhost:3000` is shared by many projects and a stale worker breaks hydration.
 - On quire.fyi, Cloudflare adds its managed content-signal block above `app/robots.ts`'s rules.

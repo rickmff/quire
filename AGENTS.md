@@ -13,10 +13,10 @@
 | `components/app/` | The gallery shell: `Sidebar`, `TopBar`, `CommandMenu`, `CollectionView`, `Toast`, dialogs, and the hooks `useViewRoute`, `useGalleryData` (what each view shows), `useLibraryActions` (every change to the library), `useShortcuts`, `useGridKeys`, `useToast`, and `agent.ts` (the UI SDK agent that browser agents reach through WebMCP). |
 | `components/gallery/` | The component grid and its card, previews and live frames, the hover live demo (`useCardLive`), the variants ring, the detail drawer, the Sites and Agents pages. |
 | `components/` (top level) | The landing: the WebGL hero (`Quire3D`, `quire3d/shader.ts`), `FocusReveal`, `StartLink`, wordmark and social links. `components/ui/` holds the shadcn-based primitives. |
-| `lib/` | Logic with no markup. Browser state: `store.ts` (the library in localStorage), `useCatalog.ts`, `useIntro.ts`, `media.ts`. Shared rules: `view.ts` (views and their URLs), `groups.ts`, `types.ts` and `motion.ts` (taxonomy), `libraries.ts`. Server only: `net.ts`, `kv.ts`, `sync.ts`, `mcp.ts`, `source.ts`, `capture.ts`, `rateLimit.ts`. |
+| `lib/` | Logic with no markup. Browser state: `store.ts` (the library in localStorage), `useCatalog.ts`, `useIntro.ts`, `media.ts`. Shared rules: `view.ts` (views and their URLs), `groups.ts`, `types.ts` and `motion.ts` (taxonomy), `libraries.ts`. Server only: `net.ts`, `redis.ts`, `kv.ts`, `sync.ts`, `mcp.ts`, `source.ts`, `capture.ts`, `rateLimit.ts`. |
 | `lib/catalog/` | The curated catalog: `data.json` (generated), its schema, search and facets. |
 | `scripts/` | The catalog build (`build-catalog.ts`, `catalog/sources.ts`) and the comment check. |
-| `stage/` | The preview stage that builds live demos into `public/stage/` and records previews into `public/previews/`. |
+| `stage/` | The preview stage that builds live demos into `public/stage/` and records previews into `public/previews/`, which `npm run previews:upload` sends to Vercel Blob (the folder is not in Git). |
 | `capture/`, `extension/` | The optional capture service and the Chrome extension. |
 | `e2e/` | Playwright end-to-end tests. Unit tests sit next to the code they test, as `*.test.ts`. |
 | `skills/quire/` | The agent skill that `npx skills add rickmff/quire --skill quire` installs. Keep its MCP tool names and motion rules in step with `lib/mcp.ts`. |

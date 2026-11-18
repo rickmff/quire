@@ -1,6 +1,4 @@
 .next/
-.open-next/
-.wrangler/
 node_modules/
 public/
 lib/catalog/*.json

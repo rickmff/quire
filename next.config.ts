@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
+const previewsUrl = process.env.QUIRE_PREVIEWS_URL?.replace(/\/$/, "");
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -28,6 +29,13 @@ const everywhere = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: previewsUrl ? [{ source: "/previews/:path*", destination: `${previewsUrl}/previews/:path*` }] : [],
+    };
+  },
   async headers() {
     return [
       { source: "/:path*", headers: everywhere },
