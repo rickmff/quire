@@ -2,8 +2,10 @@
 
 import type { RefObject } from "react";
 import { PlusIcon as Plus, SearchIcon } from "lucide-react";
+import { DialogTrigger } from "@ui-sdk/react/dialog";
 import SocialLinks from "@/components/SocialLinks";
 import { Tip } from "@/components/ui/tooltip";
+import { commandDialog } from "@/components/app/agent";
 import type { BarMode } from "@/components/app/useShortcuts";
 import { USER_ADDS } from "@/lib/features";
 import { normalizeUrl } from "@/lib/store";
@@ -23,7 +25,6 @@ export function TopBar({
   viewName,
   onAdd,
   onImport,
-  onOpenPalette,
 }: {
   input: string;
   setInput: (value: string) => void;
@@ -33,7 +34,6 @@ export function TopBar({
   viewName: string;
   onAdd: (url: string) => void;
   onImport: (url: string) => void;
-  onOpenPalette: () => void;
 }) {
   return (
     <header
@@ -137,14 +137,13 @@ export function TopBar({
               Clear
             </button>
           )}
-          <button
-            type="button"
-            onClick={onOpenPalette}
+          <DialogTrigger
+            controller={commandDialog}
             className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
             aria-label="Open command menu"
           >
             ⌘K
-          </button>
+          </DialogTrigger>
         </div>
         <SocialLinks className="hidden md:flex" />
       </form>

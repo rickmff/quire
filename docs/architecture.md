@@ -169,6 +169,31 @@ description.
   it in production.
 - `lib/capture.ts` is off unless both `QUIRE_CAPTURE_URL` and `QUIRE_CAPTURE_TOKEN` are set.
 
+## Security
+
+- Quire has no accounts, passwords, admin area, payments or file uploads. The only credential a visitor holds is
+  the library key. It has at least 124 bits of randomness, so it cannot be guessed, and reads and writes are rate
+  limited.
+- `lib/security.ts` refuses writes that a browser marks as coming from another site (`Sec-Fetch-Site` or an
+  `Origin` from another host). `PUT /api/library/:key` and `POST /api/capture` use it. Clients that send neither
+  header, such as scripts holding the key, still work. `/api/mcp` stays open to every origin (`*`) because MCP
+  clients call it from anywhere; it is read-only and uses no cookies.
+- `lib/rateLimit.ts` counts per isolate, in memory. On Cloudflare each isolate counts on its own, so it is a
+  first line only. A Cloudflare WAF rate limiting rule on `/api/*` gives a global limit.
+- Refused requests (rate limit, cross-site) are logged as one JSON line with `kind: "security"`. Cloudflare
+  Workers observability (`wrangler.jsonc`) keeps them; filter on that field.
+- `next.config.ts` sets the headers for pages and routes that the worker serves. `public/_headers` sets them for
+  static files that Cloudflare serves directly, so the two lists are kept in step. `script-src` keeps
+  `'unsafe-inline'` because Next.js inlines its bootstrap scripts; removing it needs a nonce per request.
+- Live demos in `/stage/` run on the same origin as the app, so their code can read the app's `localStorage`,
+  which holds the library key. Only curated libraries are built into `/stage/`. Anything that stores a more
+  valuable secret in the browser must first move the demos to another origin.
+- `capture/server.mjs` compares its bearer token in constant time and warns when the token is shorter than 32
+  characters.
+- `@opennextjs/cloudflare` pins `glob` 13, which has a moderate advisory. `package.json` overrides it to 14. Drop
+  the override once the package ships a fixed `glob`.
+- `.env.example` and `capture/.env.example` list every variable. Real `.env` files are ignored by Git.
+
 ## Reading component sites
 
 `/api/import` tries the most structured source first: a shadcn `registry.json` (listed in the public shadcn
@@ -208,6 +233,20 @@ and Headless UI).
 - On quire.fyi, Cloudflare adds its managed content-signal block above `app/robots.ts`'s rules.
 - `stage/setup.sh` pins `lucide-react@0.577.0` for Animate UI, because lucide-react 1.x dropped the brand
   icons (Github, Facebook) its demos use.
+- The command menu is built on [UI SDK](https://ui-sdk.dev) (`@ui-sdk/react`, Apache-2.0). UI SDK is in beta, so
+  `@ui-sdk/core` and `@ui-sdk/react` are pinned to one exact version and move together.
+- `components/app/agent.ts` creates the UI SDK agent when the module loads, before the gallery renders, because the
+  agent only hears components made after it. `App` registers its tools with the browser through WebMCP
+  (`document.modelContext`) and does nothing where the browser has none. The command menu's dialog shares one
+  controller with the ⌘K button, so an agent sees the closed menu as a component it can open. Commands marked
+  `data-agent-confirm` (Delete collection, Import backup) are refused for agents: a person runs them.
+- `CommandMenu` closes the dialog inside `flushSync` before it runs a command. While the dialog is open the rest of
+  the page is inert, so a command that focuses something outside it, such as the New collection name field, must
+  run after the close is committed. It runs in the same task, so keys typed right after Enter reach that field.
+  Opening a bookmark stays inside the key or click event, so the browser allows it.
+- Commands that open another dialog (Delete collection, Import a site) wait for `onOpenChangeComplete` instead. A
+  click that lands while the command menu is still closing does not reach the new dialog, so its confirm button
+  would ignore the first click. The e2e test for deleting a collection catches this on a production build.
 
 ## Third-party code and design
 

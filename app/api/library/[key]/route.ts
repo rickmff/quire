@@ -1,13 +1,16 @@
 import { cleanLibrary, KEY_RE, loadLibrary, saveLibrary } from "@/lib/sync";
 import { kv } from "@/lib/kv";
-import { rateLimited } from "@/lib/rateLimit";
+import { clientAddress, rateLimited } from "@/lib/rateLimit";
+import { isCrossSite, logSuspicious } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ key: string }> };
 
-export async function GET(_: Request, { params }: Params) {
+export async function GET(req: Request, { params }: Params) {
+  const limited = rateLimited(req, "read");
+  if (limited) return limited;
   const { key } = await params;
   if (!KEY_RE.test(key)) return Response.json({ error: "bad-key" }, { status: 400 });
   if (!kv()) return Response.json({ error: "no-store" }, { status: 503 });
@@ -16,6 +19,10 @@ export async function GET(_: Request, { params }: Params) {
 }
 
 export async function PUT(req: Request, { params }: Params) {
+  if (isCrossSite(req)) {
+    logSuspicious({ reason: "cross-site", route: "library", client: clientAddress(req) });
+    return Response.json({ error: "forbidden" }, { status: 403 });
+  }
   const limited = rateLimited(req, "write");
   if (limited) return limited;
   const { key } = await params;
