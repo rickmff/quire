@@ -250,9 +250,7 @@ const STAGE = join(ROOT, "lib/catalog/stage.json");
 if (existsSync(STAGE)) {
   type Shot = {
     image?: string;
-    imageDark?: string;
     video?: string;
-    videoDark?: string;
     live?: CatalogComponent["live"];
   };
   const shots: Record<string, Shot> = JSON.parse(readFileSync(STAGE, "utf8"));
@@ -260,9 +258,7 @@ if (existsSync(STAGE)) {
     const s = shots[c.id];
     if (!s?.image) continue;
     c.preview = s.image;
-    c.previewDark = s.imageDark;
     c.video = s.video;
-    c.videoDark = s.videoDark;
     c.live = s.live;
   }
 }

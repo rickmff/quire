@@ -204,8 +204,8 @@ function summary(id: string) {
     const s = shots[c.id];
     const problems = [
       !demos.find((d) => d.name === c.name)?.demo && "no demo",
-      ...["light", "dark"].flatMap((t) => [report[`${c.name}|${t}`]?.error, ...(report[`${c.name}|${t}`]?.errs ?? [])]),
-      ...["light", "dark"].map((t) => video[`${c.name}|${t}`]?.error),
+      ...["dark"].flatMap((t) => [report[`${c.name}|${t}`]?.error, ...(report[`${c.name}|${t}`]?.errs ?? [])]),
+      ...["dark"].map((t) => video[`${c.name}|${t}`]?.error),
     ].filter((p): p is string => Boolean(p));
     return {
       id: c.id,

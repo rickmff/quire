@@ -17,10 +17,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fcfcfc" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0b0b" },
-  ],
+  themeColor: "#0b0b0b",
+  colorScheme: "dark",
 };
 
 const DROP_SW = `(function(){try{var s=navigator.serviceWorker;if(!s)return;s.getRegistrations().then(function(r){if(!r.length)return;Promise.all(r.map(function(x){return x.unregister()})).then(function(){if(window.caches)caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}).finally(function(){if(!sessionStorage.getItem("quire-sw")){sessionStorage.setItem("quire-sw","1");location.reload()}});else location.reload()})})}catch(e){}})();`;

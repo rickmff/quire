@@ -15,9 +15,7 @@ export type CatalogComponent = {
   repo?: string;
   files?: string[];
   preview?: string;
-  previewDark?: string;
   video?: string;
-  videoDark?: string;
   live?: LiveDemo;
   note?: string;
   site?: string;
@@ -27,8 +25,6 @@ export type LiveDemo = {
   src: string;
   frame: number[];
   view: number[];
-  srcDark?: string;
-  frameDark?: number[];
   variants?: LiveVariant[];
 };
 
