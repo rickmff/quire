@@ -3,30 +3,57 @@ import { dirname, join } from "node:path";
 
 const SCRATCH = process.env.REG_CACHE || "/tmp/quire-reg";
 const RAW = "https://raw.githubusercontent.com";
-const REG = {
-  magicui: { repo: "magicuidesign/magicui", dir: "apps/www/public/r" },
-  "animate-ui": { repo: "imskyleen/animate-ui", dir: "apps/v1/apps/www/public/r" },
-  shadcn: { repo: "shadcn-ui/ui", dir: "apps/v4/public/r/styles/new-york-v4" },
-};
-const LOCAL = {
-  magicui: process.env.REG_LOCAL_MAGICUI,
-  "animate-ui": process.env.REG_LOCAL_ANIMATE_UI,
-};
-const DOCS = {
-  magicui: ["magicuidesign/magicui/HEAD/apps/www"],
-  "animate-ui": ["imskyleen/animate-ui/HEAD/apps/v1/apps/www", "imskyleen/animate-ui/HEAD/apps/v1/packages/ui/src"],
-};
+export const LIBS = JSON.parse(readFileSync(new URL("./libs.json", import.meta.url), "utf8"));
+const REG = { ...LIBS, shadcn: { repo: "shadcn-ui/ui", dir: "apps/v4/public/r/styles/new-york-v4" } };
+const localDir = (reg) => process.env[`REG_LOCAL_${reg.toUpperCase().replace(/[^A-Z0-9]/g, "_")}`];
+const roots = (reg) => (LIBS[reg]?.roots ?? []).map((r) => `${LIBS[reg].repo}/HEAD${r ? `/${r}` : ""}`);
+
+const indexes = new Map();
+async function index(reg) {
+  if (!indexes.has(reg))
+    indexes.set(
+      reg,
+      fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/registry.json`)
+        .then((r) => (r.ok ? r.json() : { items: [] }))
+        .catch(() => ({ items: [] })),
+    );
+  return indexes.get(reg);
+}
+
+async function fromIndex(reg, name) {
+  const entry = (await index(reg)).items?.find((i) => i.name === name);
+  if (!entry?.files?.length) return null;
+  const files = [];
+  for (const f of entry.files) {
+    const path = typeof f === "string" ? f : f.path;
+    let content = null;
+    for (const root of roots(reg)) {
+      const r = await fetch(`${RAW}/${root}/${path}`);
+      if (r.ok) {
+        content = await r.text();
+        break;
+      }
+    }
+    if (!content) return null;
+    files.push({ ...(typeof f === "string" ? { path: f } : f), content });
+  }
+  return { ...entry, files };
+}
 
 async function load(reg, name) {
   const cache = join(SCRATCH, reg, name + ".json");
   if (existsSync(cache)) return JSON.parse(readFileSync(cache, "utf8"));
-  const local = LOCAL[reg] && join(LOCAL[reg], name + ".json");
+  const local = localDir(reg) && join(localDir(reg), name + ".json");
   let text;
   if (local && existsSync(local)) text = readFileSync(local, "utf8");
   else {
     const r = await fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/${name}.json`);
-    if (!r.ok) return null;
-    text = await r.text();
+    if (r.ok) text = await r.text();
+    else {
+      const built = await fromIndex(reg, name);
+      if (!built) return null;
+      text = JSON.stringify(built);
+    }
   }
   mkdirSync(dirname(cache), { recursive: true });
   writeFileSync(cache, text);
@@ -68,6 +95,10 @@ async function shadcnUi(name) {
   };
 }
 
+const npmName = (d) => d.replace(/^((?:@[^/@]+\/)?[^/@]+)\/[^@]*/, "$1");
+
+const libFor = (text) => Object.keys(LIBS).find((id) => text.includes(id));
+
 function ref(dep, from) {
   if (/^https?:/.test(dep)) {
     const u = new URL(dep);
@@ -75,22 +106,20 @@ function ref(dep, from) {
       .split("/")
       .pop()
       .replace(/\.json$/, "");
-    if (/magicui/.test(u.host)) return ["magicui", n];
-    if (/animate-ui/.test(u.host)) return ["animate-ui", n];
-    return ["shadcn", n];
+    return [libFor(u.host) ?? "shadcn", n];
   }
-  let m;
-  if ((m = dep.match(/^@magicui\/(.+)$/))) return ["magicui", m[1]];
-  if ((m = dep.match(/^@animate-ui\/(?:v\d\/)?(.+)$/))) return ["animate-ui", m[1]];
+  const m = dep.match(/^@([\w.-]+)\/(?:v\d+\/)?(.+)$/);
+  if (m && LIBS[m[1]]) return [m[1], m[2]];
   if (dep.startsWith("@")) return ["shadcn", dep.split("/").pop()];
   return ["shadcn", dep, from];
 }
 
 function dest(reg, f) {
-  if (reg === "magicui" && f.path.startsWith("registry/")) return f.path;
+  const keep = LIBS[reg]?.keepPaths;
+  if (keep && f.path.startsWith("registry/")) return f.path;
   if (f.target) return f.target.replace(/^~\//, "");
   const base = f.path.split("/").pop();
-  if (reg === "magicui") return f.path;
+  if (keep) return f.path;
   if (f.type === "registry:lib") return `lib/${base}`;
   if (f.type === "registry:hook") return `hooks/${base}`;
   return `components/ui/${base}`;
@@ -174,7 +203,7 @@ export async function install(lib, app, names) {
       missing.push(key);
       return false;
     }
-    for (const d of item.dependencies ?? []) deps.add(d);
+    for (const d of item.dependencies ?? []) deps.add(npmName(d));
     for (const d of item.registryDependencies ?? []) {
       const [r, n] = ref(d);
       await add(r, n, r === "shadcn" ? lib : undefined);
@@ -191,11 +220,8 @@ export async function install(lib, app, names) {
     return item;
   }
 
-  const ALIAS = {
-    "magicui/bento-grid": "bento-demo",
-    "magicui/backlight": "backlight-svg-demo",
-    "magicui/client-tweet-card": "tweet-card-demo",
-  };
+  const conf = LIBS[lib] ?? {};
+  const alias = conf.aliases ?? {};
   const demos = [];
   for (const name of names) {
     const custom = join(dirname(new URL(import.meta.url).pathname), "custom", lib, `${name}.tsx`);
@@ -206,11 +232,11 @@ export async function install(lib, app, names) {
       demos.push({ name, demo: `custom/${name}`, file: `custom/${name}.tsx`, props: {} });
       continue;
     }
-    const cands = ALIAS[`${lib}/${name}`]
-      ? [ALIAS[`${lib}/${name}`]]
-      : lib === "magicui"
-        ? [`${name}-demo`, `${name}-demo-1`, `${name}-demo-2`, name]
-        : [`demo-${name}`, name];
+    const cands = alias[name]
+      ? [alias[name]]
+      : conf.demos === "prefix"
+        ? [`demo-${name}`, name]
+        : [`${name}-demo`, `${name}-demo-1`, `${name}-demo-2`, name];
     let found = null;
     for (const c of cands) {
       const it = await load(lib, c);
@@ -231,9 +257,8 @@ export async function install(lib, app, names) {
     demos.push({ name, demo: found, file: dest(lib, main), props, ...variantsOf(item) });
   }
 
-  if (lib === "magicui") {
-    const index = await (await fetch(`${RAW}/${REG.magicui.repo}/HEAD/${REG.magicui.dir}/registry.json`)).json();
-    const examples = index.items.filter((i) => i.type === "registry:example").map((i) => i.name);
+  if (conf.examples) {
+    const examples = (await index(lib)).items.filter((i) => i.type === "registry:example").map((i) => i.name);
     for (const d of demos) {
       if (!d.demo || d.file.startsWith("custom/")) continue;
       const mine = examples.filter(
@@ -277,8 +302,22 @@ export async function install(lib, app, names) {
         const rel = m[1];
         const base = join(app, "src", rel);
         if ([".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts"].some((e) => existsSync(base + e))) continue;
-        const roots = DOCS[lib];
-        found: for (const root of roots)
+        found: for (const root of roots(lib))
+          for (const ext of [".tsx", ".ts", "/index.tsx", "/index.ts"]) {
+            const r = await fetch(`${RAW}/${root}/${rel}${ext}`);
+            if (r.ok) {
+              mkdirSync(dirname(base + ext), { recursive: true });
+              writeFileSync(base + ext, await r.text());
+              added++;
+              break found;
+            }
+          }
+      }
+      for (const m of text.matchAll(/from\s+["'](\.\.?\/[\w./-]+)["']/g)) {
+        const base = join(dirname(file), m[1]);
+        if ([".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts"].some((e) => existsSync(base + e))) continue;
+        const rel = base.slice(join(app, "src").length + 1);
+        found: for (const root of roots(lib))
           for (const ext of [".tsx", ".ts", "/index.tsx", "/index.ts"]) {
             const r = await fetch(`${RAW}/${root}/${rel}${ext}`);
             if (r.ok) {
@@ -321,8 +360,8 @@ export async function install(lib, app, names) {
   scan(join(app, "src"));
   for (const a of assets) {
     const out = join(app, "public", a);
-    if (existsSync(out)) continue;
-    const r = await fetch(`${RAW}/${DOCS[lib][0]}/public${a}`);
+    if (existsSync(out) || !roots(lib).length) continue;
+    const r = await fetch(`${RAW}/${roots(lib)[0]}/public${a}`);
     if (!r.ok) {
       missing.push("asset " + a);
       continue;

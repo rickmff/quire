@@ -224,6 +224,30 @@ stage win over a library's own media; captures fill in where there is none. `ded
 component when a library publishes copies (Animate UI ships styled and primitive versions for Radix, Base UI
 and Headless UI).
 
+## Importing a library
+
+`npm run import -- <site> [--repo owner/name]` brings a shadcn-registry library into the catalog with the same
+previews as the curated ones. It runs six steps, and `--from` and `--until` run part of them:
+
+| Step | What it does | Stops when |
+| --- | --- | --- |
+| `discover` | Finds the library in the shadcn directory, its GitHub repo (from the site, or `--repo`), its license and its `registry.json`. Writes the source to `scripts/catalog/imported.json` and the stage settings to `stage/libs.json`. | The license is not MIT, Apache-2.0, BSD, ISC, 0BSD or Unlicense, or it adds the Commons Clause, non-commercial or no-redistribution terms. No registry lists components. |
+| `catalog` | `build-catalog.ts <id>`. | |
+| `stage` | `stage/setup.sh` and `stage/build.sh`. | The Vite build fails. |
+| `record` | Serves the stage and runs `capture.mjs` and `video.mjs`. | |
+| `publish` | `stage/publish.mjs`. | |
+| `summary` | Writes `stage/out/<id>/summary.md`: counts and every component without a preview or with render errors. | |
+
+The license check reads the file, not only `package.json`, because several libraries declare MIT there and add
+the Commons Clause in the file. A refused library is not imported; ask its author or leave it out.
+
+`stage/libs.json` holds what `install.mjs` needs per library: the repo, the folder of built registry items, the
+source roots, and whether demos are named `<name>-demo` (`suffix`) or `demo-<name>` (`prefix`). When a built item
+is missing, `install.mjs` builds it from the `registry.json` entry and the source files. Relative imports that no
+item lists are fetched from the same source root.
+
+The import does not upload previews. Run `npm run previews:upload` after the pull request is reviewed.
+
 ## Config notes
 
 - Quire deploys to Vercel from Git with no `vercel.json`: the framework preset and project settings are enough.

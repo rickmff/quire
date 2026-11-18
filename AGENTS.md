@@ -15,7 +15,7 @@
 | `components/` (top level) | The landing: the WebGL hero (`Quire3D`, `quire3d/shader.ts`), `FocusReveal`, `StartLink`, wordmark and social links. `components/ui/` holds the shadcn-based primitives. |
 | `lib/` | Logic with no markup. Browser state: `store.ts` (the library in localStorage), `useCatalog.ts`, `useIntro.ts`, `media.ts`. Shared rules: `view.ts` (views and their URLs), `groups.ts`, `types.ts` and `motion.ts` (taxonomy), `libraries.ts`. Server only: `net.ts`, `redis.ts`, `kv.ts`, `sync.ts`, `mcp.ts`, `source.ts`, `capture.ts`, `rateLimit.ts`. |
 | `lib/catalog/` | The curated catalog: `data.json` (generated), its schema, search and facets. |
-| `scripts/` | The catalog build (`build-catalog.ts`, `catalog/sources.ts`) and the comment check. |
+| `scripts/` | The catalog build (`build-catalog.ts`, `catalog/sources.ts`), the library import (`import-library.ts`, `import/`, `catalog/imported.json`) and the comment check. |
 | `stage/` | The preview stage that builds live demos into `public/stage/` and records previews into `public/previews/`, which `npm run previews:upload` sends to Vercel Blob (the folder is not in Git). |
 | `capture/`, `extension/` | The optional capture service and the Chrome extension. |
 | `e2e/` | Playwright end-to-end tests. Unit tests sit next to the code they test, as `*.test.ts`. |

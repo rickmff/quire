@@ -6,3 +6,5 @@ stage/poses.json
 package-lock.json
 **/package-lock.json
 *.md
+stage/app-*/
+stage/out/

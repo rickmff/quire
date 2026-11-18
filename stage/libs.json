@@ -1,0 +1,22 @@
+{
+  "magicui": {
+    "repo": "magicuidesign/magicui",
+    "dir": "apps/www/public/r",
+    "roots": ["apps/www"],
+    "demos": "suffix",
+    "keepPaths": true,
+    "examples": true,
+    "aliases": {
+      "bento-grid": "bento-demo",
+      "backlight": "backlight-svg-demo",
+      "client-tweet-card": "tweet-card-demo"
+    }
+  },
+  "animate-ui": {
+    "repo": "imskyleen/animate-ui",
+    "dir": "apps/v1/apps/www/public/r",
+    "roots": ["apps/v1/apps/www", "apps/v1/packages/ui/src"],
+    "demos": "prefix",
+    "pins": ["lucide-react@0.577.0"]
+  }
+}
