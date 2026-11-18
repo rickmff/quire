@@ -19,6 +19,7 @@
 | `stage/` | The preview stage that builds live demos into `public/stage/` and records previews into `public/previews/`. |
 | `capture/`, `extension/` | The optional capture service and the Chrome extension. |
 | `e2e/` | Playwright end-to-end tests. Unit tests sit next to the code they test, as `*.test.ts`. |
+| `skills/quire/` | The agent skill that `npx skills add rickmff/quire --skill quire` installs. Keep its MCP tool names and motion rules in step with `lib/mcp.ts`. |
 | `docs/architecture.md` | Why things are the way they are: state diagrams, values kept in step, config reasons. |
 | `docs/user-adds.md` | The paused features that let a visitor add components by link, and the one flag (`lib/features.ts`) that turns them on. |
 

@@ -3,6 +3,8 @@
 import { SITE_URL } from "@/lib/seo";
 import { useClientValue } from "@/lib/useClientValue";
 
+const SKILL_COMMAND = "npx skills add rickmff/quire --skill quire";
+
 export function Agents({
   syncKey,
   syncedAt,
@@ -84,6 +86,26 @@ export function Agents({
             </pre>
           </div>
         ))}
+      </div>
+
+      <h2 className="mt-10 font-medium">Skill</h2>
+      <p className="mt-2 text-[12px] text-muted">
+        The Quire skill teaches your agent the workflow: recommend, read the real source, then build. It pairs with the
+        UI SDK skill for focus, keyboard and ARIA.
+      </p>
+      <div className="mt-3">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[12px] text-faint">Any agent</span>
+          <button
+            onClick={() => copy(SKILL_COMMAND, "Copied")}
+            className="text-[12px] text-faint transition hover:text-muted"
+          >
+            Copy
+          </button>
+        </div>
+        <pre className="mt-1 overflow-x-auto rounded-md bg-field px-3 py-2 font-mono text-[11px] text-muted">
+          {SKILL_COMMAND}
+        </pre>
       </div>
 
       <h2 className="mt-10 font-medium">In the browser</h2>

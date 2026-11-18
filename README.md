@@ -11,7 +11,7 @@
 
 - **One gallery** for every component and library you find.
 - **Live cards** show how each component moves.
-- **Hand it to your agent** with one click, or over MCP.
+- **Hand it to your agent** with one click, over MCP, or with the skill: `npx skills add rickmff/quire --skill quire`.
 
 Try it at [quire.fyi](https://quire.fyi) or run `npm install && npm run dev`.
 
