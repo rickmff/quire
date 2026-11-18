@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { USER_ADDS } from "@/lib/features";
 
 export const metadata: Metadata = {
   title: "Save to library",
@@ -6,5 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function AddLayout({ children }: { children: React.ReactNode }) {
+  if (!USER_ADDS) notFound();
   return children;
 }

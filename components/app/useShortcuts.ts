@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent } from "react";
+import { USER_ADDS } from "@/lib/features";
 import { normalizeUrl } from "@/lib/store";
 
 export type BarMode = "search" | "add";
@@ -22,7 +23,7 @@ export function useShortcuts({
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
       e.preventDefault();
       togglePalette();
-    } else if ((e.key === "/" || e.key === "+") && !typing) {
+    } else if ((e.key === "/" || (USER_ADDS && e.key === "+")) && !typing) {
       e.preventDefault();
       focusBar(e.key === "/" ? "search" : "add");
     } else if (e.key === "Escape" && typing) {
@@ -31,7 +32,7 @@ export function useShortcuts({
   });
 
   const onPaste = useEffectEvent((e: ClipboardEvent) => {
-    if (isTypingIn(e.target, "input, textarea")) return;
+    if (!USER_ADDS || isTypingIn(e.target, "input, textarea")) return;
     const text = e.clipboardData?.getData("text") ?? "";
     if (normalizeUrl(text)) {
       e.preventDefault();

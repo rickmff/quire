@@ -55,7 +55,7 @@ export function CommandMenu({
   setView: (v: View) => void;
   copy: (text: string, msg: string) => void;
   copyInstall: () => void;
-  onImportSite: () => void;
+  onImportSite?: () => void;
   onNewCollection: () => void;
   onRenameCollection: (id: string) => void;
   onDeleteCollection: (id: string) => void;
@@ -191,9 +191,11 @@ export function CommandMenu({
               </CommandGroup>
               <CommandGroup>
                 <CommandGroupLabel className={headingCls}>Library</CommandGroupLabel>
-                <CommandItem value="import-site" onSelect={runAfterClose(onImportSite)} className={itemCls}>
-                  Import every component from a site
-                </CommandItem>
+                {onImportSite && (
+                  <CommandItem value="import-site" onSelect={runAfterClose(onImportSite)} className={itemCls}>
+                    Import every component from a site
+                  </CommandItem>
+                )}
                 <CommandItem value="new-collection" onSelect={run(onNewCollection)} className={itemCls}>
                   New collection
                 </CommandItem>

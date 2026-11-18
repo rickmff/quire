@@ -26,7 +26,8 @@ by type, the type (`text-effect`). Curated components group by library id; links
 site they came from.
 
 `/app?import=<url>` opens the import dialog for a whole site; the extension uses it. `/add?url=` is the
-extension's save page and is kept out of search, as is `/api`.
+extension's save page and is kept out of search, as is `/api`. Both belong to adding by link, which is off
+unless the build sets `NEXT_PUBLIC_QUIRE_USER_ADDS=1`; [user-adds.md](user-adds.md) lists every part of it.
 
 ## First load of /app
 
