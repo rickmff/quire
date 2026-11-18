@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import {
   Command,
@@ -61,6 +61,11 @@ export function CommandMenu({
   onRestoreBackup: (file: File) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [then, setThen] = useState<(() => void) | null>(null);
+  const runAfterClose = (fn: () => void) => () => {
+    setThen(() => fn);
+    setOpen(false);
+  };
   const run = (fn: () => void) => () => {
     flushSync(() => setOpen(false));
     fn();
@@ -85,7 +90,15 @@ export function CommandMenu({
         }}
       />
 
-      <Dialog open={open} onOpenChange={(next) => setOpen(next)}>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => setOpen(next)}
+        onOpenChangeComplete={(next) => {
+          if (next || !then) return;
+          setThen(null);
+          then();
+        }}
+      >
         <DialogBackdrop className="cmd-backdrop" />
         <DialogContent className="cmd-dialog overflow-hidden rounded-xl border border-line bg-panel shadow-[0_16px_48px_-12px_rgb(0_0_0/0.25)]">
           <DialogTitle className="sr-only">Command menu</DialogTitle>
@@ -176,7 +189,7 @@ export function CommandMenu({
               </CommandGroup>
               <CommandGroup>
                 <CommandGroupLabel className={headingCls}>Library</CommandGroupLabel>
-                <CommandItem value="import-site" onSelect={run(onImportSite)} className={itemCls}>
+                <CommandItem value="import-site" onSelect={runAfterClose(onImportSite)} className={itemCls}>
                   Import every component from a site
                 </CommandItem>
                 <CommandItem value="new-collection" onSelect={run(onNewCollection)} className={itemCls}>
@@ -193,7 +206,7 @@ export function CommandMenu({
                     </CommandItem>
                     <CommandItem
                       value="delete-collection"
-                      onSelect={run(() => onDeleteCollection(collection.id))}
+                      onSelect={runAfterClose(() => onDeleteCollection(collection.id))}
                       className={itemCls}
                     >
                       Delete “{collection.name}”

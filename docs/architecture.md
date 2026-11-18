@@ -238,6 +238,9 @@ and Headless UI).
   the page is inert, so a command that focuses something outside it, such as the New collection name field, must
   run after the close is committed. It runs in the same task, so keys typed right after Enter reach that field.
   Opening a bookmark stays inside the key or click event, so the browser allows it.
+- Commands that open another dialog (Delete collection, Import a site) wait for `onOpenChangeComplete` instead. A
+  click that lands while the command menu is still closing does not reach the new dialog, so its confirm button
+  would ignore the first click. The e2e test for deleting a collection catches this on a production build.
 
 ## Third-party code and design
 
