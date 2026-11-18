@@ -63,15 +63,42 @@ export function demoStyle(items: RegistryItem[]): "suffix" | "prefix" {
   return prefix > suffix ? "prefix" : "suffix";
 }
 
-export function docsTemplate(files: string[], homepage: string, names: string[]) {
+export function docsLayout(files: string[], homepage: string, names: string[]) {
   const base = homepage.replace(/\/$/, "");
-  for (const name of names) {
-    const hit = files.find((f) => f.endsWith(`/${name}.mdx`) && /\/docs\//.test(f));
-    if (!hit) continue;
-    const rel = hit.slice(hit.lastIndexOf("/docs/") + 1, -".mdx".length);
-    return { template: `${base}/${rel.slice(0, -name.length)}{name}`, guessed: false };
+  const wanted = new Set(names);
+  const hits = files
+    .filter((f) => f.endsWith(".mdx") && f.includes("/docs/"))
+    .map((f) => {
+      const at = f.lastIndexOf("/docs/") + "/docs/".length;
+      const rel = f.slice(at, -".mdx".length);
+      return { dir: f.slice(0, at), rel, name: rel.split("/").pop()! };
+    })
+    .filter((h) => wanted.has(h.name));
+  if (!hits.length) return { template: `${base}/docs/components/{name}`, guessed: true };
+  const count = <T>(list: T[]) =>
+    [...list.reduce((m, k) => m.set(k, (m.get(k) ?? 0) + 1), new Map<T, number>())].sort((a, b) => b[1] - a[1])[0][0];
+  const dir = count(hits.map((h) => h.dir));
+  const folder = count(hits.filter((h) => h.dir === dir).map((h) => h.rel.slice(0, -h.name.length)));
+  const folders = new Set(hits.filter((h) => h.dir === dir).map((h) => h.rel.slice(0, -h.name.length)));
+  return {
+    template: `${base}/docs/${folder}{name}`,
+    guessed: false,
+    ...(folders.size > 1 ? { pages: { dir, base: `${base}/docs/` } } : {}),
+  };
+}
+
+export function libraryName(registryJson?: string) {
+  try {
+    const name: string | undefined = JSON.parse(registryJson ?? "{}").name;
+    return name
+      ?.replace(/[-_]+/g, " ")
+      .replace(/\s*ui$/i, " UI")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .replace(/\s+/g, " ")
+      .trim();
+  } catch {
+    return undefined;
   }
-  return { template: `${base}/docs/components/{name}`, guessed: true };
 }
 
 export const slug = (s: string) =>

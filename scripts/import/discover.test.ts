@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { demoStyle, docsTemplate, findInDirectory, firstSentence, pickRegistry, repoFromHtml } from "./discover";
+import {
+  demoStyle,
+  docsLayout,
+  findInDirectory,
+  firstSentence,
+  libraryName,
+  pickRegistry,
+  repoFromHtml,
+} from "./discover";
 
 describe("findInDirectory", () => {
   const dir = [
@@ -67,17 +75,51 @@ describe("demoStyle", () => {
   });
 });
 
-describe("docsTemplate", () => {
+describe("docsLayout", () => {
   it("builds the docs URL from the docs page in the repository", () => {
     const files = ["apps/www/content/docs/components/marquee.mdx"];
-    expect(docsTemplate(files, "https://eldoraui.site/", ["marquee"])).toEqual({
+    expect(docsLayout(files, "https://eldoraui.site/", ["marquee"])).toEqual({
       template: "https://eldoraui.site/docs/components/{name}",
       guessed: false,
     });
   });
 
+  it("maps each page when docs sit in category folders", () => {
+    const files = [
+      "apps/docs/content/docs/ai/ai-prompt.mdx",
+      "apps/docs/content/docs/navigation/action-search-bar.mdx",
+      "apps/docs/content/docs/navigation/toolbar.mdx",
+      "apps/docs/content/blog/action-search-bar.mdx",
+    ];
+    expect(docsLayout(files, "https://kokonutui.com", ["ai-prompt", "action-search-bar", "toolbar"])).toEqual({
+      template: "https://kokonutui.com/docs/navigation/{name}",
+      guessed: false,
+      pages: { dir: "apps/docs/content/docs/", base: "https://kokonutui.com/docs/" },
+    });
+  });
+
+  it("ignores pages that are not components", () => {
+    const files = ["apps/www/content/docs/installation.mdx", "apps/www/content/docs/components/grid.mdx"];
+    expect(docsLayout(files, "https://x.dev", ["grid"]).template).toBe("https://x.dev/docs/components/{name}");
+  });
+
   it("guesses when no docs page is found", () => {
-    expect(docsTemplate([], "https://x.dev", ["a"]).guessed).toBe(true);
+    expect(docsLayout([], "https://x.dev", ["a"]).guessed).toBe(true);
+  });
+});
+
+describe("libraryName", () => {
+  it("names a library from its registry", () => {
+    expect(libraryName('{"name":"kokonut-ui"}')).toBe("Kokonut UI");
+    expect(libraryName('{"name":"kokonutui"}')).toBe("Kokonut UI");
+    expect(libraryName('{"name":"eldoraui"}')).toBe("Eldora UI");
+    expect(libraryName('{"name":"magic_ui"}')).toBe("Magic UI");
+    expect(libraryName('{"name":"spec-01"}')).toBe("Spec 01");
+  });
+
+  it("returns nothing without a name", () => {
+    expect(libraryName("{}")).toBeUndefined();
+    expect(libraryName("not json")).toBeUndefined();
   });
 });
 

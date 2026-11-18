@@ -32,6 +32,7 @@ export type Imported = {
   repo: string;
   path: string;
   docs: string;
+  docsPages?: { dir: string; base: string };
   item?: string;
   scope?: string;
   license: string;
@@ -48,6 +49,7 @@ const fromImport = (i: Imported): Source => ({
   kind: "registry",
   path: i.path,
   docs: (n) => fill(i.docs, n),
+  docsPages: i.docsPages,
   item: i.item ? (n) => fill(i.item!, n) : undefined,
   install: (n) => shadcnAdd(i.scope ? `@${i.scope}/${n}` : i.item ? fill(i.item, n) : n),
 });

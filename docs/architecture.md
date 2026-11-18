@@ -238,6 +238,11 @@ previews as the curated ones. It runs six steps, and `--from` and `--until` run 
 | `publish` | `stage/publish.mjs`. | |
 | `summary` | Writes `stage/out/<id>/summary.md`: counts and every component without a preview or with render errors. | |
 
+The docs URL comes from the component pages in the repository. When they sit in more than one folder (Kokonut
+UI keeps them by category, `docs/navigation/<name>`), the source gets `docsPages` and `build-catalog.ts` maps
+each component to its own page; the template is only the fallback. `record` stops if the stage port already
+answers, so a server left by an earlier run is never recorded by mistake.
+
 The license check reads the file, not only `package.json`, because several libraries declare MIT there and add
 the Commons Clause in the file. A refused library is not imported; ask its author or leave it out.
 
