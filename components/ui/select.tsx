@@ -50,7 +50,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "select-pop relative z-50 max-h-(--radix-select-content-available-height) min-w-48 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-panel text-[12px] text-fg shadow-[0_12px_32px_-8px_rgb(0_0_0/0.18)] ring-1 ring-line dark:shadow-[0_12px_32px_-8px_rgb(0_0_0/0.7)]",
+          "select-pop relative z-50 max-h-(--radix-select-content-available-height) min-w-48 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-panel text-[12px] text-fg shadow-[0_12px_32px_-8px_rgb(0_0_0/0.7)] ring-1 ring-line",
           className,
         )}
         position={position}

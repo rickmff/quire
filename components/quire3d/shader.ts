@@ -21,7 +21,6 @@ uniform float uUnit;
 uniform vec4 uG[N];
 uniform vec3 uHover;
 uniform float uTime;
-uniform float uDark;
 uniform float uFov;
 uniform vec3 uCamPos;
 uniform mat3 uCam;
@@ -260,22 +259,22 @@ void main() {
     vec3 foil = foilAt(h);
     foil = mix(vec3(0.95), foil, smoothstep(0.0, 0.6, length(dv)));
 
-    vec3 col = mix(mix(vec3(1.0), foil, 0.6), foil, uDark);
-    float a = mix(mix(0.8, 0.44, uDark), mix(0.95, 0.9, uDark), pres);
+    vec3 col = foil;
+    float a = mix(0.44, 0.9, pres);
 
     vec2 hp = q - mix(vec2(uPointer.x * 0.6, -0.25 + uPointer.y * 0.45), vec2(uHover.x, -uHover.y), uHover.z * pres);
     float hl = exp(-dot(hp, hp) / mix(0.55, 0.34, uHover.z * pres)) * (1.0 + 0.2 * uHover.z * pres);
-    col = mix(col, vec3(1.0), hl * mix(0.3, 0.16, uDark));
+    col = mix(col, vec3(1.0), hl * 0.16);
 
     float rim = exp(-pow(d / (w * 2.2), 2.0)) * top;
-    col = mix(col, mix(col * 0.9, vec3(1.0), uDark), rim * mix(0.7, 0.5, uDark));
-    col = mix(col, mix(foil * 0.82, foil * 1.12, uDark), side);
+    col = mix(col, vec3(1.0), rim * 0.5);
+    col = mix(col, foil * 1.12, side);
     a = mix(a, 0.95, side);
 
     if (pres > 0.01) {
       vec2 gq = vec2(q.x, -q.y);
       vec2 g = glyph(i, gq, e, uTime);
-      col = mix(col, vec3(1.0), 0.1 * pres * uDark);
+      col = mix(col, vec3(1.0), 0.1 * pres);
       col = mix(col, mix(INK, vec3(1.0), g.x), g.y * pres);
       a = mix(a, 1.0, g.y * pres);
       const float LW = 1.76, LH = LW / 16.0;
@@ -297,7 +296,7 @@ void main() {
     vec3 rr = reflect(ld, vec3(0.0, sign(-ld.y), 0.0));
     float spec = pow(max(dot(rr, uLight * uR[i]), 0.0), 18.0);
     float sweep = exp(-pow((q.x * 0.8 - q.y * 0.6 - uGlint) / 0.13, 2.0)) * pres;
-    float add = spec * 0.22 + sweep * mix(0.24, 0.2, uDark);
+    float add = spec * 0.22 + sweep * 0.2;
     rgb += add * mix(vec3(1.0), foil, 0.3);
     a = min(a + add * 0.5, 1.0);
     C[i] = vec4(min(rgb, vec3(1.0)) * cov, a * cov) ;
@@ -331,8 +330,7 @@ void main() {
     }
     tint /= float(N);
     vec4 night = vec4(mix(vec3(0.66, 0.59, 1.0), tint * 2.2, 0.55) * occ * 0.2, 0.0);
-    vec4 day = vec4(mix(vec3(0.0), tint, 0.5) * occ * 0.16, occ * 0.16);
-    acc += (1.0 - acc.a) * mix(day, night, uDark) * uFloorK;
+    acc += (1.0 - acc.a) * night * uFloorK;
   }
 
   acc *= uIntro;

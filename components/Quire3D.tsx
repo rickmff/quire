@@ -128,7 +128,6 @@ export default function Quire3D() {
       center: U("uCenter"),
       unit: U("uUnit"),
       time: U("uTime"),
-      dark: U("uDark"),
       fov: U("uFov"),
       camPos: U("uCamPos"),
       cam: U("uCam"),
@@ -173,8 +172,6 @@ export default function Quire3D() {
     );
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const scheme = matchMedia("(prefers-color-scheme: dark)");
-    let dark = scheme.matches ? 1 : 0;
 
     const view = { cx: 0, cy: 0, fit: 100 };
     const native = devicePixelRatio || 1;
@@ -459,7 +456,6 @@ export default function Quire3D() {
       px += (tx - px) * damp(dt, 6);
       py += (ty - py) * damp(dt, 6);
       near += (nearT - near) * damp(dt, 6);
-      dark += ((scheme.matches ? 1 : 0) - dark) * damp(dt, 8);
       hov.z += ((hov.on ? 1 : 0) - hov.z) * damp(dt, 9);
       hov.x += (hov.tx - hov.x) * damp(dt, 14);
       hov.y += (hov.ty - hov.y) * damp(dt, 14);
@@ -694,7 +690,6 @@ export default function Quire3D() {
       gl.uniform2f(u.center, ccx, ccy);
       gl.uniform1f(u.unit, unit);
       gl.uniform1f(u.time, t);
-      gl.uniform1f(u.dark, dark);
       gl.uniform1f(u.fov, TAN);
       gl.uniform3fv(u.camPos, cam);
       gl.uniformMatrix3fv(u.cam, false, [...r, ...upv, ...f]);
