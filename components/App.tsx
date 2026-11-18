@@ -3,6 +3,7 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import ImportDialog from "@/components/ImportDialog";
 import { CollectionView } from "@/components/app/CollectionView";
+import { registerAgent } from "@/components/app/agent";
 import { CommandMenu } from "@/components/app/CommandMenu";
 import { ConfirmRemove } from "@/components/app/ConfirmRemove";
 import { StarredTools } from "@/components/app/CollectionCard";
@@ -62,6 +63,8 @@ export default function App() {
   const [libFilter, setLibFilter] = useState<string | null>(null);
   const mainRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(registerAgent, []);
 
   const query = barMode === "search" ? input.trim().toLowerCase() : "";
   const words = useMemo(() => query.split(/\s+/).filter(Boolean), [query]);
@@ -172,7 +175,6 @@ export default function App() {
           viewName={viewName}
           onAdd={act.add}
           onImport={startImport}
-          onOpenPalette={() => setPalette(true)}
         />
 
         {isGallery(view) ? (

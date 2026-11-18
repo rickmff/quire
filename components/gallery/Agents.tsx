@@ -86,7 +86,23 @@ export function Agents({
         ))}
       </div>
 
-      <h2 className="mt-10 font-medium">Tools</h2>
+      <h2 className="mt-10 font-medium">In the browser</h2>
+      <p className="mt-2 text-[12px] text-muted">
+        Quire&apos;s controls are built on{" "}
+        <a
+          href="https://ui-sdk.dev"
+          target="_blank"
+          rel="noreferrer"
+          className="text-fg underline-offset-2 hover:underline"
+        >
+          UI SDK
+        </a>
+        . In a browser with WebMCP, its agent gets <code className="text-fg">snapshot</code>,{" "}
+        <code className="text-fg">query</code> and <code className="text-fg">act</code>, so it can open the command menu
+        and run any command without clicking. Commands that delete or replace your library stay with you.
+      </p>
+
+      <h2 className="mt-10 font-medium">MCP tools</h2>
       <ul className="mt-2 flex flex-col gap-1.5 text-[12px] text-muted">
         <li>
           <code className="text-fg">recommend(brief)</code> picks component types from a plain brief and returns

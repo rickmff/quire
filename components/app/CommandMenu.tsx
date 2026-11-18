@@ -12,6 +12,7 @@ import {
   CommandList,
 } from "@ui-sdk/react/command";
 import { Dialog, DialogBackdrop, DialogContent, DialogTitle } from "@ui-sdk/react/dialog";
+import { commandDialog } from "@/components/app/agent";
 import { type Collection, type Library, exportJSON, exportMarkdown } from "@/lib/store";
 import { download } from "@/lib/libraryFile";
 import { OTHER, TYPES } from "@/lib/types";
@@ -91,6 +92,7 @@ export function CommandMenu({
       />
 
       <Dialog
+        controller={commandDialog}
         open={open}
         onOpenChange={(next) => setOpen(next)}
         onOpenChangeComplete={(next) => {
@@ -206,6 +208,7 @@ export function CommandMenu({
                     </CommandItem>
                     <CommandItem
                       value="delete-collection"
+                      data-agent-confirm="Deletes this collection"
                       onSelect={runAfterClose(() => onDeleteCollection(collection.id))}
                       className={itemCls}
                     >
@@ -216,7 +219,12 @@ export function CommandMenu({
                 <CommandItem value="export-backup" onSelect={run(() => download(lib))} className={itemCls}>
                   Export backup (JSON)
                 </CommandItem>
-                <CommandItem value="import-backup" onSelect={pickBackup} className={itemCls}>
+                <CommandItem
+                  value="import-backup"
+                  data-agent-confirm="Replaces the library with a backup file"
+                  onSelect={pickBackup}
+                  className={itemCls}
+                >
                   Import backup
                 </CommandItem>
               </CommandGroup>
