@@ -22,6 +22,7 @@ import { Agents } from "@/components/gallery/Agents";
 import { Detail } from "@/components/gallery/Detail";
 import { Gallery } from "@/components/gallery/Gallery";
 import { Sources } from "@/components/gallery/Sources";
+import { USER_ADDS } from "@/lib/features";
 import { groupLabel } from "@/lib/groups";
 import { mergeLibrary } from "@/lib/libraryFile";
 import { type Library, useLibrary } from "@/lib/store";
@@ -116,7 +117,7 @@ export default function App() {
 
   const importFromAddress = useEffectEvent(() => {
     const url = new URLSearchParams(window.location.search).get("import");
-    if (!url) return;
+    if (!url || !USER_ADDS) return;
     startImport(url);
     window.history.replaceState(null, "", window.location.pathname);
   });
@@ -227,7 +228,7 @@ export default function App() {
               act.setFollowed(next);
             }}
             onAll={(on) => act.setFollowed(new Set(on ? (catalog?.libraries ?? []).map((l) => l.id) : []))}
-            onAddSite={() => setDialog({ kind: "import", url: "" })}
+            onAddSite={USER_ADDS ? () => setDialog({ kind: "import", url: "" }) : undefined}
             imported={data.importedSites}
           />
         ) : view === "agents" ? (
@@ -248,7 +249,7 @@ export default function App() {
             selected={selected}
             libFilter={libFilter}
             clearLibFilter={() => setLibFilter(null)}
-            onAdd={act.add}
+            onAdd={USER_ADDS ? act.add : undefined}
             onMove={act.moveAndSay}
             onUnstar={act.removeBookmark}
             onType={act.setType}
@@ -285,7 +286,7 @@ export default function App() {
         setView={setView}
         copy={act.copy}
         copyInstall={() => act.copyInstall(bookmarksInView)}
-        onImportSite={() => setDialog({ kind: "import", url: "" })}
+        onImportSite={USER_ADDS ? () => setDialog({ kind: "import", url: "" }) : undefined}
         onNewCollection={() => setEdit({ kind: "new", name: "" })}
         onRenameCollection={(id) => setEdit({ kind: "rename", id })}
         onDeleteCollection={(id) => setDialog({ kind: "delete", id })}
@@ -304,7 +305,7 @@ export default function App() {
         />
       )}
 
-      {dialog?.kind === "import" && (
+      {USER_ADDS && dialog?.kind === "import" && (
         <ImportDialog
           initialUrl={dialog.url}
           savedUrls={new Set(lib.bookmarks.map((b) => b.url))}
