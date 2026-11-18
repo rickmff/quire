@@ -160,7 +160,7 @@ async function findRegistry(page: URL, html: string, extraHtml: () => Promise<st
 
 export async function GET(req: Request) {
   if (!USER_ADDS) return Response.json({ error: "off" }, { status: 404 });
-  const limited = rateLimited(req, "fetch");
+  const limited = await rateLimited(req, "fetch");
   if (limited) return limited;
   const raw = new URL(req.url).searchParams.get("url") ?? "";
   const page = await safeUrl(raw);

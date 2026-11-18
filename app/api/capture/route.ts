@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     logSuspicious({ reason: "cross-site", route: "capture", client: clientAddress(req) });
     return Response.json({ error: "forbidden" }, { status: 403 });
   }
-  const limited = rateLimited(req, "capture");
+  const limited = await rateLimited(req, "capture");
   if (limited) return limited;
   const { url } = await req.json().catch(() => ({}));
   const u = typeof url === "string" ? await safeUrl(url) : null;

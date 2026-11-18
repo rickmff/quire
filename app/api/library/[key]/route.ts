@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 type Params = { params: Promise<{ key: string }> };
 
 export async function GET(req: Request, { params }: Params) {
-  const limited = rateLimited(req, "read");
+  const limited = await rateLimited(req, "read");
   if (limited) return limited;
   const { key } = await params;
   if (!KEY_RE.test(key)) return Response.json({ error: "bad-key" }, { status: 400 });
@@ -23,7 +23,7 @@ export async function PUT(req: Request, { params }: Params) {
     logSuspicious({ reason: "cross-site", route: "library", client: clientAddress(req) });
     return Response.json({ error: "forbidden" }, { status: 403 });
   }
-  const limited = rateLimited(req, "write");
+  const limited = await rateLimited(req, "write");
   if (limited) return limited;
   const { key } = await params;
   if (!KEY_RE.test(key)) return Response.json({ error: "bad-key" }, { status: 400 });

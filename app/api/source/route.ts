@@ -5,7 +5,7 @@ import { rateLimited } from "@/lib/rateLimit";
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
-  const limited = rateLimited(req, "fetch");
+  const limited = await rateLimited(req, "fetch");
   if (limited) return limited;
   const id = new URL(req.url).searchParams.get("id") ?? "";
   const c = catalog.components.find((x) => x.id === id);

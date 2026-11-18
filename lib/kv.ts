@@ -1,6 +1,7 @@
 import "server-only";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { redis } from "./redis";
 
 export type KV = {
   name: string;
@@ -29,23 +30,26 @@ function cloudflare(): KV | null {
 }
 
 function upstash(): KV | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
-  if (!url || !token) return null;
-  const call = async (cmd: string[]) => {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-      body: JSON.stringify(cmd),
-      cache: "no-store",
-    });
-    if (!r.ok) throw new Error(`Redis ${r.status}`);
-    return (await r.json()).result as string | null;
-  };
+  const db = redis();
+  if (!db) return null;
   return {
     name: "upstash",
-    get: (key) => call(["GET", key]),
-    put: async (key, value) => void (await call(["SET", key, value])),
+    get: async (key) => (await db.run(["GET", key])) as string | null,
+    put: async (key, value) => void (await db.run(["SET", key, value])),
+  };
+}
+
+export function withFallback(primary: KV, legacy: KV): KV {
+  return {
+    name: `${primary.name}+${legacy.name}`,
+    async get(key) {
+      const value = await primary.get(key);
+      if (value !== null) return value;
+      const old = await legacy.get(key).catch(() => null);
+      if (old !== null) await primary.put(key, old);
+      return old;
+    },
+    put: (key, value) => primary.put(key, value),
   };
 }
 
@@ -71,6 +75,10 @@ function files(): KV | null {
 
 let cached: KV | null | undefined;
 export function kv(): KV | null {
-  if (cached === undefined) cached = cloudflare() ?? upstash() ?? files();
+  if (cached === undefined) {
+    const primary = upstash();
+    const legacy = cloudflare();
+    cached = primary && legacy ? withFallback(primary, legacy) : (primary ?? legacy ?? files());
+  }
   return cached;
 }

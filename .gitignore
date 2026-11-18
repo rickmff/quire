@@ -11,10 +11,9 @@ capture/media/
 capture/.env
 capture/node_modules/
 
-# OpenNext / Wrangler
-.open-next
-.wrangler
-
 # Playwright
 test-results/
 playwright-report/
+
+# Recorded previews live in Vercel Blob (npm run previews:upload)
+public/previews/

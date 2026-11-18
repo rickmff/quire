@@ -43,7 +43,7 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Build (OpenNext for Cloudflare)
+      - name: Build
         run: npm run build
 
   e2e:
@@ -65,7 +65,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Build
-        run: npm run build:next
+        run: npm run build
 
       - name: Run Playwright against next start
         run: npm run test:e2e

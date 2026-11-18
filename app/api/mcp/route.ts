@@ -24,7 +24,7 @@ function keyFrom(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const limited = rateLimited(req, "mcp", CORS);
+  const limited = await rateLimited(req, "mcp", CORS);
   if (limited) return limited;
   const raw = await req.text();
   if (raw.length > MAX_BODY)
