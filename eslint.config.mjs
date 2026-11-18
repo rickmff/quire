@@ -21,5 +21,6 @@ export default defineConfig([
     "capture/**",
     "extension/**",
     "node_modules/**",
+    "app/.well-known/workflow/**",
   ]),
 ]);

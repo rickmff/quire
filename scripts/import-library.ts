@@ -41,6 +41,7 @@ const runs = (s: Step) => STEPS.indexOf(s) >= STEPS.indexOf(from) && STEPS.index
 if (!input && !arg("repo") && !arg("id")) {
   console.log(`Usage: npm run import -- <site url | @scope> [--repo owner/name] [--id id] [--name "Name"]
   [--blurb "One line."] [--docs "https://site/docs/{name}"] [--from step] [--until step] [--port 5190]
+  [--only name,name] records only those components
 Steps: ${STEPS.join(", ")}`);
   process.exit(1);
 }
@@ -138,6 +139,11 @@ async function discover() {
   };
   writeJson(LIBS, libs);
   log("discover", `wrote ${id} to scripts/catalog/imported.json and stage/libs.json`);
+  mkdirSync(join(STAGE, "out"), { recursive: true });
+  writeFileSync(
+    join(STAGE, "out", "discover.json"),
+    JSON.stringify({ ...entry, components: registry!.count, docsGuessed: docs.guessed }, null, 1),
+  );
   return id;
 }
 
@@ -181,8 +187,9 @@ async function record(id: string) {
   });
   try {
     await waitFor(`http://localhost:${port}/`);
-    run("record", "node", ["capture.mjs", id, port, `out/${id}`], STAGE);
-    run("record", "node", ["video.mjs", id, port, `out/${id}`], STAGE);
+    const only = arg("only")?.split(",").filter(Boolean) ?? [];
+    run("record", "node", ["capture.mjs", id, port, `out/${id}`, ...only], STAGE);
+    run("record", "node", ["video.mjs", id, port, `out/${id}`, ...only], STAGE);
   } finally {
     try {
       process.kill(-server.pid!, "SIGTERM");
