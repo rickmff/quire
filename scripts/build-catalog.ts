@@ -1,15 +1,14 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { classify } from "../lib/types.ts";
 import { techFrom, triggersFor } from "../lib/motion.ts";
 import { SOURCES, type Source } from "./catalog/sources.ts";
 import { dedupe } from "./catalog/dedupe.ts";
+import { checkout } from "./catalog/git.ts";
 import type { CatalogComponent, CatalogLibrary, Catalog } from "../lib/catalog/schema.ts";
 import type { Registry, RegistryItem } from "../lib/catalog/registry.ts";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const CACHE = join(ROOT, ".cache/catalog");
 const OUT = join(ROOT, "lib/catalog/data.json");
 const manual: Record<string, RegistryItem[]> = JSON.parse(
   readFileSync(join(ROOT, "scripts/catalog/manual.json"), "utf8"),
@@ -17,26 +16,6 @@ const manual: Record<string, RegistryItem[]> = JSON.parse(
 
 const COMPONENT_TYPES = new Set(["registry:ui", "registry:component", "registry:block", undefined]);
 const SKIP = /^(index|utils?|style|theme|demo|example)$|-(demo|example)(-\d+)?$/i;
-
-function git(args: string[], cwd?: string) {
-  return execFileSync("git", args, {
-    cwd,
-    encoding: "utf8",
-    maxBuffer: 256 * 1024 * 1024,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-}
-
-function checkout(repo: string, branch = "HEAD") {
-  const dir = join(CACHE, repo.replace("/", "__"));
-  if (!existsSync(dir)) {
-    mkdirSync(CACHE, { recursive: true });
-    git(["clone", "-q", "--depth", "1", "--filter=blob:none", "--no-checkout", `https://github.com/${repo}`, dir]);
-  }
-  const files = git(["ls-tree", "-r", "--name-only", branch], dir).split("\n").filter(Boolean);
-  const show = (path: string) => git(["show", `${branch}:${path}`], dir);
-  return { files, show };
-}
 
 const titleCase = (s: string) =>
   s

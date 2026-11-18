@@ -1,3 +1,5 @@
+import imported from "./imported.json" with { type: "json" };
+
 export type Source = {
   id: string;
   name: string;
@@ -21,6 +23,34 @@ export type Source = {
 };
 
 const shadcnAdd = (url: string) => `npx shadcn@latest add ${url}`;
+
+export type Imported = {
+  id: string;
+  name: string;
+  url: string;
+  blurb: string;
+  repo: string;
+  path: string;
+  docs: string;
+  item?: string;
+  scope?: string;
+  license: string;
+};
+
+const fill = (template: string, name: string) => template.replaceAll("{name}", name);
+
+const fromImport = (i: Imported): Source => ({
+  id: i.id,
+  name: i.name,
+  url: i.url,
+  blurb: i.blurb,
+  repo: i.repo,
+  kind: "registry",
+  path: i.path,
+  docs: (n) => fill(i.docs, n),
+  item: i.item ? (n) => fill(i.item!, n) : undefined,
+  install: (n) => shadcnAdd(i.scope ? `@${i.scope}/${n}` : i.item ? fill(i.item, n) : n),
+});
 
 export const SOURCES: Source[] = [
   {
@@ -50,4 +80,5 @@ export const SOURCES: Source[] = [
     install: (n) => shadcnAdd(`@animate-ui/${n}`),
     skip: /^(demo|icons)-/,
   },
+  ...(imported as Imported[]).map(fromImport),
 ];

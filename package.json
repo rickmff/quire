@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "check:comments": "node scripts/check-comments.mjs",
     "check": "npm run check:comments && npm run format:check && npm run lint && npm run typecheck && npm test",
-    "previews:upload": "node stage/upload-previews.mjs"
+    "previews:upload": "node stage/upload-previews.mjs",
+    "import": "node scripts/import-library.ts"
   },
   "dependencies": {
     "@ui-sdk/core": "0.1.0-beta.8",
