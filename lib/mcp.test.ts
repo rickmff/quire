@@ -26,6 +26,18 @@ describe("handleRpc", () => {
     expect(loose.total).toBeGreaterThan(0);
   });
 
+  it("filters by engine and offers the UI SDK parts to rebuild with", async () => {
+    const radix = textOf(await call("tools/call", { name: "search_components", arguments: { engine: "Radix" } }));
+    expect(radix.total).toBeGreaterThan(0);
+    expect(radix.items.every((i: { engine: string }) => i.engine === "Radix")).toBe(true);
+    const one = textOf(
+      await call("tools/call", { name: "get_component", arguments: { id: "animate-ui/components-radix-dialog" } }),
+    );
+    expect(one.rebuildWithUiSdk.imports).toContain("@ui-sdk/react/dialog");
+    const filters = textOf(await call("tools/call", { name: "get_filters", arguments: {} }));
+    expect(filters.engines.map((e: { id: string }) => e.id)).toContain("radix");
+  });
+
   it("asks for a brief before recommending", async () => {
     const reply = (await call("tools/call", { name: "recommend", arguments: {} })) as { result: { isError?: boolean } };
     expect(reply.result.isError).toBe(true);

@@ -2,8 +2,16 @@ import data from "./data.json";
 import type { Catalog, CatalogComponent, CatalogLibrary, SyncedLibrary } from "./schema";
 import { TYPES, OTHER, typeById } from "../types";
 import { TRIGGERS, triggerById } from "../motion";
+import { ENGINES, engineById, engineName, engineOf, type EngineId } from "../engine";
 
-export const catalog = data as unknown as Catalog;
+const raw = data as unknown as Catalog;
+export const catalog: Catalog = {
+  ...raw,
+  components: raw.components.map((c) => {
+    const engine = c.engine ?? engineOf(c);
+    return engine ? { ...c, engine } : c;
+  }),
+};
 export const libraries: CatalogLibrary[] = catalog.libraries;
 const libraryById = new Map(libraries.map((l) => [l.id, l]));
 export const libraryName = (c: CatalogComponent) => c.site ?? libraryById.get(c.library)?.name ?? c.library;
@@ -21,6 +29,7 @@ export type Query = {
   trigger?: string;
   tech?: string;
   library?: string;
+  engine?: string;
   limit?: number;
 };
 
@@ -58,7 +67,9 @@ function haystack(c: CatalogComponent) {
   return {
     title: c.title.toLowerCase(),
     name: c.name.toLowerCase().replace(/[-_]/g, " "),
-    meta: [c.category, typeById(c.type).name, ...c.triggers, ...c.tech, libraryName(c)].join(" ").toLowerCase(),
+    meta: [c.category, typeById(c.type).name, ...c.triggers, ...c.tech, engineName(c.engine), libraryName(c)]
+      .join(" ")
+      .toLowerCase(),
     body: (c.description ?? "").toLowerCase() + " " + (c.note ?? "").toLowerCase(),
   };
 }
@@ -81,10 +92,12 @@ export function score(c: CatalogComponent, ts: string[]) {
 export function search(items: CatalogComponent[], q: Query) {
   const ts = terms(q.query ?? "");
   const lib = q.library?.toLowerCase();
+  const engine = q.engine ? (engineById(q.engine) ?? q.engine) : undefined;
   const hits = items
     .filter((c) => !q.type || c.type === q.type)
     .filter((c) => !q.trigger || c.triggers.includes(q.trigger))
     .filter((c) => !q.tech || c.tech.some((t) => t.toLowerCase() === q.tech!.toLowerCase()))
+    .filter((c) => !engine || c.engine === engine)
     .filter((c) => !lib || c.library === lib || libraryName(c).toLowerCase() === lib)
     .map((c) => ({ c, s: score(c, ts) }))
     .filter((x) => x.s > 0)
@@ -109,12 +122,16 @@ export function facets(items: CatalogComponent[]) {
   const trig = count((c) => c.triggers);
   const tech = count((c) => c.tech);
   const libs = count((c) => [c.library]);
+  const engines = count((c) => (c.engine ? [c.engine] : []));
   return {
     types: [...TYPES, OTHER]
       .filter((t) => types.has(t.id))
       .map((t) => ({ id: t.id, name: t.name, family: t.family, count: types.get(t.id)! })),
     triggers: TRIGGERS.filter((t) => trig.has(t.id)).map((t) => ({ id: t.id, name: t.name, count: trig.get(t.id)! })),
     tech: [...tech].sort((a, b) => b[1] - a[1]).map(([id, count]) => ({ id, count })),
+    engines: (Object.keys(ENGINES) as EngineId[])
+      .filter((id) => engines.has(id))
+      .map((id) => ({ id, name: ENGINES[id].name, count: engines.get(id)! })),
     libraries: [...libs]
       .sort((a, b) => b[1] - a[1])
       .map(([id, count]) => ({ id, name: libraryById.get(id)?.name ?? id, count })),

@@ -2,6 +2,7 @@ import "server-only";
 import { catalog, facets, libraries, libraryName, readBrief, scope, search, typeById } from "./catalog";
 import type { CatalogComponent, SyncedLibrary } from "./catalog/schema";
 import { triggerById } from "./motion";
+import { UI_SDK_DOCS, engineName, uiSdkParts } from "./engine";
 import { readSource } from "./source";
 
 const VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
@@ -21,6 +22,7 @@ function card(c: CatalogComponent) {
     type: typeById(c.type).name,
     ...(c.triggers.length ? { motion: c.triggers.map((t) => triggerById(t)?.name ?? t) } : {}),
     ...(c.tech.length ? { tech: c.tech } : {}),
+    ...(c.engine ? { engine: engineName(c.engine) } : {}),
     ...(c.description ? { description: c.description } : {}),
     ...(c.note ? { note: c.note } : {}),
     docs: c.docs,
@@ -36,6 +38,19 @@ function full(c: CatalogComponent, base: string) {
     ...(c.preview ? { preview: c.preview.startsWith("/") ? `${base}${c.preview}` : c.preview } : {}),
     ...(c.live ? { liveDemo: `${base}${c.live.src}` } : {}),
     sourceAvailable: Boolean(c.item || (c.repo && c.files?.length)),
+    ...uiSdk(c),
+  };
+}
+
+function uiSdk(c: CatalogComponent) {
+  const parts = uiSdkParts(c);
+  if (!parts.length || c.engine === "ui-sdk") return {};
+  return {
+    rebuildWithUiSdk: {
+      imports: parts.map((p) => `@ui-sdk/react/${p}`),
+      docs: UI_SDK_DOCS,
+      how: `Keep the look and motion of this reference and take the behavior (focus, keyboard, dismissal, ARIA) from UI SDK${c.engine ? ` instead of ${engineName(c.engine)}` : ""}.`,
+    },
   };
 }
 
@@ -51,6 +66,10 @@ const filterProps = {
     description: "Animation tech: Motion, GSAP, Three.js, WebGL, Lottie, React Spring, Matter.js.",
   },
   library: { type: "string", description: "Library id or name from list_libraries." },
+  engine: {
+    type: "string",
+    description: "Headless engine behind the behavior: radix, base-ui, headless-ui, react-aria, ui-sdk.",
+  },
 };
 
 const TOOLS = [
@@ -81,7 +100,8 @@ const TOOLS = [
   },
   {
     name: "get_component",
-    description: "Full record of one component: description, motion, tech, dependencies, docs link, install command.",
+    description:
+      "Full record of one component: description, motion, tech, engine, dependencies, docs link, install command, and the UI SDK parts to rebuild its behavior with.",
     inputSchema: {
       type: "object",
       properties: { id: { ...str, description: "Component id, e.g. magicui/magic-card." } },
@@ -97,7 +117,7 @@ const TOOLS = [
   {
     name: "get_filters",
     description:
-      "Every valid filter value with counts: types (grouped by family), motion triggers, tech and libraries.",
+      "Every valid filter value with counts: types (grouped by family), motion triggers, tech, engines and libraries.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -157,6 +177,7 @@ async function callTool(name: string, args: ToolArgs, ctx: Ctx) {
         trigger: optionalText(args.trigger),
         tech: optionalText(args.tech),
         library: optionalText(args.library),
+        engine: optionalText(args.engine),
         limit: Number(args.limit) || 12,
       });
       return text({ total: r.total, items: r.items.map(card) });

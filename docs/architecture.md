@@ -282,6 +282,13 @@ The import does not upload previews. Run `npm run previews:upload` after the pul
 - Commands that open another dialog (Delete collection, Import a site) wait for `onOpenChangeComplete` instead. A
   click that lands while the command menu is still closing does not reach the new dialog, so its confirm button
   would ignore the first click. The e2e test for deleting a collection catches this on a production build.
+- `lib/engine.ts` reads which headless library a component's behavior comes from (Radix, Base UI, Headless UI,
+  React Aria, UI SDK), first from its name (Animate UI ships `components-radix-*` and `components-base-*`), then from
+  its dependencies. `@radix-ui/react-icons` is an icon set, not an engine, so it does not count. `lib/catalog`
+  adds the engine when it loads `data.json`, so the catalog build does not have to run again. The map from Quire
+  types to UI SDK parts names only paths that `@ui-sdk/react` exports; when the pinned version changes, check it
+  against that package's `exports`. The UI SDK prompt links the React docs root, not a page per part, because the
+  per-part URLs are not stable in the beta.
 
 ## Third-party code and design
 

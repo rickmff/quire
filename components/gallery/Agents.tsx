@@ -131,7 +131,7 @@ export function Agents({
           references for each.
         </li>
         <li>
-          <code className="text-fg">search_components</code> by words, type, motion trigger, tech or site.
+          <code className="text-fg">search_components</code> by words, type, motion trigger, tech, engine or site.
         </li>
         <li>
           <code className="text-fg">get_component_source(id)</code> returns the real code from the site&apos;s registry

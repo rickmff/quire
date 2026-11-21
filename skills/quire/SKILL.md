@@ -24,7 +24,7 @@ Other agents: point any MCP client at `https://quire.fyi/api/mcp` over HTTP.
    "pricing page with a playful toggle and a hover effect on cards". It returns the component types it reads from
    the brief, the best references for each, and motion rules.
 2. **Narrow.** If you need more, call `search_components` with words and filters (`type`, `trigger`, `tech`,
-   `library`). `get_filters` lists the valid values.
+   `engine`, `library`). `get_filters` lists the valid values.
 3. **Read the source.** Call `get_component_source(id)` for each reference you will use. Adapt that code. Do not
    rebuild it from memory.
 4. **Install when you can.** If the project uses shadcn and the component has an `install` command, run it instead
@@ -34,7 +34,9 @@ Other agents: point any MCP client at `https://quire.fyi/api/mcp` over HTTP.
 ## Behavior with UI SDK
 
 For interactive parts (menus, comboboxes, dialogs, popovers, tabs, sliders), keep the look from the Quire
-reference and take the behavior from [UI SDK](https://ui-sdk.dev): focus, keyboard, dismissal and ARIA. If the
+reference and take the behavior from [UI SDK](https://ui-sdk.dev): focus, keyboard, dismissal and ARIA.
+`get_component` returns `rebuildWithUiSdk` with the UI SDK imports that fit the component, and `engine` names the
+headless library it uses now (Radix, Base UI, Headless UI, React Aria). If the
 UI SDK skill is not installed, add it with `npx skills add vercel-labs/ui --skill ui-sdk`. Components built on UI SDK
 can also be operated by browser agents through WebMCP.
 

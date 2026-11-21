@@ -7,6 +7,7 @@ import { triggerById } from "@/lib/motion";
 import StarIcon from "@/components/StarIcon";
 import { Tip } from "@/components/ui/tooltip";
 import { agentText } from "@/lib/agentText";
+import { ENGINES, engineName, rebuildPrompt, type EngineId } from "@/lib/engine";
 import type { Picked } from "@/components/gallery/types";
 import { LiveDemo, Preview } from "@/components/gallery/Preview";
 import { VariantsMenu } from "@/components/gallery/VariantsMenu";
@@ -61,6 +62,7 @@ export function Detail({
   };
 
   const forAgent = agentText(item, site);
+  const rebuild = rebuildPrompt(item, site);
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-label={item.title}>
@@ -127,6 +129,21 @@ export function Detail({
                 <dd>{item.tech.join(", ")}</dd>
               </>
             )}
+            {item.engine && (
+              <>
+                <dt className="text-faint">Behavior</dt>
+                <dd>
+                  <a
+                    href={ENGINES[item.engine as EngineId]?.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="transition hover:text-muted"
+                  >
+                    {engineName(item.engine) ?? item.engine}
+                  </a>
+                </dd>
+              </>
+            )}
             {item.category && (
               <>
                 <dt className="text-faint">On {site}</dt>
@@ -174,6 +191,13 @@ export function Detail({
             <button onClick={() => copy(forAgent, "Copied for your agent")} className="btn btn-secondary">
               Copy for agent
             </button>
+            {rebuild && (
+              <Tip label="A prompt that keeps this look and takes the behavior from UI SDK">
+                <button onClick={() => copy(rebuild, "UI SDK prompt copied")} className="btn btn-secondary">
+                  Rebuild with UI SDK
+                </button>
+              </Tip>
+            )}
             <a href={item.docs} target="_blank" rel="noreferrer" className="btn btn-secondary">
               Open docs
             </a>
