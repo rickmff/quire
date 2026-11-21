@@ -291,6 +291,10 @@ flowchart LR
 
 - Quire deploys to Vercel from Git with no `vercel.json`: the framework preset and project settings are enough.
   Every pull request gets a preview deployment.
+- Quire is dark only. `app/globals.css` holds one set of colour tokens, the hero shader and the landing deal
+  have no light branch, and the stage records one image, one video and one live demo per component, all in
+  the dark theme (`theme=dark`). The stage's own libraries still carry their light CSS, because the demos
+  are theirs.
 - Recorded previews (`public/previews/`) live in Vercel Blob, not in Git. `npm run previews:upload` sends the
   files whose size changed. `next.config.ts` rewrites `/previews/*` to `QUIRE_PREVIEWS_URL` only as a
   fallback, so a local file still wins in development and URLs in `lib/catalog/stage.json` stay relative, which

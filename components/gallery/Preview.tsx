@@ -7,7 +7,7 @@ import { type GalleryItem } from "@/lib/useCatalog";
 import { useCaptureAvailable } from "@/lib/useCatalog";
 import { typeById } from "@/lib/types";
 import { watchOnScreen } from "@/components/gallery/hooks";
-import { useDark, useReducedMotion } from "@/lib/media";
+import { useReducedMotion } from "@/lib/media";
 import { variantQuery } from "@/components/gallery/variants";
 import type { Picked } from "@/components/gallery/types";
 
@@ -22,9 +22,8 @@ export function Preview({
   large?: boolean;
   still?: boolean;
 }) {
-  const dark = useDark();
-  const image = (dark && item.previewDark) || item.preview;
-  const video = still ? undefined : (dark && item.videoDark) || item.video;
+  const image = item.preview;
+  const video = still ? undefined : item.video;
   return <PreviewMedia key={`${image}|${video}`} item={item} site={site} large={large} image={image} video={video} />;
 }
 function PreviewMedia({
@@ -123,14 +122,12 @@ export function LiveDemo({
   card?: boolean;
   picked?: Picked;
 }) {
-  const dark = useDark();
-  const base = (dark && live.srcDark) || live.src;
-  const src = `${base}${card ? "&card=1" : ""}${variantQuery(live.variants, picked)}`;
+  const src = `${live.src}${card ? "&card=1" : ""}${variantQuery(live.variants, picked)}`;
   return (
     <LiveFrame
       key={src}
       src={src}
-      frame={(dark && live.frameDark) || live.frame}
+      frame={live.frame}
       view={live.view}
       title={title}
       onEscape={onEscape}

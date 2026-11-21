@@ -6,14 +6,12 @@ const STAGGER = 45;
 const FLIGHT = 560;
 
 const TAU = Math.PI * 2;
-const shade = (f: number, dark: boolean) => (dark ? 0.079 + 0.906 * f : 0.895 + 0.58 * (f - 0.8));
-function foilStops(dark: boolean, steps = 24): string {
+const shade = (f: number) => 0.079 + 0.906 * f;
+function foilStops(steps = 24): string {
   const out: string[] = [];
   for (let k = 0; k <= steps; k++) {
     const h = k / steps;
-    const rgb = [0, 1 / 3, 2 / 3].map((o) =>
-      Math.round(Math.min(shade(0.8 + 0.2 * Math.cos(TAU * (h - o)), dark), 1) * 255),
-    );
+    const rgb = [0, 1 / 3, 2 / 3].map((o) => Math.round(Math.min(shade(0.8 + 0.2 * Math.cos(TAU * (h - o))), 1) * 255));
     out.push(`rgb(${rgb.join(" ")}) ${(h * 100).toFixed(1)}%`);
   }
   return out.join(", ");
@@ -22,18 +20,14 @@ const glow = (a: number) =>
   [0, 0.33, 0.67, 1]
     .map((r) => `rgb(255 255 255 / ${(a * Math.exp(-((r * 1.56) ** 2) / 0.55)).toFixed(3)}) ${r * 100}%`)
     .join(", ");
-function centre(dark: boolean): string {
-  const v = Math.round(shade(0.95, dark) * 255);
+function centre(): string {
+  const v = Math.round(shade(0.95) * 255);
   return `rgb(${v} ${v} ${v})`;
 }
 
 export type FoilAt = { from: number; cx: number; cy: number };
 
-export function foilSheet(
-  dark: boolean,
-  i: number,
-  at?: FoilAt,
-): { el: HTMLElement; wheel: HTMLElement; sweep: HTMLElement } {
+export function foilSheet(i: number, at?: FoilAt): { el: HTMLElement; wheel: HTMLElement; sweep: HTMLElement } {
   const { from = i * 0.061 * 360, cx = 50, cy = 50 } = at ?? {};
   const el = document.createElement("div");
   el.setAttribute("aria-hidden", "true");
@@ -44,7 +38,7 @@ export function foilSheet(
     overflow: "hidden",
     borderRadius: "8px",
     pointerEvents: "none",
-    boxShadow: dark ? "inset 0 0 0 1px rgb(255 255 255 / .1)" : "inset 0 0 0 1px rgb(150 140 220 / .18)",
+    boxShadow: "inset 0 0 0 1px rgb(255 255 255 / .1)",
   });
   const wheel = document.createElement("div");
   Object.assign(wheel.style, {
@@ -53,22 +47,22 @@ export function foilSheet(
     top: `${cy - 160}%`,
     width: "220%",
     height: "320%",
-    background: `conic-gradient(from ${from.toFixed(1)}deg, ${foilStops(dark)})`,
+    background: `conic-gradient(from ${from.toFixed(1)}deg, ${foilStops()})`,
   });
   const wash = document.createElement("div");
   Object.assign(wash.style, {
     position: "absolute",
     inset: "0",
     background: [
-      `radial-gradient(ellipse 78% 104% at 50% 33%, ${glow(dark ? 0.1 : 0.3)})`,
-      `radial-gradient(ellipse 30% 40% at ${cx.toFixed(1)}% ${cy.toFixed(1)}%, ${centre(dark)}, transparent)`,
+      `radial-gradient(ellipse 78% 104% at 50% 33%, ${glow(0.1)})`,
+      `radial-gradient(ellipse 30% 40% at ${cx.toFixed(1)}% ${cy.toFixed(1)}%, ${centre()}, transparent)`,
     ].join(", "),
   });
   const sweep = document.createElement("div");
   Object.assign(sweep.style, {
     position: "absolute",
     inset: "-20% -60%",
-    background: `linear-gradient(115deg, transparent 38%, rgb(255 255 255 / ${dark ? 0.12 : 0.5}) 50%, transparent 62%)`,
+    background: `linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.12) 50%, transparent 62%)`,
     transform: "translateX(-60%)",
   });
   el.append(wheel, wash, sweep);
@@ -92,7 +86,6 @@ function heroStack(stage: HTMLElement): Pile {
 
 export function handOffPile(at: Pile, settle = false) {
   const { x, y, w, sheets } = at;
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   document.getElementById(OVERLAY)?.remove();
   const layer = document.createElement("div");
   layer.id = OVERLAY;
@@ -107,7 +100,7 @@ export function handOffPile(at: Pile, settle = false) {
     aspectRatio: `1 / ${SHEET}`,
   });
   for (let i = PILE - 1; i >= 0; i--) {
-    const sheet = foilSheet(dark, i, sheets?.[i]).el;
+    const sheet = foilSheet(i, sheets?.[i]).el;
     sheet.style.transform = `translateY(${i * 1.5}px) rotate(${pileRot(i)}deg)`;
     pile.appendChild(sheet);
   }
@@ -170,7 +163,6 @@ export function deal(root: HTMLElement): number {
   const box = root.getBoundingClientRect();
   const cx = handoff ? handoff.x : box.left + box.width / 2;
   const cy = handoff ? handoff.y : Math.max(box.top, 0) + (vh - Math.max(box.top, 0)) * 0.45;
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const n = cards.length;
 
   if (handoff) document.getElementById(OVERLAY)?.remove();
@@ -211,7 +203,7 @@ export function deal(root: HTMLElement): number {
       { duration: total, easing: "linear", fill: "both" },
     );
 
-    const { el: foil, wheel, sweep } = foilSheet(dark, i, i < PILE ? handoff?.sheets?.[i] : undefined);
+    const { el: foil, wheel, sweep } = foilSheet(i, i < PILE ? handoff?.sheets?.[i] : undefined);
     sheet.appendChild(foil);
     const end = total + 160;
     const sheen = foil.animate(

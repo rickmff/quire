@@ -1,33 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fcfcfc;
-  --panel: #ffffff;
-  --fg: #111111;
-  --muted: #8f8f8f;
-  --faint: #c4c4c4;
-  --line: #ededed;
-  --hover: rgb(0 0 0 / 0.035);
-  --field: rgb(0 0 0 / 0.035);
-  --field-focus: rgb(0 0 0 / 0.06);
-  --accent: #2f6fed;
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0b0b;
-    --panel: #111111;
-    --fg: #ececec;
-    --muted: #7a7a7a;
-    --faint: #474747;
-    --line: #1d1d1d;
-    --hover: rgb(255 255 255 / 0.04);
-    --field: rgb(255 255 255 / 0.04);
-    --field-focus: rgb(255 255 255 / 0.075);
-    --accent: #5b8cff;
-    color-scheme: dark;
-  }
+  --bg: #0b0b0b;
+  --panel: #111111;
+  --fg: #ececec;
+  --muted: #7a7a7a;
+  --faint: #474747;
+  --line: #1d1d1d;
+  --hover: rgb(255 255 255 / 0.04);
+  --field: rgb(255 255 255 / 0.04);
+  --field-focus: rgb(255 255 255 / 0.075);
+  --accent: #5b8cff;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -352,84 +336,47 @@ textarea:focus-visible {
   }
 
   .btn-primary {
-    --btn-bg: #212126;
-    --btn-bg-hover: #2a2a30;
-    --btn-fg: #ffffff;
-    --btn-fg-hover: #ffffff;
-    --btn-ring: #212126;
-    --btn-ring-hover: #2a2a30;
-    --btn-lip: rgb(255 255 255 / 0.07);
-    --btn-drop: 0 1px 3px rgb(19 19 22 / 0.2);
-    --btn-drop-hover: 0 2px 4px rgb(19 19 22 / 0.16), 0 6px 14px -6px rgb(19 19 22 / 0.4);
-    --btn-glow: rgb(255 255 255 / 0.2);
-    --btn-band: rgb(255 255 255 / 0.1);
-    --btn-band-blend: overlay;
-  }
-
-  .btn-secondary {
     --btn-bg: #e9e9ec;
     --btn-bg-hover: #f0f0f2;
     --btn-fg: #131316;
     --btn-fg-hover: #131316;
-    --btn-ring: rgb(19 19 22 / 0.14);
-    --btn-ring-hover: rgb(19 19 22 / 0.22);
+    --btn-ring: #ffffff;
+    --btn-ring-hover: #ffffff;
     --btn-lip: rgb(255 255 255 / 0.8);
-    --btn-drop: 0 1px 1px -0.5px rgb(0 0 0 / 0.06), 0 2px 2px -1px rgb(0 0 0 / 0.06), 0 4px 4px -2px rgb(0 0 0 / 0.04);
+    --btn-drop: 0 1px 1px -0.5px rgb(0 0 0 / 0.4), 0 2px 2px -1px rgb(0 0 0 / 0.4), 0 4px 4px -2px rgb(0 0 0 / 0.3);
     --btn-drop-hover:
-      0 1px 1px -0.5px rgb(0 0 0 / 0.06), 0 3px 3px -1.5px rgb(0 0 0 / 0.07), 0 8px 12px -4px rgb(0 0 0 / 0.1);
+      0 1px 1px -0.5px rgb(0 0 0 / 0.4), 0 3px 3px -1.5px rgb(0 0 0 / 0.45), 0 8px 16px -4px rgb(0 0 0 / 0.6);
     --btn-glow: rgb(255 255 255 / 0.9);
     --btn-band: rgb(255 255 255 / 0.55);
     --btn-band-blend: normal;
   }
-  .btn-secondary:active {
+  .btn-primary:active {
     --btn-bg: #e3e3e6;
     --btn-bg-hover: #e3e3e6;
+  }
+  .btn-secondary {
+    --btn-bg: rgb(255 255 255 / 0.03);
+    --btn-bg-hover: rgb(255 255 255 / 0.06);
+    --btn-fg: var(--fg);
+    --btn-fg-hover: #ffffff;
+    --btn-ring: rgb(255 255 255 / 0.1);
+    --btn-ring-hover: rgb(255 255 255 / 0.17);
+    --btn-lip: rgb(255 255 255 / 0.06);
+    --btn-drop: 0 1px 1px -0.5px rgb(0 0 0 / 0.3), 0 2px 2px -1px rgb(0 0 0 / 0.3), 0 4px 4px -2px rgb(0 0 0 / 0.3);
+    --btn-drop-hover:
+      0 1px 1px -0.5px rgb(0 0 0 / 0.3), 0 3px 3px -1.5px rgb(0 0 0 / 0.35), 0 8px 12px -4px rgb(0 0 0 / 0.5);
+    --btn-glow: rgb(255 255 255 / 0.08);
+    --btn-band: rgb(255 255 255 / 0.035);
+    --btn-band-blend: normal;
+    background-image: none;
+  }
+  .btn-secondary:active {
+    --btn-bg: rgb(255 255 255 / 0.03);
+    --btn-bg-hover: rgb(255 255 255 / 0.03);
   }
 
   .btn-ghost {
     --btn-fg: var(--muted);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .btn-primary {
-      --btn-bg: #e9e9ec;
-      --btn-bg-hover: #f0f0f2;
-      --btn-fg: #131316;
-      --btn-fg-hover: #131316;
-      --btn-ring: #ffffff;
-      --btn-ring-hover: #ffffff;
-      --btn-lip: rgb(255 255 255 / 0.8);
-      --btn-drop: 0 1px 1px -0.5px rgb(0 0 0 / 0.4), 0 2px 2px -1px rgb(0 0 0 / 0.4), 0 4px 4px -2px rgb(0 0 0 / 0.3);
-      --btn-drop-hover:
-        0 1px 1px -0.5px rgb(0 0 0 / 0.4), 0 3px 3px -1.5px rgb(0 0 0 / 0.45), 0 8px 16px -4px rgb(0 0 0 / 0.6);
-      --btn-glow: rgb(255 255 255 / 0.9);
-      --btn-band: rgb(255 255 255 / 0.55);
-      --btn-band-blend: normal;
-    }
-    .btn-primary:active {
-      --btn-bg: #e3e3e6;
-      --btn-bg-hover: #e3e3e6;
-    }
-    .btn-secondary {
-      --btn-bg: rgb(255 255 255 / 0.03);
-      --btn-bg-hover: rgb(255 255 255 / 0.06);
-      --btn-fg: var(--fg);
-      --btn-fg-hover: #ffffff;
-      --btn-ring: rgb(255 255 255 / 0.1);
-      --btn-ring-hover: rgb(255 255 255 / 0.17);
-      --btn-lip: rgb(255 255 255 / 0.06);
-      --btn-drop: 0 1px 1px -0.5px rgb(0 0 0 / 0.3), 0 2px 2px -1px rgb(0 0 0 / 0.3), 0 4px 4px -2px rgb(0 0 0 / 0.3);
-      --btn-drop-hover:
-        0 1px 1px -0.5px rgb(0 0 0 / 0.3), 0 3px 3px -1.5px rgb(0 0 0 / 0.35), 0 8px 12px -4px rgb(0 0 0 / 0.5);
-      --btn-glow: rgb(255 255 255 / 0.08);
-      --btn-band: rgb(255 255 255 / 0.035);
-      --btn-band-blend: normal;
-      background-image: none;
-    }
-    .btn-secondary:active {
-      --btn-bg: rgb(255 255 255 / 0.03);
-      --btn-bg-hover: rgb(255 255 255 / 0.03);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
