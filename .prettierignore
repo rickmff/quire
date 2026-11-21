@@ -8,3 +8,4 @@ package-lock.json
 *.md
 stage/app-*/
 stage/out/
+app/.well-known/workflow/

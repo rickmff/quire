@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withWorkflow } from "workflow/next";
 
 const isDev = process.env.NODE_ENV !== "production";
 const previewsUrl = process.env.QUIRE_PREVIEWS_URL?.replace(/\/$/, "");
@@ -57,4 +58,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withWorkflow(nextConfig);

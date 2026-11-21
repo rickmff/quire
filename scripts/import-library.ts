@@ -9,7 +9,8 @@ import {
   COMPONENT_TYPES,
   type DirectoryEntry,
   demoStyle,
-  docsTemplate,
+  docsLayout,
+  libraryName,
   findInDirectory,
   firstSentence,
   pickRegistry,
@@ -36,11 +37,24 @@ const arg = (name: string) => {
 const input = argv.find((a, i) => !a.startsWith("--") && !argv[i - 1]?.startsWith("--"));
 const from = (arg("from") ?? "discover") as Step;
 const until = (arg("until") ?? "summary") as Step;
+for (const [flag, value] of [
+  ["from", from],
+  ["until", until],
+] as const)
+  if (!STEPS.includes(value)) {
+    console.error(`--${flag} "${value}" is not a step. Steps: ${STEPS.join(", ")}`);
+    process.exit(1);
+  }
+if (STEPS.indexOf(from) > STEPS.indexOf(until)) {
+  console.error(`--from ${from} comes after --until ${until}.`);
+  process.exit(1);
+}
 const runs = (s: Step) => STEPS.indexOf(s) >= STEPS.indexOf(from) && STEPS.indexOf(s) <= STEPS.indexOf(until);
 
 if (!input && !arg("repo") && !arg("id")) {
   console.log(`Usage: npm run import -- <site url | @scope> [--repo owner/name] [--id id] [--name "Name"]
   [--blurb "One line."] [--docs "https://site/docs/{name}"] [--from step] [--until step] [--port 5190]
+  [--only name,name] records only those components
 Steps: ${STEPS.join(", ")}`);
   process.exit(1);
 }
@@ -50,9 +64,9 @@ const writeJson = (file: string, value: unknown) => {
   writeFileSync(file, JSON.stringify(value, null, 2) + "\n");
   spawnSync("npx", ["prettier", "--write", file], { cwd: ROOT, stdio: "ignore" });
 };
+class Stop extends Error {}
 const fail = (message: string): never => {
-  console.error(`\nStopped: ${message}`);
-  process.exit(2);
+  throw new Stop(message);
 };
 const log = (step: string, message: string) => console.log(`[${step}] ${message}`);
 
@@ -74,9 +88,11 @@ async function discover() {
   let repo = arg("repo");
   if (!repo && homepage) {
     const html = await fetchText(homepage);
-    repo = html ? repoFromHtml(html) : undefined;
+    if (!html) fail(`could not load ${homepage}. Check the URL, or pass --repo owner/name.`);
+    repo = repoFromHtml(html!);
+    if (!repo) fail(`${homepage} links to no GitHub repository. Pass --repo owner/name.`);
   }
-  if (!repo) fail("no GitHub repository found. Pass --repo owner/name.");
+  if (!repo) fail("no site and no repository. Pass a site URL or --repo owner/name.");
   log("discover", `repository ${repo}`);
 
   const { files, show } = checkout(repo!);
@@ -108,18 +124,19 @@ async function discover() {
   const id = arg("id") ?? slug(scope ?? repo!.split("/")[1]);
   const site = (homepage ?? `https://github.com/${repo}`).replace(/\/$/, "");
   const names = registry!.items.filter((i) => COMPONENT_TYPES.has(i.type ?? "")).map((i) => i.name);
-  const docs = arg("docs") ? { template: arg("docs")!, guessed: false } : docsTemplate(files, site, names);
+  const docs = arg("docs") ? { template: arg("docs")!, guessed: false } : docsLayout(files, site, names);
   if (docs.guessed) log("discover", `docs URL guessed as ${docs.template}; pass --docs to fix it`);
   const style = demoStyle(registry!.items);
 
   const entry: Imported = {
     id,
-    name: arg("name") ?? registryName(read(registry!.path)) ?? id,
+    name: arg("name") ?? libraryName(read(registry!.path)) ?? id,
     url: site,
     blurb: arg("blurb") ?? (firstSentence(listed?.description) || `Components from ${repo}.`),
     repo: repo!,
     path: registry!.path,
     docs: docs.template,
+    ...("pages" in docs && docs.pages ? { docsPages: docs.pages } : {}),
     item: listed?.url,
     scope,
     license: license.ok ? license.spdx : "",
@@ -138,20 +155,12 @@ async function discover() {
   };
   writeJson(LIBS, libs);
   log("discover", `wrote ${id} to scripts/catalog/imported.json and stage/libs.json`);
+  mkdirSync(join(STAGE, "out"), { recursive: true });
+  writeFileSync(
+    join(STAGE, "out", "discover.json"),
+    JSON.stringify({ ...entry, components: registry!.count, docsGuessed: docs.guessed }, null, 1),
+  );
   return id;
-}
-
-function registryName(text?: string) {
-  try {
-    const name: string | undefined = JSON.parse(text ?? "{}").name;
-    return name
-      ?.replace(/[-_]+/g, " ")
-      .replace(/ui$/i, " UI")
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-      .trim();
-  } catch {
-    return undefined;
-  }
 }
 
 function run(step: string, cmd: string, args: string[], cwd = ROOT, env: NodeJS.ProcessEnv = {}) {
@@ -169,24 +178,34 @@ async function waitFor(url: string, ms = 120000) {
   fail(`the stage server did not answer at ${url}.`);
 }
 
+function stopTree(pid?: number) {
+  if (!pid) return;
+  try {
+    if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(pid), "/T", "/F"], { stdio: "ignore" });
+    else process.kill(-pid, "SIGTERM");
+  } catch {}
+}
+
 async function record(id: string) {
   const port = arg("port") ?? "5190";
+  if (await fetchText(`http://localhost:${port}/`))
+    fail(`port ${port} is already in use, maybe by a stage server left from an earlier run. Stop it or pass --port.`);
   const app = join(STAGE, `app-${id}`);
   log("record", `starting the stage on port ${port}`);
   const server = spawn("npx", ["vite", "--logLevel", "warn"], {
     cwd: app,
     env: { ...process.env, PORT: port },
     stdio: "inherit",
-    detached: true,
+    detached: process.platform !== "win32",
+    shell: process.platform === "win32",
   });
   try {
     await waitFor(`http://localhost:${port}/`);
-    run("record", "node", ["capture.mjs", id, port, `out/${id}`], STAGE);
-    run("record", "node", ["video.mjs", id, port, `out/${id}`], STAGE);
+    const only = arg("only")?.split(",").filter(Boolean) ?? [];
+    run("record", "node", ["capture.mjs", id, port, `out/${id}`, ...only], STAGE);
+    run("record", "node", ["video.mjs", id, port, `out/${id}`, ...only], STAGE);
   } finally {
-    try {
-      process.kill(-server.pid!, "SIGTERM");
-    } catch {}
+    stopTree(server.pid);
   }
 }
 
@@ -245,14 +264,24 @@ function summary(id: string) {
   log("summary", `wrote stage/out/${id}/summary.md`);
 }
 
-let id = arg("id") ?? "";
-if (runs("discover")) id = await discover();
-if (!id) fail("pass --id when starting after the discover step.");
-if (runs("catalog")) run("catalog", "node", ["scripts/build-catalog.ts", id]);
-if (runs("stage")) {
-  run("stage", "sh", ["setup.sh", id], STAGE);
-  run("stage", "bash", ["build.sh", "..", id], STAGE);
+async function main() {
+  let id = arg("id") ?? "";
+  if (runs("discover")) id = await discover();
+  if (!id) fail("pass --id when starting after the discover step.");
+  if (runs("catalog")) run("catalog", "node", ["scripts/build-catalog.ts", id]);
+  if (runs("stage")) {
+    run("stage", "sh", ["setup.sh", id], STAGE);
+    run("stage", "bash", ["build.sh", "..", id], STAGE);
+  }
+  if (runs("record")) await record(id);
+  if (runs("publish")) run("publish", "node", ["publish.mjs", "..", id], STAGE);
+  if (runs("summary")) summary(id);
 }
-if (runs("record")) await record(id);
-if (runs("publish")) run("publish", "node", ["publish.mjs", "..", id], STAGE);
-if (runs("summary")) summary(id);
+
+try {
+  await main();
+} catch (e) {
+  if (!(e instanceof Stop)) throw e;
+  console.error(`\nStopped: ${e.message}`);
+  process.exitCode = 2;
+}

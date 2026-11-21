@@ -238,6 +238,11 @@ previews as the curated ones. It runs six steps, and `--from` and `--until` run 
 | `publish` | `stage/publish.mjs`. | |
 | `summary` | Writes `stage/out/<id>/summary.md`: counts and every component without a preview or with render errors. | |
 
+The docs URL comes from the component pages in the repository. When they sit in more than one folder (Kokonut
+UI keeps them by category, `docs/navigation/<name>`), the source gets `docsPages` and `build-catalog.ts` maps
+each component to its own page; the template is only the fallback. `record` stops if the stage port already
+answers, so a server left by an earlier run is never recorded by mistake.
+
 The license check reads the file, not only `package.json`, because several libraries declare MIT there and add
 the Commons Clause in the file. A refused library is not imported; ask its author or leave it out.
 
@@ -246,7 +251,41 @@ source roots, and whether demos are named `<name>-demo` (`suffix`) or `demo-<nam
 is missing, `install.mjs` builds it from the `registry.json` entry and the source files. Relative imports that no
 item lists are fetched from the same source root.
 
-The import does not upload previews. Run `npm run previews:upload` after the pull request is reviewed.
+Run locally, the import does not upload previews. Run `npm run previews:upload` after the pull request is
+reviewed.
+
+### The import agent on Vercel
+
+`POST /api/library-imports` runs the same import on Vercel. It takes `{ "url": "https://site", "repo"?, "id"?,
+"name"?, "docs"? }` and a bearer token equal to `QUIRE_ADMIN_TOKEN` (32 characters or more; without it the route
+refuses everyone). It answers `202` with an `importId`; `GET /api/library-imports/<importId>` with the same token
+returns the phase, the progress and, at the end, the pull request.
+
+```mermaid
+flowchart LR
+  A[POST /api/library-imports] --> B[Workflow importLibrary]
+  B --> C[Sandbox: setup]
+  C --> D[discover] --> E[stage] --> F[record, 16 components per batch] --> G[publish]
+  G --> H[Blob: previews/id/]
+  G --> I[GitHub: branch import/id and pull request]
+```
+
+- `workflows/import-library/` holds the workflow (`index.ts`) and its steps (`steps.ts`). The workflow only
+  orders steps; every step that touches the network or the sandbox lives in `steps.ts`.
+- One named, persistent Vercel Sandbox per import holds the checkout. Each phase runs as a detached command that
+  writes its log and exit code to `~/import-logs/`. The workflow sleeps 30 seconds between polls, so no function
+  waits on a long command, and stops the sandbox after each phase so the next one starts a fresh 45-minute
+  session (the Hobby limit) from the saved filesystem. A phase that runs past 44 minutes fails.
+- Recording goes in batches of 16 components (`--only`), because a full library does not fit in one session.
+- The sandbox gets no secrets: it installs and runs the library's code. Uploading to Blob and calling GitHub
+  happen in steps, in the function, with `BLOB_READ_WRITE_TOKEN` and `QUIRE_GITHUB_TOKEN` (a fine-grained token
+  with Contents and Pull requests write on the repository).
+- Previews go to Blob before review, under the library's own folder, so the pull request's preview deployment
+  shows the new cards. Nothing reaches `main` until the pull request is merged.
+- A license refusal ends the run as `refused`; any other failure as `failed`, with the end of the phase log. The
+  sandbox is deleted in both cases.
+- Status lives in the KV store (`lib/imports.ts`, key `import:<importId>`).
+
 
 ## Config notes
 
