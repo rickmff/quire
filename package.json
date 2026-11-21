@@ -22,7 +22,7 @@
     "import": "node scripts/import-library.ts"
   },
   "dependencies": {
-    "@ui-sdk/core": "0.1.0-beta.8",
+    "@ui-sdk/core": "0.1.0-beta.10",
     "@ui-sdk/react": "0.1.0-beta.8",
     "@vercel/analytics": "^2.0.1",
     "@vercel/sandbox": "4.0.0",
