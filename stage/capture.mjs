@@ -70,7 +70,7 @@ export function frameOf(t, cfg = {}) {
 
 const browser = await chromium.launch({ args: ["--enable-gpu-rasterization", "--ignore-gpu-blocklist"] });
 const report = existsSync(`${OUT}/report.json`) ? JSON.parse(readFileSync(`${OUT}/report.json`, "utf8")) : {};
-const queue = demos.flatMap((d) => ["light", "dark"].map((theme) => ({ d, theme })));
+const queue = demos.map((d) => ({ d, theme: "dark" }));
 async function shoot(ctx, d, theme, cfg, zoom) {
   const p = await ctx.newPage();
   const errs = [],

@@ -318,7 +318,7 @@ async function record(browser, d, theme, slow) {
 }
 
 const browser = await chromium.launch({ args: ["--enable-gpu-rasterization", "--ignore-gpu-blocklist"] });
-const queue = demos.flatMap((d) => ["light", "dark"].map((theme) => ({ d, theme })));
+const queue = demos.map((d) => ({ d, theme: "dark" }));
 await Promise.all(
   Array.from({ length: Number(process.env.JOBS || 3) }, async () => {
     while (queue.length) {

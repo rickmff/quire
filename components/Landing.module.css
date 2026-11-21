@@ -1,22 +1,14 @@
 .page {
-  --sheet: rgb(255 255 255 / 0.62);
-  --edge: rgb(0 0 0 / 0.07);
-  --foil: 0.55;
-  --floor: rgb(0 0 0 / 0.1);
+  --sheet: rgb(255 255 255 / 0.035);
+  --edge: rgb(255 255 255 / 0.09);
+  --foil: 0.42;
+  --floor: rgb(170 150 255 / 0.12);
   position: relative;
   height: 100dvh;
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
   padding: 24px 28px;
-}
-@media (prefers-color-scheme: dark) {
-  .page {
-    --sheet: rgb(255 255 255 / 0.035);
-    --edge: rgb(255 255 255 / 0.09);
-    --foil: 0.42;
-    --floor: rgb(170 150 255 / 0.12);
-  }
 }
 .bar {
   position: relative;
