@@ -7,8 +7,14 @@ together, lives here.
 ## Routes and views
 
 The gallery lives in `app/app/layout.tsx`, above the pages, so moving between views keeps it mounted: no
-reload and no second deal. `app/app/page.tsx` and `app/app/[...view]/page.tsx` only set metadata, and every
-view shares the same title, description and canonical, because they are views of one app.
+reload and no second deal. `app/app/page.tsx` and `app/app/[...view]/page.tsx` render no markup of their own.
+They set the metadata and, for a catalog view, a `CollectionPage` JSON-LD with its components.
+
+`lib/pages.ts` lists every catalog view worth a search result: All libraries, each library, each library's
+categories and each component type. Each one is prerendered with its own title, description and canonical, and
+listed in the sitemap and in `/llms.txt`. The page list and the view URLs come from the same `viewPath`, and
+`lib/pages.test.ts` checks that each path opens the same view in the app. Collections live in the browser, so
+their pages render on demand with `noindex`.
 
 The address is the source of truth. Picking a view pushes its path; back, forward or a link moves the view.
 
