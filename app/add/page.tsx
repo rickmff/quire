@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { fetchMeta, normalizeUrl, pushLibrary, readLibrary, uid, writeLibrary, type Bookmark } from "@/lib/store";
+import { CATALOG_URL } from "@/lib/catalogUrl";
 import type { ClientCatalog } from "@/lib/useCatalog";
 import { matchLibrary, titleFromUrl } from "@/lib/libraries";
 
@@ -19,7 +20,7 @@ const CLOSE_AFTER_SAVE_MS = 1200;
 async function describeLink(url: string, hintTitle?: string, hintImage?: string): Promise<Omit<Bookmark, "id">> {
   const base = { url, tags: [] as string[], collectionId: null, createdAt: Date.now() };
   try {
-    const cat: ClientCatalog = await (await fetch("/api/catalog")).json();
+    const cat: ClientCatalog = await (await fetch(CATALOG_URL)).json();
     const known = cat.components.find((c) => c.docs.replace(/\/$/, "") === url.replace(/\/$/, ""));
     if (known)
       return {
@@ -102,7 +103,7 @@ function Add() {
   }[state.kind];
 
   return (
-    <main className="grid min-h-dvh place-items-center p-6">
+    <main id="main" tabIndex={-1} className="grid min-h-dvh place-items-center p-6">
       <div className="text-center" role="status" aria-live="polite">
         <p className="text-faint">quire</p>
         <h1 className="mt-3 font-normal">{heading}</h1>

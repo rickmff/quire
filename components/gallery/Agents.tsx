@@ -115,7 +115,7 @@ export function Agents({
           href="https://ui-sdk.dev"
           target="_blank"
           rel="noreferrer"
-          className="text-fg underline-offset-2 hover:underline"
+          className="text-fg underline underline-offset-2 hover:no-underline"
         >
           UI SDK
         </a>

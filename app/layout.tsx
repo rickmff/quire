@@ -2,8 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ErrorReporter from "@/components/ErrorReporter";
 import { DEFAULT_TITLE, DESCRIPTION, SITE_NAME, SITE_URL, social } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -21,18 +23,18 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const DROP_SW = `(function(){try{var s=navigator.serviceWorker;if(!s)return;s.getRegistrations().then(function(r){if(!r.length)return;Promise.all(r.map(function(x){return x.unregister()})).then(function(){if(window.caches)caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}).finally(function(){if(!sessionStorage.getItem("quire-sw")){sessionStorage.setItem("quire-sw","1");location.reload()}});else location.reload()})})}catch(e){}})();`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={GeistMono.variable}>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: DROP_SW }} />
-      </head>
       <body className="font-sans min-h-dvh">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <TooltipProvider>{children}</TooltipProvider>
+        <ErrorReporter />
         <Analytics />
         <SpeedInsights />
+        <Script src="/drop-sw.js" strategy="beforeInteractive" />
       </body>
     </html>
   );

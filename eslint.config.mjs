@@ -9,7 +9,12 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
       "@next/next/no-img-element": "off",
+      "max-lines": ["error", { max: 400, skipBlankLines: true }],
     },
+  },
+  {
+    files: ["components/Quire3D.tsx", "**/*.test.ts", "**/*.test.tsx", "e2e/**"],
+    rules: { "max-lines": "off" },
   },
   globalIgnores([
     ".next/**",
@@ -21,6 +26,7 @@ export default defineConfig([
     "capture/**",
     "extension/**",
     "node_modules/**",
+    "coverage/**",
     "app/.well-known/workflow/**",
   ]),
 ]);

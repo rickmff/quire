@@ -7,8 +7,14 @@ together, lives here.
 ## Routes and views
 
 The gallery lives in `app/app/layout.tsx`, above the pages, so moving between views keeps it mounted: no
-reload and no second deal. `app/app/page.tsx` and `app/app/[...view]/page.tsx` only set metadata, and every
-view shares the same title, description and canonical, because they are views of one app.
+reload and no second deal. `app/app/page.tsx` and `app/app/[...view]/page.tsx` render no markup of their own.
+They set the metadata and, for a catalog view, a `CollectionPage` JSON-LD with its components.
+
+`lib/pages.ts` lists every catalog view worth a search result: All libraries, each library, each library's
+categories and each component type. Each one is prerendered with its own title, description and canonical, and
+listed in the sitemap and in `/llms.txt`. The page list and the view URLs come from the same `viewPath`, and
+`lib/pages.test.ts` checks that each path opens the same view in the app. Collections live in the browser, so
+their pages render on demand with `noindex`.
 
 The address is the source of truth. Picking a view pushes its path; back, forward or a link moves the view.
 
@@ -52,6 +58,11 @@ nothing. Starred cards exist before the catalog arrives, so the deal waits until
 render, so the phase moves before the first paint instead of one frame later. Reduced motion is read with
 `useSyncExternalStore` and is unknown (`null`) on the server, so the server always renders `wait`.
 
+The catalog is fetched as `/api/catalog?v=<version>`. `next.config.ts` makes the version from a hash of
+`lib/catalog/data.json` and the deployment id, and serves that URL as `immutable`, so a browser downloads the
+180 KB once per deploy. `app/app/layout.tsx` preloads it, so the request starts with the page and not after
+hydration. The bare `/api/catalog` stays uncached for scripts and agents.
+
 `lib/deal.ts` deals the visible cards out of one pile, using transforms and opacity only, so the grid keeps its
 final layout. The first frame of a new page is long (layout, images), so the pile is shown standing still
 through it and the clocks start once it has painted.
@@ -73,7 +84,7 @@ The HTML pile imitates the shader, so these values are kept in step by hand:
 | Foil palette `foilAt(h) = 0.8 + 0.2 cos(2π (h − [0, 1/3, 2/3]))`, the per-sheet hue offset `fi * 0.061`, the key light falloff `exp(−r² / 0.55)`, the wash-out at the pinwheel's centre (smoothstep to 0.6 units, to 0.95 grey) | `FRAG` in `components/quire3d/shader.ts` |
 | Sheets of 2 by 1.5 world units | `HALF` in the shader |
 | Where the stack is drawn | the resize code in `Quire3D.tsx` |
-| Pile turn per sheet (`pileRot`) | `pileTurn` in `Quire3D.tsx`, in radians |
+| Pile turn per sheet (`pileRot`) | `pileTurn` in `components/quire3d/scene.ts`, in radians |
 | Seven sheets | `SHEETS` in the shader |
 
 ## The hero
@@ -87,6 +98,14 @@ Below 1.5 device pixels per CSS pixel the hero renders at twice the screen and l
 down, because the sheet's text and edges are too coarse otherwise. When frames run slow it drops the
 supersampling first, then resolution. The label atlas uses anisotropic filtering because the text is seen at a
 slant.
+
+Files stay under 400 lines (`max-lines` in `eslint.config.mjs`). `components/Quire3D.tsx` is the one exception:
+its render loop, pointer handlers and springs share about forty values inside one effect, so splitting it would
+pass them around as arguments. Its constants and pure helpers live in `components/quire3d/scene.ts`, the shaders
+in `components/quire3d/shader.ts`. `components/Hero3D.tsx` loads it with `next/dynamic` after the first paint, so
+the landing's text does not wait for the WebGL code.
+`e2e/quality.spec.ts` turns WebGL 2 off, so axe checks the flat fallback: in CI the hero runs on a software GPU
+and starves the page of time.
 
 ## Gallery cards
 
@@ -189,8 +208,16 @@ description.
 - Refused requests (rate limit, cross-site) are logged as one JSON line with `kind: "security"`. Vercel runtime
   logs keep them (one hour on Hobby); filter on that field.
 - `next.config.ts` sets the headers for every response, static files included, because Vercel applies them to
-  `public/` too. `script-src` keeps `'unsafe-inline'` because Next.js inlines its bootstrap scripts; removing it
-  needs a nonce per request.
+  `public/` too. `script-src` keeps `'unsafe-inline'` because Next.js inlines its bootstrap and its RSC payload
+  in every prerendered page. `experimental.sri` only hashes the script files, not those inline scripts, and a
+  nonce needs a fresh render per request, which would end the static pages and their CDN cache. The rest of the
+  policy narrows what an injected script could do: `script-src-attr 'none'` blocks inline event handlers,
+  `connect-src`, `form-action` and `base-uri` stay on `'self'`, and the only inline script Quire wrote, the
+  service worker cleanup, is a file (`public/drop-sw.js`). `e2e/quality.spec.ts` fails on any CSP violation.
+- HSTS carries `preload` with two years and every subdomain, which [hstspreload.org](https://hstspreload.org)
+  asks for. Leaving the preload list takes months, so a subdomain that must serve plain HTTP cannot exist.
+- `/.well-known/security.txt` points reporters to GitHub's private vulnerability reporting. Its `Expires` is a
+  year after the build, so any deploy within a year keeps it valid.
 - Live demos in `/stage/` run on the same origin as the app, so their code can read the app's `localStorage`,
   which holds the library key. Only curated libraries are built into `/stage/`. Anything that stores a more
   valuable secret in the browser must first move the demos to another origin.

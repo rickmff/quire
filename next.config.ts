@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { withWorkflow } from "workflow/next";
 
 const isDev = process.env.NODE_ENV !== "production";
+const catalogVersion = createHash("sha256")
+  .update(readFileSync("lib/catalog/data.json"))
+  .update(process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "")
+  .digest("hex")
+  .slice(0, 12);
+
 const previewsUrl = process.env.QUIRE_PREVIEWS_URL?.replace(/\/$/, "");
 
 const contentSecurityPolicy = [
@@ -18,18 +26,21 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
+  "script-src-attr 'none'",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const everywhere = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
-  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  env: { NEXT_PUBLIC_CATALOG_VERSION: catalogVersion },
   async rewrites() {
     return {
       beforeFiles: [],
@@ -46,6 +57,11 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: contentSecurityPolicy },
           { key: "X-Frame-Options", value: "DENY" },
         ],
+      },
+      {
+        source: "/api/catalog",
+        has: [{ type: "query", key: "v" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
         source: "/stage/:path*",

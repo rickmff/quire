@@ -1,0 +1,27 @@
+name: Library for the catalog
+description: Propose a component library for the curated catalog.
+labels: [catalog]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Library site
+      placeholder: https://example.com
+    validations:
+      required: true
+  - type: input
+    id: registry
+    attributes:
+      label: shadcn registry URL
+      description: The registry.json or the registry index, if the library has one.
+  - type: input
+    id: license
+    attributes:
+      label: License
+      placeholder: MIT
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it belongs in Quire
