@@ -166,7 +166,7 @@ export default function App() {
         openId={open?.id}
       />
 
-      <main ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-10">
+      <main id="main" tabIndex={-1} ref={mainRef} className="min-w-0 flex-1 px-4 pb-24 md:pr-10 md:pl-10">
         <TopBar
           input={input}
           setInput={setInput}

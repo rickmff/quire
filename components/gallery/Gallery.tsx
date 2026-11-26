@@ -149,7 +149,7 @@ export function Gallery({
                   trigger === t.id ? "bg-hover text-fg" : "text-faint hover:text-muted"
                 }`}
               >
-                {t.name} <span className="tabular-nums opacity-60">{triggerCounts.get(t.id)}</span>
+                {t.name} <span className="tabular-nums">{triggerCounts.get(t.id)}</span>
               </button>
             ))}
           </div>

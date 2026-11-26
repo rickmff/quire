@@ -1,6 +1,6 @@
 import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
-import Quire3D from "@/components/Quire3D";
+import Hero3D from "@/components/Hero3D";
 import Wordmark from "@/components/Wordmark";
 import SocialLinks from "@/components/SocialLinks";
 import StartLink from "@/components/StartLink";
@@ -60,8 +60,8 @@ export default function Landing() {
         <SocialLinks />
       </header>
 
-      <main className={s.main}>
-        <Quire3D />
+      <main id="main" tabIndex={-1} className={s.main}>
+        <Hero3D />
         <div className={s.copy}>
           <h1 className={s.title} aria-label={`${LEAD} ${TAIL}`}>
             <span aria-hidden="true">

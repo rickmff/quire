@@ -18,3 +18,4 @@ playwright-report/
 # Recorded previews live in Vercel Blob (npm run previews:upload)
 public/previews/
 /.swc
+.lighthouseci/

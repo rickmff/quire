@@ -140,9 +140,10 @@ export function TopBar({
           <DialogTrigger
             controller={commandDialog}
             className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-faint transition hover:text-muted"
-            aria-label="Open command menu"
+            aria-keyshortcuts="Meta+K Control+K"
           >
-            ⌘K
+            <span aria-hidden="true">⌘K</span>
+            <span className="sr-only">Open command menu</span>
           </DialogTrigger>
         </div>
         <SocialLinks className="hidden md:flex" />

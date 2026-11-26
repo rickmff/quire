@@ -58,6 +58,11 @@ nothing. Starred cards exist before the catalog arrives, so the deal waits until
 render, so the phase moves before the first paint instead of one frame later. Reduced motion is read with
 `useSyncExternalStore` and is unknown (`null`) on the server, so the server always renders `wait`.
 
+The catalog is fetched as `/api/catalog?v=<version>`. `next.config.ts` makes the version from a hash of
+`lib/catalog/data.json` and the deployment id, and serves that URL as `immutable`, so a browser downloads the
+180 KB once per deploy. `app/app/layout.tsx` preloads it, so the request starts with the page and not after
+hydration. The bare `/api/catalog` stays uncached for scripts and agents.
+
 `lib/deal.ts` deals the visible cards out of one pile, using transforms and opacity only, so the grid keeps its
 final layout. The first frame of a new page is long (layout, images), so the pile is shown standing still
 through it and the clocks start once it has painted.
@@ -195,8 +200,16 @@ description.
 - Refused requests (rate limit, cross-site) are logged as one JSON line with `kind: "security"`. Vercel runtime
   logs keep them (one hour on Hobby); filter on that field.
 - `next.config.ts` sets the headers for every response, static files included, because Vercel applies them to
-  `public/` too. `script-src` keeps `'unsafe-inline'` because Next.js inlines its bootstrap scripts; removing it
-  needs a nonce per request.
+  `public/` too. `script-src` keeps `'unsafe-inline'` because Next.js inlines its bootstrap and its RSC payload
+  in every prerendered page. `experimental.sri` only hashes the script files, not those inline scripts, and a
+  nonce needs a fresh render per request, which would end the static pages and their CDN cache. The rest of the
+  policy narrows what an injected script could do: `script-src-attr 'none'` blocks inline event handlers,
+  `connect-src`, `form-action` and `base-uri` stay on `'self'`, and the only inline script Quire wrote, the
+  service worker cleanup, is a file (`public/drop-sw.js`). `e2e/quality.spec.ts` fails on any CSP violation.
+- HSTS carries `preload` with two years and every subdomain, which [hstspreload.org](https://hstspreload.org)
+  asks for. Leaving the preload list takes months, so a subdomain that must serve plain HTTP cannot exist.
+- `/.well-known/security.txt` points reporters to GitHub's private vulnerability reporting. Its `Expires` is a
+  year after the build, so any deploy within a year keeps it valid.
 - Live demos in `/stage/` run on the same origin as the app, so their code can read the app's `localStorage`,
   which holds the library key. Only curated libraries are built into `/stage/`. Anything that stores a more
   valuable secret in the browser must first move the demos to another origin.

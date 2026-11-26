@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CatalogComponent, CatalogLibrary } from "@/lib/catalog/schema";
+import { CATALOG_URL } from "@/lib/catalogUrl";
 
 export type GalleryItem = Omit<CatalogComponent, "files" | "repo" | "dependencies"> & {
   source?: boolean;
@@ -12,13 +13,13 @@ export type ClientCatalog = { generatedAt: string; libraries: CatalogLibrary[]; 
 let cache: Promise<ClientCatalog> | null = null;
 
 export function preloadCatalog() {
-  cache ??= fetch("/api/catalog").then((r) => r.json());
+  cache ??= fetch(CATALOG_URL).then((r) => r.json());
 }
 
 export function useCatalog() {
   const [data, setData] = useState<ClientCatalog | null>(null);
   useEffect(() => {
-    cache ??= fetch("/api/catalog").then((r) => r.json());
+    cache ??= fetch(CATALOG_URL).then((r) => r.json());
     let alive = true;
     cache.then((d) => alive && setData(d)).catch(() => (cache = null));
     return () => {

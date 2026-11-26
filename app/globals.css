@@ -4,8 +4,8 @@
   --bg: #0b0b0b;
   --panel: #111111;
   --fg: #ececec;
-  --muted: #7a7a7a;
-  --faint: #474747;
+  --muted: #a1a1a1;
+  --faint: #858585;
   --line: #1d1d1d;
   --hover: rgb(255 255 255 / 0.04);
   --field: rgb(255 255 255 / 0.04);
@@ -455,4 +455,23 @@ textarea:focus-visible {
   .tip-pop {
     animation: none !important;
   }
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 13px;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+main:focus {
+  outline: none;
 }
