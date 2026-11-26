@@ -104,6 +104,8 @@ its render loop, pointer handlers and springs share about forty values inside on
 pass them around as arguments. Its constants and pure helpers live in `components/quire3d/scene.ts`, the shaders
 in `components/quire3d/shader.ts`. `components/Hero3D.tsx` loads it with `next/dynamic` after the first paint, so
 the landing's text does not wait for the WebGL code.
+`e2e/quality.spec.ts` turns WebGL 2 off, so axe checks the flat fallback: in CI the hero runs on a software GPU
+and starves the page of time.
 
 ## Gallery cards
 

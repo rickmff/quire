@@ -23,6 +23,12 @@ const watch = (page: Page) => {
 };
 
 const settle = async (page: Page, path: string) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+      return type === "webgl2" ? null : (getContext as (...a: unknown[]) => unknown).call(this, type, ...rest);
+    } as typeof getContext;
+  });
   await page.goto(path);
   if (path.startsWith("/app")) await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.waitForLoadState("networkidle");
