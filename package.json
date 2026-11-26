@@ -51,5 +51,14 @@
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3",
     "vitest": "5.1.1"
+  },
+  "overrides": {
+    "zod": "^4.6.7",
+    "@oclif/core": {
+      "minimatch": "^11.0.9"
+    },
+    "@vercel/queue": {
+      "minimatch": "^11.0.9"
+    }
   }
 }

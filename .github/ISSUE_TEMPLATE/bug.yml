@@ -1,0 +1,32 @@
+name: Bug
+description: Something on quire.fyi or in the code does not work.
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: What you did, step by step.
+      placeholder: |
+        1. Open /app/all-libraries
+        2. Click a card
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Add a screenshot or the console error if you have one.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Chrome 142 on macOS

@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: No known vulnerabilities in production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
       - name: No code comments
         run: npm run check:comments
 
