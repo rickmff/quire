@@ -246,6 +246,22 @@ answers, so a server left by an earlier run is never recorded by mistake.
 The license check reads the file, not only `package.json`, because several libraries declare MIT there and add
 the Commons Clause in the file. A refused library is not imported; ask its author or leave it out.
 
+Some libraries keep only the component sources in GitHub and serve their `registry.json` from the site, often
+next to Pro items behind a license key. Prestige UI is one. For these, save the site's `/r/registry.json` under
+`scripts/catalog/registries/<id>.json` and pass `--registry` with that path. The import then reads the items from
+that file and the sources from the repository, so the cloud and CI never need to reach the site. Items marked
+`"access": "pro"` are dropped in `discover`, `build-catalog.ts` and `install.mjs`. When an item's `path` is not in
+the repository (`registry/...`), the file is looked up at its `target` (`components/...`). `--docs` takes `{kind}`,
+which becomes `blocks` for `registry:block` items and `components` for the rest. `--full-titles` builds the title
+from the name when the registry gives a one-word title that only makes sense inside a group ("Pill" for
+`navbar-pill`). Pass it last, after the site or scope. To refresh the snapshot, fetch the file again and rerun the
+import.
+
+The stage template accepts `forwardRef` and `memo` exports as the component to render, not only functions.
+A library without demo items gets its demos from `stage/custom/<id>/<name>.tsx`, which win over registry demos.
+Prestige UI ships no demos, so every component that needs data or a label has one there, with inline SVG images so
+the capture makes no network requests.
+
 `stage/libs.json` holds what `install.mjs` needs per library: the repo, the folder of built registry items, the
 source roots, and whether demos are named `<name>-demo` (`suffix`) or `demo-<name>` (`prefix`). When a built item
 is missing, `install.mjs` builds it from the `registry.json` entry and the source files. Relative imports that no

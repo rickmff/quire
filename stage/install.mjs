@@ -13,27 +13,29 @@ async function index(reg) {
   if (!indexes.has(reg))
     indexes.set(
       reg,
-      fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/registry.json`)
-        .then((r) => (r.ok ? r.json() : { items: [] }))
-        .catch(() => ({ items: [] })),
+      REG[reg].index
+        ? Promise.resolve(JSON.parse(readFileSync(new URL(`../${REG[reg].index}`, import.meta.url), "utf8")))
+        : fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/registry.json`)
+            .then((r) => (r.ok ? r.json() : { items: [] }))
+            .catch(() => ({ items: [] })),
     );
   return indexes.get(reg);
 }
 
 async function fromIndex(reg, name) {
-  const entry = (await index(reg)).items?.find((i) => i.name === name);
-  if (!entry?.files?.length) return null;
+  const entry = (await index(reg)).items?.find((i) => i.name === name && i.access !== "pro");
+  if (!entry) return null;
+  if (!entry.files?.length) return REG[reg].index ? { ...entry, files: [] } : null;
   const files = [];
   for (const f of entry.files) {
-    const path = typeof f === "string" ? f : f.path;
+    const paths = typeof f === "string" ? [f] : [f.path, f.target?.replace(/^~\//, "")].filter(Boolean);
     let content = null;
-    for (const root of roots(reg)) {
-      const r = await fetch(`${RAW}/${root}/${path}`);
-      if (r.ok) {
-        content = await r.text();
-        break;
+    for (const root of roots(reg))
+      for (const path of paths) {
+        if (content) break;
+        const r = await fetch(`${RAW}/${root}/${path}`);
+        if (r.ok) content = await r.text();
       }
-    }
     if (!content) return null;
     files.push({ ...(typeof f === "string" ? { path: f } : f), content });
   }
@@ -47,8 +49,8 @@ async function load(reg, name) {
   let text;
   if (local && existsSync(local)) text = readFileSync(local, "utf8");
   else {
-    const r = await fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/${name}.json`);
-    if (r.ok) text = await r.text();
+    const r = REG[reg].index ? null : await fetch(`${RAW}/${REG[reg].repo}/HEAD/${REG[reg].dir}/${name}.json`);
+    if (r?.ok) text = await r.text();
     else {
       const built = await fromIndex(reg, name);
       if (!built) return null;

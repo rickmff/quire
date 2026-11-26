@@ -3,6 +3,7 @@ export type RegistryFile = string | { path?: string; target?: string; content?: 
 export type RegistryItem = {
   name: string;
   type?: string;
+  access?: string;
   title?: string;
   description?: string;
   category?: string;

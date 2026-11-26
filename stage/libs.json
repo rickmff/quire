@@ -18,5 +18,11 @@
     "roots": ["apps/v1/apps/www", "apps/v1/packages/ui/src"],
     "demos": "prefix",
     "pins": ["lucide-react@0.577.0"]
+  },
+  "prestige": {
+    "repo": "vora-aryan/Prestige-UI",
+    "index": "scripts/catalog/registries/prestige.json",
+    "roots": [""],
+    "demos": "suffix"
   }
 }

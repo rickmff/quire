@@ -9,9 +9,11 @@ export type Source = {
   branch?: string;
   kind: "registry" | "mdx" | "pages" | "manual";
   path?: string;
+  registry?: string;
+  fullTitles?: boolean;
   pattern?: RegExp;
   live?: string;
-  docs: (name: string, category?: string) => string;
+  docs: (name: string, category?: string, type?: string) => string;
   item?: (name: string) => string;
   install?: (name: string) => string;
   variant?: RegExp;
@@ -31,6 +33,8 @@ export type Imported = {
   blurb: string;
   repo: string;
   path: string;
+  registry?: string;
+  fullTitles?: boolean;
   docs: string;
   docsPages?: { dir: string; base: string };
   item?: string;
@@ -38,7 +42,8 @@ export type Imported = {
   license: string;
 };
 
-const fill = (template: string, name: string) => template.replaceAll("{name}", name);
+const fill = (template: string, name: string, type?: string) =>
+  template.replaceAll("{name}", name).replaceAll("{kind}", type === "registry:block" ? "blocks" : "components");
 
 const fromImport = (i: Imported): Source => ({
   id: i.id,
@@ -48,7 +53,9 @@ const fromImport = (i: Imported): Source => ({
   repo: i.repo,
   kind: "registry",
   path: i.path,
-  docs: (n) => fill(i.docs, n),
+  registry: i.registry,
+  fullTitles: i.fullTitles,
+  docs: (n, _category, type) => fill(i.docs, n, type),
   docsPages: i.docsPages,
   item: i.item ? (n) => fill(i.item!, n) : undefined,
   install: (n) => shadcnAdd(i.scope ? `@${i.scope}/${n}` : i.item ? fill(i.item, n) : n),

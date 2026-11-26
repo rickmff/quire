@@ -1,0 +1,1 @@
+var e={};function t(t){return e.current?.add(t),t}var n=t=>e.current?e.current.bind(t):t;function r(t,n,r){if(t==null)return[];if(t instanceof EventTarget)return[t];if(typeof t==`string`){let i=n?n.current:e.current?.root||document,a=r?.[t]??i.querySelectorAll(t);return a?Array.from(a):[]}return Array.from(t).filter(e=>e!=null)}export{n as i,e as n,t as r,r as t};
