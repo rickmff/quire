@@ -12,7 +12,7 @@ Thanks for helping. Small fixes are as welcome as features.
 
 ## Set up
 
-You need Node 20 or newer. No account, key or database is needed.
+You need Node 24 (see `.nvmrc`). No account, key or database is needed.
 
 ```bash
 git clone https://github.com/rickmff/quire.git
