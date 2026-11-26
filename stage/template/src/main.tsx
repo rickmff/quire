@@ -148,7 +148,8 @@ function Stage({ Demo }: { Demo: any }) {
 const c = q.get("c") || "",
   v = q.get("v");
 const load = (v && demos[`${c}~${v}`]) || demos[c];
-const pick = (m: any) => m.default ?? Object.values(m).find((x) => typeof x === "function");
+const isComponent = (x: any) => typeof x === "function" || (typeof x === "object" && x !== null && "$$typeof" in x);
+const pick = (m: any) => m.default ?? Object.values(m).find(isComponent);
 const render = (Demo: any) =>
   createRoot(document.getElementById("root")!).render(
     <ThemeProvider

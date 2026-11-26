@@ -4,6 +4,7 @@ import {
   docsLayout,
   findInDirectory,
   firstSentence,
+  hostedRegistry,
   libraryName,
   pickRegistry,
   repoFromHtml,
@@ -125,4 +126,32 @@ describe("libraryName", () => {
 
 it("firstSentence keeps the first sentence", () => {
   expect(firstSentence("A kit. With more.")).toBe("A kit.");
+});
+
+describe("hostedRegistry", () => {
+  const json = JSON.stringify({
+    name: "acme",
+    items: [
+      { name: "utils", type: "registry:lib" },
+      { name: "glow-button", type: "registry:component", access: "free" },
+      { name: "hero", type: "registry:block" },
+      { name: "pricing", type: "registry:block", access: "pro" },
+    ],
+  });
+
+  it("keeps the free items and counts the components among them", () => {
+    const reg = hostedRegistry("scripts/catalog/registries/acme.json", json);
+    expect(reg?.count).toBe(2);
+    expect(reg?.items.map((i) => i.name)).toEqual(["utils", "glow-button", "hero"]);
+    expect(reg?.path).toBe("scripts/catalog/registries/acme.json");
+  });
+
+  it("returns nothing when only Pro items list components", () => {
+    const pro = JSON.stringify({ items: [{ name: "pricing", type: "registry:block", access: "pro" }] });
+    expect(hostedRegistry("x.json", pro)).toBeUndefined();
+  });
+
+  it("returns nothing for a file that is not JSON", () => {
+    expect(hostedRegistry("x.json", "<html>")).toBeUndefined();
+  });
 });

@@ -1,0 +1,1 @@
+import{ct as e,r as t,w as n}from"./react-DCDSqIom.js";import{i as r,r as i}from"./index-Cvsa5Tuj.js";var a=r(i(),1);function o(r){let i=e(()=>n(r)),{isStatic:o}=(0,a.useContext)(t);if(o){let[,e]=(0,a.useState)(r);(0,a.useEffect)(()=>i.on(`change`,e),[])}return i}export{o as t};

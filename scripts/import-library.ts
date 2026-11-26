@@ -14,6 +14,7 @@ import {
   findInDirectory,
   firstSentence,
   pickRegistry,
+  hostedRegistry,
   repoFromHtml,
   slug,
 } from "./import/discover.ts";
@@ -53,7 +54,8 @@ const runs = (s: Step) => STEPS.indexOf(s) >= STEPS.indexOf(from) && STEPS.index
 
 if (!input && !arg("repo") && !arg("id")) {
   console.log(`Usage: npm run import -- <site url | @scope> [--repo owner/name] [--id id] [--name "Name"]
-  [--blurb "One line."] [--docs "https://site/docs/{name}"] [--from step] [--until step] [--port 5190]
+  [--blurb "One line."] [--docs "https://site/docs/{name}"] [--registry scripts/catalog/registries/id.json]
+  [--full-titles] [--from step] [--until step] [--port 5190]
   [--only name,name] records only those components
 Steps: ${STEPS.join(", ")}`);
   process.exit(1);
@@ -113,8 +115,17 @@ async function discover() {
   if (!license.ok) fail(`license refused: ${license.reason}.`);
   log("discover", `license ${license.ok && license.spdx} (${licenseFile})`);
 
-  const registry = pickRegistry(files, (p) => read(p) ?? "");
-  if (!registry) fail("no shadcn registry.json that lists components in the repository.");
+  const hosted = arg("registry");
+  if (hosted && !existsSync(join(ROOT, hosted))) fail(`${hosted} does not exist.`);
+  const registry = hosted
+    ? hostedRegistry(hosted, readFileSync(join(ROOT, hosted), "utf8"))
+    : pickRegistry(files, (p) => read(p) ?? "");
+  if (!registry)
+    fail(
+      hosted
+        ? `${hosted} lists no free components.`
+        : "no shadcn registry.json that lists components in the repository. Save the site's /r/registry.json under scripts/catalog/registries/ and pass --registry.",
+    );
   log(
     "discover",
     `registry ${registry!.path}: ${registry!.count} components, ${registry!.built ? "built items" : "source only"}`,
@@ -130,11 +141,13 @@ async function discover() {
 
   const entry: Imported = {
     id,
-    name: arg("name") ?? libraryName(read(registry!.path)) ?? id,
+    name: arg("name") ?? libraryName(hosted ? readFileSync(join(ROOT, hosted), "utf8") : read(registry!.path)) ?? id,
     url: site,
     blurb: arg("blurb") ?? (firstSentence(listed?.description) || `Components from ${repo}.`),
     repo: repo!,
     path: registry!.path,
+    ...(hosted ? { registry: hosted } : {}),
+    ...(argv.includes("--full-titles") ? { fullTitles: true } : {}),
     docs: docs.template,
     ...("pages" in docs && docs.pages ? { docsPages: docs.pages } : {}),
     item: listed?.url,
@@ -145,14 +158,16 @@ async function discover() {
   writeJson(IMPORTED, [...imported, entry]);
 
   const libs = readJson<Record<string, unknown>>(LIBS, {});
-  libs[id] = {
-    repo: repo!,
-    dir: registry!.dir,
-    roots: [registry!.root],
-    demos: style,
-    keepPaths: true,
-    examples: style === "suffix",
-  };
+  libs[id] = hosted
+    ? { repo: repo!, index: hosted, roots: [""], demos: style }
+    : {
+        repo: repo!,
+        dir: registry!.dir,
+        roots: [registry!.root],
+        demos: style,
+        keepPaths: true,
+        examples: style === "suffix",
+      };
   writeJson(LIBS, libs);
   log("discover", `wrote ${id} to scripts/catalog/imported.json and stage/libs.json`);
   mkdirSync(join(STAGE, "out"), { recursive: true });

@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "prestige",
+    "name": "Prestige UI",
+    "url": "https://prestigeui.com",
+    "blurb": "Animated React components and full-page blocks built with Tailwind CSS and Motion.",
+    "repo": "vora-aryan/Prestige-UI",
+    "path": "scripts/catalog/registries/prestige.json",
+    "registry": "scripts/catalog/registries/prestige.json",
+    "fullTitles": true,
+    "docs": "https://prestigeui.com/{kind}/{name}",
+    "item": "https://prestigeui.com/r/{name}.json",
+    "scope": "prestige",
+    "license": "MIT"
+  }
+]

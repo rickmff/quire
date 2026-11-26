@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import catalog from "../lib/catalog/data.json" with { type: "json" };
 
 type StoredLibrary = {
   mode?: string;
@@ -147,7 +148,8 @@ test("turning a library off on Sites removes it from the gallery", async ({ page
   await page.goto("/app/sites");
   const magic = page.getByRole("switch").first();
   await magic.click();
-  await expect.poll(async () => (await stored(page))?.sources).toEqual(["animate-ui"]);
+  const rest = catalog.libraries.map((l) => l.id).filter((id) => id !== "magicui");
+  await expect.poll(async () => [...((await stored(page))?.sources ?? [])].sort()).toEqual(rest.sort());
 });
 
 test("the address drives the view, including back and forward", async ({ page }) => {

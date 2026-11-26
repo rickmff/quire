@@ -56,6 +56,18 @@ export function pickRegistry(files: string[], read: (path: string) => string) {
   return { path: best.path, dir, root, built, items: best.items, count: best.count };
 }
 
+export function hostedRegistry(path: string, json: string) {
+  let items: RegistryItem[];
+  try {
+    items = itemsOf(JSON.parse(json)).filter((i) => i.access !== "pro");
+  } catch {
+    return undefined;
+  }
+  const count = items.filter((i) => COMPONENT_TYPES.has(i.type ?? "")).length;
+  if (!count) return undefined;
+  return { path, dir: "", root: "", built: false, items, count };
+}
+
 export function demoStyle(items: RegistryItem[]): "suffix" | "prefix" {
   const names = items.map((i) => i.name);
   const suffix = names.filter((n) => /-demo(-\d+)?$/.test(n)).length;

@@ -37,6 +37,8 @@ function frontMatter(text: string) {
 
 const filePaths = (i: RegistryItem) =>
   (i.files ?? []).map((f) => (typeof f === "string" ? f : f.path)).filter((p): p is string => Boolean(p));
+const fileTargets = (i: RegistryItem) =>
+  (i.files ?? []).map((f) => (typeof f === "string" ? undefined : f.target?.replace(/^~\//, "")));
 
 const registryEntry = (i: RegistryItem) => ({ ...i, files: filePaths(i) });
 
@@ -47,12 +49,14 @@ function entry(
     title?: string;
     description?: string;
     category?: string;
+    type?: string;
     dependencies?: string[];
     files?: string[];
   },
 ): CatalogComponent {
   const deps = (raw.dependencies ?? []).map((d) => d.replace(/(?<=.)@[^/]*$/, ""));
-  let title = raw.title && !/^[a-z0-9-]+$/.test(raw.title) ? raw.title : titleCase(raw.name);
+  const partial = src.fullTitles && /^\S+$/.test(raw.title ?? "") && raw.name.includes("-");
+  let title = raw.title && !partial && !/^[a-z0-9-]+$/.test(raw.title) ? raw.title : titleCase(raw.name);
   if (/^[A-Z][a-z]+[A-Z][A-Za-z0-9]*$/.test(title)) title = title.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   const text = { title, name: raw.name, category: raw.category, description: raw.description };
   return {
@@ -66,7 +70,7 @@ function entry(
     triggers: triggersFor(text),
     tech: techFrom(deps),
     dependencies: deps.length ? deps : undefined,
-    docs: src.docs(raw.name, raw.category),
+    docs: src.docs(raw.name, raw.category, raw.type),
     item: src.item?.(raw.name),
     install: src.install?.(raw.name),
     repo: src.repo,
@@ -163,7 +167,9 @@ async function build(src: Source): Promise<CatalogComponent[]> {
   };
 
   if (src.kind === "registry") {
-    const reg: Registry | RegistryItem[] = JSON.parse(show(src.path!));
+    const reg: Registry | RegistryItem[] = JSON.parse(
+      src.registry ? readFileSync(join(ROOT, src.registry), "utf8") : show(src.path!),
+    );
     const items: RegistryItem[] = Array.isArray(reg) ? reg : (reg.items ?? []);
     const cats = src.id === "reactbits" ? reactBitsCategories(show) : null;
     const picked = new Map<string, RegistryItem>();
@@ -172,7 +178,7 @@ async function build(src: Source): Promise<CatalogComponent[]> {
       return i < 0 ? 99 : i;
     };
     for (const i of items) {
-      if (!COMPONENT_TYPES.has(i.type) || SKIP.test(i.name) || src.skip?.test(i.name)) continue;
+      if (!COMPONENT_TYPES.has(i.type) || SKIP.test(i.name) || src.skip?.test(i.name) || i.access === "pro") continue;
       const base = src.variant ? i.name.replace(src.variant, "") : i.name;
       const prev = picked.get(base);
       if (!prev || rank(i.name) < rank(prev.name)) picked.set(base, i);
@@ -180,14 +186,18 @@ async function build(src: Source): Promise<CatalogComponent[]> {
     const out: CatalogComponent[] = [];
     for (const [base, i] of picked) {
       const paths = filePaths(i);
+      const targets = fileTargets(i);
       const category = cats?.get(base.toLowerCase()) ?? i.category ?? i.categories?.find((c: string) => c !== src.id);
       const c = entry(src, {
         name: i.name,
         title: i.title ?? (src.variant ? titleCase(base) : undefined),
         description: i.description,
         category,
+        type: i.type,
         dependencies: i.dependencies,
-        files: paths.map((p) => resolve(p, src.pathHint?.(i.name))).filter((p): p is string => Boolean(p)),
+        files: paths
+          .map((p, n) => resolve(p, src.pathHint?.(i.name)) ?? (targets[n] && resolve(targets[n]!)))
+          .filter((p): p is string => Boolean(p)),
       });
       if (src.variant) c.docs = src.docs(base, category);
       out.push(withPreview(c, base));

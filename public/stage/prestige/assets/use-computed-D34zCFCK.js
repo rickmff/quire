@@ -1,0 +1,1 @@
+import{C as e,G as t,K as n,st as r}from"./react-DCDSqIom.js";import{t as i}from"./use-motion-value-C2YGV8D_.js";function a(e,a){let o=i(a()),s=()=>o.set(a());return s(),r(()=>{let r=()=>n.preRender(s,!1,!0),i=e.map(e=>e.on(`change`,r));return s(),()=>{i.forEach(e=>e()),t(s)}}),o}function o(t){e.current=[],t();let n=a(e.current,t);return e.current=void 0,n}export{a as n,o as t};

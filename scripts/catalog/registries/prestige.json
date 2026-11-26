@@ -1,0 +1,958 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "prestige",
+  "homepage": "https://prestigeui.com",
+  "items": [
+    {
+      "name": "fonts",
+      "type": "registry:item",
+      "access": "free",
+      "title": "Fonts",
+      "description": "Outfit and Instrument Serif used by Prestige UI headings, and a sans-serif fallback for when the project has none set.",
+      "registryDependencies": [
+        "https://prestigeui.com/r/font-outfit.json",
+        "https://prestigeui.com/r/font-instrument-serif.json"
+      ],
+      "css": {
+        "@layer base": {
+          "@container not style(--font-sans)": {
+            "body": { "font-family": "var(--font-geist-sans, ui-sans-serif), system-ui, sans-serif" }
+          }
+        }
+      },
+      "files": []
+    },
+    {
+      "name": "font-outfit",
+      "type": "registry:font",
+      "access": "free",
+      "title": "Outfit",
+      "description": "Outfit, the display heading font in Prestige UI blocks.",
+      "font": {
+        "family": "Outfit",
+        "provider": "google",
+        "import": "Outfit",
+        "variable": "--font-outfit",
+        "subsets": ["latin"],
+        "dependency": "@fontsource-variable/outfit"
+      },
+      "files": []
+    },
+    {
+      "name": "font-instrument-serif",
+      "type": "registry:font",
+      "access": "free",
+      "title": "Instrument Serif",
+      "description": "Instrument Serif, the serif accent font in Prestige UI blocks.",
+      "font": {
+        "family": "Instrument Serif",
+        "provider": "google",
+        "import": "Instrument_Serif",
+        "variable": "--font-instrument",
+        "weight": ["400"],
+        "subsets": ["latin"],
+        "dependency": "@fontsource/instrument-serif"
+      },
+      "files": []
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "access": "free",
+      "title": "Utils",
+      "description": "Class name helper used by Prestige UI components.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [{ "path": "lib/utils.ts", "type": "registry:lib", "target": "lib/utils.ts" }]
+    },
+    {
+      "name": "shine-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Shine Button",
+      "description": "A CTA button with a sweeping shine highlight on hover.",
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/shine-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/shine-button.tsx"
+        }
+      ],
+      "cssVars": { "theme": { "--animate-shine-sweep": "shine-sweep 1.4s ease-in-out" } },
+      "css": {
+        "@keyframes shine-sweep": {
+          "0%": { "transform": "translateX(-120%) skewX(-16deg)" },
+          "100%": { "transform": "translateX(220%) skewX(-16deg)" }
+        }
+      }
+    },
+    {
+      "name": "magnetic-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Magnetic Button",
+      "description": "A button that gently magnetizes toward the cursor.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/magnetic-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/magnetic-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "social-login-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Social Login Button",
+      "description": "Clean, accessible buttons for Google, Apple, and GitHub SSO.",
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/social-login-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/social-login-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "async-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Async Button",
+      "description": "A button with a smooth loading spinner and success state.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/async-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/async-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "waitlist-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Waitlist Button",
+      "description": "A waitlist button that opens into an email field, with the button becoming the submit, then a confirmation across the field.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/waitlist-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/waitlist-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "hold-to-confirm",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Hold to Confirm",
+      "description": "A delete button you press and hold: a red fill rises and the trash can's lid lifts with the hold, then it snaps shut and confirms.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/hold-to-confirm.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/hold-to-confirm.tsx"
+        }
+      ]
+    },
+    {
+      "name": "slide-to-confirm",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Slide to Confirm",
+      "description": "A slider for irreversible actions: ink follows the thumb and turns the label white where it passes, then the thumb locks and confirms.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/slide-to-confirm.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/slide-to-confirm.tsx"
+        }
+      ]
+    },
+    {
+      "name": "theme-toggle",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Theme Toggle",
+      "description": "A theme button whose icon turns from sun to moon as an eclipse, while the page changes like the sky: dusk sweeps down, dawn rises.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/theme-toggle.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/theme-toggle.tsx"
+        }
+      ]
+    },
+    {
+      "name": "star-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Star Button",
+      "description": "A star or upvote button whose count rolls like an odometer, carrying digit by digit, with an optional live GitHub star count.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/star-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/star-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "follow-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Follow Button",
+      "description": "A follow button whose icon morphs from plus to check to cross: Follow, Following, and Unfollow on hover, always centred and never resizing.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/follow-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/follow-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "split-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Split Button",
+      "description": "A primary action with a menu of alternatives: picking one makes it the main action, and running it turns its icon into a spinner, then a check.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/split-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/split-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "add-to-cart",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Add to Cart",
+      "description": "An add to cart button: the item drops into the cart icon and the button opens into a quantity stepper in the same space.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/add-to-cart.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/add-to-cart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "copy-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Copy Button",
+      "description": "An interactive copy-to-clipboard button with micro-animations.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/copy-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/copy-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "gradient-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Gradient Button",
+      "description": "A glowing, animated gradient border button for primary CTAs.",
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/gradient-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/gradient-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "payment-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Payment Button",
+      "description": "A checkout button that shows the amount, then processing, paid or failed, without changing size.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/payment-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/payment-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "interactive-button",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Interactive Button",
+      "description": "A download button whose fill tracks real progress, with a percentage and a finished state.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/interactive-button.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/interactive-button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "text-reveal",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Text Reveal",
+      "description": "Word-by-word blur reveal for headlines and copy.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/text-reveal.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/text-reveal.tsx"
+        }
+      ]
+    },
+    {
+      "name": "infinite-marquee",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Basic",
+      "description": "Seamless looping marquee for logos, chips, and quotes.",
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/infinite-marquee.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/infinite-marquee.tsx"
+        }
+      ],
+      "cssVars": { "theme": { "--animate-marquee": "marquee 30s linear infinite" } },
+      "css": {
+        "@keyframes marquee": { "0%": { "transform": "translateX(0)" }, "100%": { "transform": "translateX(-50%)" } }
+      }
+    },
+    {
+      "name": "navbar-pill",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Pill",
+      "description": "A floating capsule with a sliding active pill.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/navbar-pill.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-pill.tsx"
+        }
+      ]
+    },
+    {
+      "name": "navbar-mega",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Mega",
+      "description": "A full-width header whose mega menus glide and resize between triggers.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/navbar-mega.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-mega.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "navbar-condense",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Condense",
+      "description": "A full-width header that tightens into a floating, frosted capsule as the page scrolls.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/navbar-condense.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-condense.tsx"
+        },
+        {
+          "path": "registry/prestigeui/navbar-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "navbar-announce",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Announce",
+      "description": "A navbar with a dismissible announcement bar that folds away smoothly and stays dismissed.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/navbar-announce.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-announce.tsx"
+        },
+        {
+          "path": "registry/prestigeui/navbar-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/navbar-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "footer-wordmark",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Wordmark",
+      "description": "Link columns over an edge-to-edge wordmark that rises in and lights up under the pointer, with status, a live local clock and back-to-top.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/footer-wordmark.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/footer-wordmark.tsx"
+        },
+        {
+          "path": "registry/prestigeui/footer-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/footer-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "auth-otp",
+      "type": "registry:block",
+      "access": "free",
+      "title": "One-time code",
+      "description": "Email then a 6-digit code: auto-advance, paste and autofill, a forgiving error with a gentle shake, and a resend countdown.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/auth-otp.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/auth-otp.tsx"
+        },
+        {
+          "path": "registry/prestigeui/auth-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/auth-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scramble-text",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Scramble Text",
+      "description": "A text animation component that cycles characters through random glyphs before settling.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/scramble-text.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/scramble-text.tsx"
+        }
+      ]
+    },
+    {
+      "name": "rotating-words",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Rotating Words",
+      "description": "A word in a headline that rotates through a list: the letters roll up in a wave and the line's width glides to each new word.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/rotating-words.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/rotating-words.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scroll-fill",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Scroll Fill",
+      "description": "A paragraph whose words fill from faint to full ink as you scroll through it, with a soft edge between read and unread, finishing while the copy is still in view.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/scroll-fill.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/scroll-fill.tsx"
+        }
+      ]
+    },
+    {
+      "name": "line-mask-reveal",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Line Mask Reveal",
+      "description": "A headline whose lines rise one after another from behind their own masks when it comes into view, split exactly where the browser wraps the text.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/line-mask-reveal.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/line-mask-reveal.tsx"
+        }
+      ]
+    },
+    {
+      "name": "membership-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Membership Card",
+      "description": "A metal membership card that tilts toward the cursor, with a banknote-style security print that catches the light as it turns and one slow sweep of light when it first comes into view.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/membership-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/membership-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "contact-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Contact Card",
+      "description": "A paper business card that turns over in 3D: name and role on the front, clickable contact details and a scannable QR code that saves the contact on the back.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/contact-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/contact-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "expandable-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Expandable Card",
+      "description": "A compact card that grows into its full detail view from where it sits, with the title gliding into place; a bottom sheet you can drag down to close on phones.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/expandable-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/expandable-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "article-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Article Card",
+      "description": "A blog or changelog card that lays itself out by the space it is given: stacked when narrow, image beside the text when wider, and a featured layout with a larger title when wide. The photo zooms slowly and the title's underline draws in on hover.",
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/article-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/article-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "profile-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Profile Card",
+      "description": "A team member card with a full-bleed portrait and the name set over it; on hover, focus or tap the bio, social links and a mail button rise over the photo, without the card changing size.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/profile-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/profile-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "product-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Product Card",
+      "description": "A store product card: move across the photo to flip through it (swipe on phones), pick a color swatch to swap the photos, and add to cart from a button that rises over the photo on hover, with price, sale price, a short detail line and a tag.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/product-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/product-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "instant-photo",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Instant Photo",
+      "description": "An instant photo print that slides out of a slot when it scrolls into view and develops from milky grey to full colour, with a caption and date on its wide bottom edge. Give each print a slight tilt to scatter a few; hovering picks one up and straightens it.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/instant-photo.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/instant-photo.tsx"
+        }
+      ]
+    },
+    {
+      "name": "stacking-cards",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Stacking Cards",
+      "description": "Cards that pin as you scroll and stack on top of each other, one screen of scrolling per card, with wheel and trackpad scrolling eased while the stack is on screen. The cards underneath ease back and darken a little while their top rows stay visible, so the finished stack reads as a list you can click to jump back, and each photo settles from a slight zoom as its card rises. Each card takes a label, title, description, facts, a link and an image or any visual.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/stacking-cards.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/stacking-cards.tsx"
+        }
+      ]
+    },
+    {
+      "name": "compare-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Compare Card",
+      "description": "Two versions of one card split by a divider that follows the cursor as you move across it and glides back when you leave, for light and dark themes, before and after, or old and new designs. It rests in the middle; on touch screens it drags, and with the keyboard it is a slider. Takes any two layouts plus optional labels.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/compare-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/compare-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "testimonial-deck",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Testimonial Deck",
+      "description": "A stack of quote cards: drag or flick the top card away, or use the buttons or arrow keys, and the next one lifts into place. It loops, keeps the height of its longest quote and takes any quotes with name, role, company, photo and rating.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/testimonial-deck.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/testimonial-deck.tsx"
+        }
+      ]
+    },
+    {
+      "name": "stat-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Stat Card",
+      "description": "A metric card whose number rolls into place like an odometer while its line or bar chart draws in; scrub the chart with a pointer, a finger or the arrow keys and the number rolls to that day, then back to today.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/stat-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/stat-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "feature-card",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Feature Card",
+      "description": "A feature card with a small app window that plays a short story on hover, focus or when it scrolls into view on phones: search filtering to a result, a scheduled export finishing, a member's role changing. Bring your own illustration or use the three built in; it lays out by its own width.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/feature-card.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/feature-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "marquee-rows",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Rows",
+      "description": "Three labelled rows of feature chips (security, workflow, insight) that travel at their own pace in alternating directions, and ease to a stop under the pointer.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/marquee-rows.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/marquee-rows.tsx"
+        },
+        {
+          "path": "registry/prestigeui/marquee-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/marquee-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "illustration-orbit",
+      "type": "registry:component",
+      "access": "free",
+      "title": "Orbit",
+      "description": "Eight tool logos on a ring around an AI model. They connect in turn: a beam runs each spoke inward, the line stays inked, and the model answers every arrival with a single ripple.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/illustration-orbit.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/illustration-orbit.tsx"
+        },
+        {
+          "path": "registry/prestigeui/illustration-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/illustration-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "cta-bloom",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Bloom",
+      "description": "A centered closing panel on a slow color field that drifts like light on paper and brightens under the pointer, with two actions and three short reassurances.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/cta-bloom.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/cta-bloom.tsx"
+        },
+        {
+          "path": "registry/prestigeui/cta-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/cta-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "command-palette",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Basic",
+      "description": "A ⌘K command palette for an app: a search button that opens a dialog of pages and actions in groups, with their own shortcuts. Typing ranks matches as you go and marks the matched letters, projects and help appear once you search, and the last items you chose come first under Recent. It works fully from the keyboard, Escape clears the search before it closes, and on phones it fills the width.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/command-palette.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/command-palette.tsx"
+        },
+        {
+          "path": "registry/prestigeui/command-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/command-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "settings-profile",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Profile",
+      "description": "A profile settings page: photo upload by click or drop with honest size and type checks, name, and a username with a live availability check that suggests a free one when it's taken. Changing the email sends a confirmation link and keeps the old address active until it's confirmed, with a timed resend. Language, time zone (with each zone's current time), date format and week start show today's date as you'll see it. Edits stay a draft until the save bar's Save or ⌘S, and Discard puts everything back.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/settings-profile.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/settings-profile.tsx"
+        },
+        {
+          "path": "registry/prestigeui/settings-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/settings-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-overview",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Overview",
+      "description": "The home page of a business dashboard. Switch between metrics to change the main chart, compare with the previous period, click any point to see what made it up, and follow recent activity and goals. Includes loading, empty and error states, CSV export, and any locale or currency.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/dashboard-overview.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/dashboard-overview.tsx"
+        },
+        {
+          "path": "registry/prestigeui/dashboard-overview.data.ts",
+          "type": "registry:component",
+          "target": "components/prestigeui/dashboard-overview.data.ts"
+        },
+        {
+          "path": "registry/prestigeui/dashboard-charts.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/dashboard-charts.tsx"
+        },
+        {
+          "path": "registry/prestigeui/dashboard-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/dashboard-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/settings-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/settings-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/table-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/table-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/sidebar-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/sidebar-ui.tsx"
+        },
+        {
+          "path": "registry/prestigeui/prestige-brand.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/prestige-brand.tsx"
+        }
+      ]
+    },
+    {
+      "name": "background-ink",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Ink",
+      "description": "A watercolor simulation behind your content. Drops of ink land on paper, bloom and dry into darker rims; a click drops more ink and a pointer moving through wet ink drags it like a brush.",
+      "dependencies": ["motion"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/background-ink.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/background-ink.tsx"
+        },
+        {
+          "path": "registry/prestigeui/background-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/background-ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "model-picker",
+      "type": "registry:block",
+      "access": "free",
+      "title": "Model Picker",
+      "description": "A menu for choosing the AI model. Models are grouped by provider and searchable, and a side pane compares the one under the cursor: what it's good at, relative intelligence, speed and cost, context size and what it accepts. Models on a higher plan stay visible with an upgrade button. Works from the keyboard.",
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["https://prestigeui.com/r/fonts.json"],
+      "files": [
+        {
+          "path": "registry/prestigeui/model-picker.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/model-picker.tsx"
+        },
+        {
+          "path": "registry/prestigeui/ai-ui.tsx",
+          "type": "registry:component",
+          "target": "components/prestigeui/ai-ui.tsx"
+        }
+      ]
+    }
+  ]
+}
