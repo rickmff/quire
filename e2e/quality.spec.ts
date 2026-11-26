@@ -84,3 +84,10 @@ test("the catalog is cached by version and the sitemap lists the catalog pages",
   expect((await request.get("/llms.txt")).ok()).toBe(true);
   expect(await (await request.get("/.well-known/security.txt")).text()).toContain("Contact:");
 });
+
+test("the error endpoint takes a client report and refuses a broken one", async ({ request }) => {
+  const ok = await request.post("/api/client-error", { data: { message: "e2e check", path: "/app", source: "e2e" } });
+  expect(ok.status()).toBe(204);
+  const bad = await request.post("/api/client-error", { data: { path: "https://evil.dev" } });
+  expect(bad.status()).toBe(400);
+});

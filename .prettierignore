@@ -9,3 +9,5 @@ package-lock.json
 stage/app-*/
 stage/out/
 app/.well-known/workflow/
+coverage/
+.lighthouseci/

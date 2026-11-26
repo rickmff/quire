@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ErrorReporter from "@/components/ErrorReporter";
 import { DEFAULT_TITLE, DESCRIPTION, SITE_NAME, SITE_URL, social } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <TooltipProvider>{children}</TooltipProvider>
+        <ErrorReporter />
         <Analytics />
         <SpeedInsights />
         <Script src="/drop-sw.js" strategy="beforeInteractive" />

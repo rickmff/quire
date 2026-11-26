@@ -19,3 +19,4 @@ playwright-report/
 public/previews/
 /.swc
 .lighthouseci/
+coverage/

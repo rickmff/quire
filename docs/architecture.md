@@ -84,7 +84,7 @@ The HTML pile imitates the shader, so these values are kept in step by hand:
 | Foil palette `foilAt(h) = 0.8 + 0.2 cos(2π (h − [0, 1/3, 2/3]))`, the per-sheet hue offset `fi * 0.061`, the key light falloff `exp(−r² / 0.55)`, the wash-out at the pinwheel's centre (smoothstep to 0.6 units, to 0.95 grey) | `FRAG` in `components/quire3d/shader.ts` |
 | Sheets of 2 by 1.5 world units | `HALF` in the shader |
 | Where the stack is drawn | the resize code in `Quire3D.tsx` |
-| Pile turn per sheet (`pileRot`) | `pileTurn` in `Quire3D.tsx`, in radians |
+| Pile turn per sheet (`pileRot`) | `pileTurn` in `components/quire3d/scene.ts`, in radians |
 | Seven sheets | `SHEETS` in the shader |
 
 ## The hero
@@ -98,6 +98,12 @@ Below 1.5 device pixels per CSS pixel the hero renders at twice the screen and l
 down, because the sheet's text and edges are too coarse otherwise. When frames run slow it drops the
 supersampling first, then resolution. The label atlas uses anisotropic filtering because the text is seen at a
 slant.
+
+Files stay under 400 lines (`max-lines` in `eslint.config.mjs`). `components/Quire3D.tsx` is the one exception:
+its render loop, pointer handlers and springs share about forty values inside one effect, so splitting it would
+pass them around as arguments. Its constants and pure helpers live in `components/quire3d/scene.ts`, the shaders
+in `components/quire3d/shader.ts`. `components/Hero3D.tsx` loads it with `next/dynamic` after the first paint, so
+the landing's text does not wait for the WebGL code.
 
 ## Gallery cards
 
