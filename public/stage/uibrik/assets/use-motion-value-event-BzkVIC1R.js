@@ -1,0 +1,1 @@
+import{i as e,o as t}from"./index-TChZs6Gr.js";var n=t(e(),1);function r(e,t,r){(0,n.useInsertionEffect)(()=>e.on(t,r),[e,t,r])}export{r as t};

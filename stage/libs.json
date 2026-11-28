@@ -24,5 +24,13 @@
     "index": "scripts/catalog/registries/prestige.json",
     "roots": [""],
     "demos": "suffix"
+  },
+  "uibrik": {
+    "repo": "Malay146/uibrik",
+    "dir": "",
+    "roots": [""],
+    "demos": "suffix",
+    "keepPaths": true,
+    "examples": true
   }
 }

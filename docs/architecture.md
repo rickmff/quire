@@ -288,6 +288,11 @@ The stage template accepts `forwardRef` and `memo` exports as the component to r
 A library without demo items gets its demos from `stage/custom/<id>/<name>.tsx`, which win over registry demos.
 Prestige UI ships no demos, so every component that needs data or a label has one there, with inline SVG images so
 the capture makes no network requests.
+uibrik ships no demos either. Its text effects take a `play` count that must be a number, and its shader
+backgrounds fill their parent, so they render nothing on their own. `stage/custom/uibrik` gives each of them data, a
+size, or a timer that bumps `play` so the clip shows the effect. The props come from each component's "Render it"
+section at `https://uibrik.com/components/<name>.md`. Five components (email composer, event feed, open source, org
+chart, testimonial carousel) load their default avatars from uibrik.com, which the cloud capture cannot reach.
 
 `stage/libs.json` holds what `install.mjs` needs per library: the repo, the folder of built registry items, the
 source roots, and whether demos are named `<name>-demo` (`suffix`) or `demo-<name>` (`prefix`). When a built item

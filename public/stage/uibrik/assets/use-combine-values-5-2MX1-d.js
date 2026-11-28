@@ -1,0 +1,1 @@
+import{mt as e,pt as t}from"./store-DHKyyO-z.js";import{u as n}from"./react-BP0YZ4D-.js";import{t as r}from"./use-motion-value-BlXfzXt0.js";function i(i,a){let o=r(a()),s=()=>o.set(a());return s(),n(()=>{let n=()=>e.preRender(s,!1,!0),r=i.map(e=>e.on(`change`,n));return s(),()=>{r.forEach(e=>e()),t(s)}}),o}export{i as t};

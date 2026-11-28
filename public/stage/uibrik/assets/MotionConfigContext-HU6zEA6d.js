@@ -1,0 +1,1 @@
+import{i as e,o as t}from"./index-TChZs6Gr.js";var n=t(e(),1);function r(e){let t=(0,n.useRef)(null);return t.current===null&&(t.current=e()),t.current}var i=(0,n.createContext)({transformPagePoint:e=>e,isStatic:!1,reducedMotion:`never`});export{r as n,i as t};
