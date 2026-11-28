@@ -1,0 +1,1 @@
+import{L as e}from"./store-DHKyyO-z.js";import{i as t,o as n}from"./index-TChZs6Gr.js";import{n as r,t as i}from"./MotionConfigContext-HU6zEA6d.js";var a=n(t(),1);function o(t){let n=r(()=>e(t)),{isStatic:o}=(0,a.useContext)(i);if(o){let[,e]=(0,a.useState)(t);(0,a.useEffect)(()=>n.on(`change`,e),[])}return n}export{o as t};

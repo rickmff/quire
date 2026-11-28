@@ -12,5 +12,17 @@
     "item": "https://prestigeui.com/r/{name}.json",
     "scope": "prestige",
     "license": "MIT"
+  },
+  {
+    "id": "uibrik",
+    "name": "uibrik",
+    "url": "https://uibrik.com",
+    "blurb": "Animated React components, shader backgrounds and blocks built with Tailwind CSS and Motion.",
+    "repo": "Malay146/uibrik",
+    "path": "registry.json",
+    "docs": "https://uibrik.com/components/{name}",
+    "item": "https://uibrik.com/r/{name}.json",
+    "scope": "uibrik",
+    "license": "MIT"
   }
 ]
